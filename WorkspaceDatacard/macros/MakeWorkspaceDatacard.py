@@ -65,8 +65,10 @@ if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 #CONFIGS = ['ttH_Run2_3lep_AWB_mass_07_10']
 
 #CONFIGS = ['WH_Run2_3lep_07_31']
-#CONFIGS = ['ZH_Run2_lep_08_14']
-CONFIGS = ['ZH_Run2_lep_BDT_08_14']
+#CONFIGS = ['ZH_Run2_lep_08_26']
+#CONFIGS = ['ZH_Run2_lep_BDT_08_26']
+
+CONFIGS = ['WH_Run2_3lep_10_20_DSCB_sig_sys']
 
 #============================================
 # Main code
@@ -130,7 +132,10 @@ class WorkspaceAndDatacardMaker:
         WS.cd()
 
         if 'stack' in model and self.rebin == False:
-            self.in_data.data_hist.Write('data_obs')
+            #self.in_data.data_hist.Write('data_obs')
+	    data_temp = self.in_data.bkg_hists[0].Clone()
+	    data_temp.Add(self.in_data.sig_hists[0].Clone())
+	    data_temp.Write('data_obs')
             self.in_data.sig_hists[0].Write()
             self.in_data.bkg_hists[0].Write()
             for i in range( min(4, len(self.in_data.hists_sys)) ):

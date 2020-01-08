@@ -54,13 +54,15 @@ def WriteSigBkgBody(card, cat, dist, fit, width, sig_hists, nBkg, signals, sys_c
     elif (fit == 'shape_MC'):
 	for sig_hist in sig_hists:
 	    hname = sig_hist.GetName()
-	    sig_name = hname.replace(('_%s' %cat),'').replace('_dimu_mass','').replace('mod_','').replace('_fit_','') 
+	    print "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWriting "
+	    print hname
+	    sig_name = hname.replace(('_%s' %cat),'').replace('_%s' %dist, '').replace('_dimu_mass','').replace('DSCB_','').replace('mod_','').replace('_fit_','') 
             card.write(sig_name.ljust(width))
         card.write(('bkg_fit').ljust(width))
     elif (fit == 'shape_data'):
         for sig_hist in sig_hists:
             hname = sig_hist.GetName()
-            sig_name = hname.replace(('_%s' %cat),'').replace('_dimu_mass','').replace('mod_','').replace('_fit_','')
+            sig_name = hname.replace(('_%s' %cat),'').replace('_dimu_mass','').replace('DSCB_','').replace('mod_','').replace('_fit_','')
             card.write(sig_name.ljust(width))
         card.write(('data_fit').ljust(width))
     else:
@@ -356,13 +358,6 @@ def WriteCutAndCount(card, cat, out_dir, dist, width, MASS_WINDOW, sig_hists, bk
 
 
 def WriteSigSystematics(card, cat, dist, width, signals, sys_cfg):
-#    card.write(('bkg_norm').ljust(width-5))
-#    card.write(('lnN  ').ljust(2))
-#    card.write(('-').ljust(width))
-##    card.write(('9.99').ljust(width))
-#    card.write(('1.2').ljust(width))
-#    card.write('\n')
-
     for sys_name in sys_cfg.sys_names:
 	card.write(sys_name.ljust(2*width-5))
 	card.write(('lnN  ').ljust(2))
@@ -371,6 +366,15 @@ def WriteSigSystematics(card, cat, dist, width, signals, sys_cfg):
 	    card.write( sys_value.ljust(width) )
 	card.write(('-').ljust(width)) # for bkg
 	card.write('\n')
+
+
+    card.write(('bkg_norm').ljust(2*width-5))
+    card.write(('lnN  ').ljust(2))
+    for signal in signals:
+	card.write(('-').ljust(width))
+    card.write(('1.05').ljust(width))
+    card.write('\n')
+
 ## End function: def WriteSigSystematics(card, cat, dist, width, signals, sys_cfg):
 
 

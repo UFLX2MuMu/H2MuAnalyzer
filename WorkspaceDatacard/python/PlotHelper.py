@@ -33,7 +33,7 @@ def DrawFits(sig_fits, bkg_fit, data_fit, cat, out_dir):
             sig_fit.model.plotOn (fra_sig, RF.Components(sig_fit.arg_sets[1]), RF.LineStyle(R.kDashed), RF.LineColor(R.kRed),    RF.Range('FULL'))
         if len(sig_fit.arg_sets) > 2:
             sig_fit.model.plotOn (fra_sig, RF.Components(sig_fit.arg_sets[2]), RF.LineStyle(R.kDashed), RF.LineColor(R.kViolet), RF.Range('FULL'))
-        sig_fit.model.paramOn(fra_sig, RF.Layout(0.55, 0.90, 0.90))
+        sig_fit.model.paramOn(fra_sig, RF.Layout(0.45, 0.90, 0.90))
         fra_sig.Draw()
         sig_chi = R.TLatex(0.7, 0.3, "#chi^{2} = %.2f" % fra_sig.chiSquare())
         sig_chi.SetNDC(R.kTRUE)

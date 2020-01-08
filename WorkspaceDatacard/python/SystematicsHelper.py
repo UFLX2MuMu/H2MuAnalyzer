@@ -23,7 +23,7 @@ def SysNameConversion(sys_name):
     elif sys_name == 'PU_wgt':    return 'CMS_pu'
     elif sys_name == 'IsoMu_SF':  return 'CMS_eff_m_trg'
     elif sys_name == 'LepMVA_SF': return 'CMS_eff_m_mva'
-    elif sys_name == 'Btag_SF':   return 'CMS_eff_b'
+    elif sys_name == 'B_SF':      return 'CMS_eff_b'
     else:	return 'invalid'
 ## End function SysNameConversion(sys_name):
 

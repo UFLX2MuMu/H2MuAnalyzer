@@ -30,10 +30,12 @@ if 'bortigno' in os.getcwd(): USER = 'bortigno'
 if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 
 IN_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/'
-LABEL  = 'WH_lep_AWB_2019_07_23_signal_sys_v1'
-CATE   = 'noZ10_noBtag'
+#LABEL  = 'WH_lep_AWB_2019_07_23_signal_sys_v1'
+LABEL  = 'WH_lep_AWB_2019_10_20_BtagSF_sys'
+#CATE   = 'noZ10_noBtag'
+CATE   = 'PreselRun2_3lep_hiPt_lep20_medLepMVA_noZ10_noBtag'
 
-SYS_NAMES = ['noSys', 'JES_up', 'JES_down', 'PU_wgt_up', 'PU_wgt_down', 'IsoMu_SF_up', 'IsoMu_SF_down', 'LepMVA_SF_up', 'LepMVA_SF_down']
+SYS_NAMES = ['noSys', 'JES_up', 'JES_down', 'PU_wgt_up', 'PU_wgt_down', 'IsoMu_SF_up', 'IsoMu_SF_down', 'LepMVA_SF_up', 'LepMVA_SF_down', 'B_SF_up', 'B_SF_down']
 YEARS = ['2016', '2017', '2018']
 
 
@@ -64,7 +66,8 @@ def main():
     print len(hists)
     for year in YEARS:
       for sys_name in SYS_NAMES:
-	in_file_name = IN_DIR + year + '/Histograms/' + LABEL + '/files/HADD/' + 'signals_' + CATE + '_' + sys_name + '.root'
+#	in_file_name = IN_DIR + year + '/Histograms/' + LABEL + '/files/HADD/' + 'signals_' + CATE + '_' + sys_name + '.root'
+	in_file_name = IN_DIR + year + '/Histograms/' + LABEL + '/files/HADD/' + 'histos_' + CATE + '_' + sys_name + '.root'
 	GetOneFile(in_file_name, year, sys_name, hists)
 
     out_file_name = IN_DIR + 'Run2' + '/Histograms/' + LABEL + '/' + 'Systematics_Run2.root'
