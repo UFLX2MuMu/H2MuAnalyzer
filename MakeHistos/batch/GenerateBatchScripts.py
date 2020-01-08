@@ -37,27 +37,28 @@ if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 #MACRO = 'macros/MC_data_comparison.C'
 #MACRO = 'macros/ggH_VBF_2l.C'
 #MACRO = 'macros/WH_lep.C'
-MACRO = 'macros/WH_lep_systematics.C'
+#MACRO = 'macros/WH_lep_systematics.C'
 #MACRO = 'macros/ttH_3l.C'
 #MACRO = 'macros/MiniNTupliser.C'
 #MACRO = 'macros/MiniNTupliser_4l_cat.C'
 #MACRO = 'macros/MassCalibration.C'
+#MACRO = 'macros/Btag_eff.C'
+MACRO = 'macros/SimpleTreeForDas.C'
 
-
-#LOC  = 'CERN'
-LOC  = 'CERN_3l'  ## Location of input files ('CERN', 'CERN_hiM', 'CERN_3l', or 'UF')
+LOC  = 'CERN'
+#LOC  = 'CERN_3l'  ## Location of input files ('CERN', 'CERN_hiM', 'CERN_3l', or 'UF')
 #LOC  = 'CERN_lepMVA_test_v2'  ## Location of input files ('CERN', 'CERN_hiM', or 'UF', or 'CERN_lepMVA_test_v1')
 #LOC  = 'CERN_lepMVA_3l_test_v1'
 YEAR = '2018'  ## Dataset year (2016, 2017, or 2018)
-LUMI = 59100   ## 36814 for 2016, 41500 for 2017, 59100 for 2018
+LUMI = 59740   ## 35920 for 2016, 41530 for 2017, 59740 for 2018   ## Lumi values from https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
 
 ## Override default sample location from SampleDatabase.py (use IN_DIR = '' to keep default)
 #IN_DIR  = '/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2017/94X_v2/2019_01_14_LepMVA_2l_hiM_test_v2'
 #IN_DIR = '/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2017/94X_v2/2019_01_14_LepMVA_2l_test_v2'
 IN_DIR = ''
 HADD_IN = False   ## Use pre-hadded root files (NTuple_*.root) instead of original files (tuple_*.root)
-#PROD   = '190521'  ## choose given product version instead of the latest one, this one is only for 2018 2l skim
-PROD  = ''
+PROD   = '190521'  ## choose given product version instead of the latest one, this one is only for 2018 2l skim
+#PROD  = ''
 
 ## Directory for logs and output root files
 if USER == 'abrinke1': OUT_DIR = '/afs/cern.ch/work/a/abrinke1/public/H2Mu/%s/Histograms' % YEAR
@@ -70,17 +71,22 @@ if USER == 'xzuo':     OUT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/%s/Histog
 #LABEL = 'lepMVA_ttH_3l_ele_v2_miniNtuple_dimu_sel_dimu_pt_v1'
 #LABEL = 'lepMVA_SF_v1'
 #LABEL = 'VH_selection_2019april/pt10_iso04/WH_mu_test_run'
-#LABEL  = 'ttH_3l_AWB_2019_04_12_v1'
+#LABEL = 'ttH_3l_AWB_2019_04_12_v1'
 #LABEL = 'data_MC_2018_M70_170_v1'
-#LABEL = 'MassCal_KinRoch_approx/2D_muP_d0_muN_d0'
-#LABEL = 'ZH_lep_2019_08_14'
+#LABEL = 'MassCal_KinRoch_approx/GeoBSRoch_2D_muP_d0_rebin_muP_phi'
+#LABEL = 'Btag_eff_cal_3l_2019_10_09'
+#LABEL = 'ZH_Val_lep_2019_08_25_medLep_veto12'
+#LABEL = 'leftover_of_ttH_and_ZH_2019_09_08'
 #LABEL = 'WH_lep_AWB_2018_data_from_skim_AD'
-LABEL = 'WH_lep_AWB_2019_08_19_signal_sys'
+#LABEL = 'WH_lep_AWB_2019_08_19_signal_sys'
+#LABEL = 'WH_lep_AWB_2019_10_20_BtagSF_sys'
+#LABEL = 'data_MC_2019_11_06_GeoFitBS'
+LABEL = 'DAS_ntuple_1percentdata_baseline_OS60'
 
 NJOBS   =   -1  ## Maximum number of jobs to generate
 # JOBSIZE = 1000  ## Size of input NTuples in MB, per job (default 1000)
 # JOBSIZE =  200  ## Size of input NTuples in MB, per job (WH with multiple categories)
-JOBSIZE =   500  ## Size of input NTuples in MB, per job (ttH with BDT reconstruction)
+JOBSIZE =   5000  ## Size of input NTuples in MB, per job (ttH with BDT reconstruction)
 
 MAX_EVT = -1     ## Maximum number of events to process per job
 PRT_EVT = 10000  ## Print every Nth event in each job
@@ -89,16 +95,16 @@ HIST_TREE = '"HistTree"'  ## Ouptut histograms, trees, or both
 
 DATA_ONLY = False  ## Only process data samples, not MC
 MC_ONLY   = False  ## Only process MC samples, not data
-SIG_ONLY  = True  ## Only process signal MC samples, no others
+SIG_ONLY  = False  ## Only process signal MC samples, no others
 SAMP_LIST = []  ## Leave [] empty to process multiple samples
 
 #SAMP_LIST = ['SingleMu_2018A', 'SingleMu_2018B', 'SingleMu_2018C', 'SingleMu_2018D', 'ZJets_MG_1'] #masscal study on 2018 data
 #SAMP_LIST = ['SingleMu_2017B', 'SingleMu_2017D', 'SingleMu_2017E', 'SingleMu_2017F', 'ZJets_AMC'] #masscal study on 2017 data
 #SAMP_LIST = ['SingleMu_2016B', 'SingleMu_2016C', 'SingleMu_2016D', 'SingleMu_2016E', 'SingleMu_2016F', 'SingleMu_2016G', 'SingleMu_2016H', 'ZJets_AMC'] #masscal study on 2016 data
-#SAMP_LIST = ['ZJets_hiM_MG']
+#SAMP_LIST = ['ZJets_hiM_AMC', 'ZJets_hiM_MG', 'tt_ll_POW', 'tt_ll_MG']
 
-#SYS_SHIFTS = ['noSys']
-SYS_SHIFTS = ['noSys', 'JES_up', 'JES_down', 'PU_wgt_up', 'PU_wgt_down', 'IsoMu_SF_up', 'IsoMu_SF_down', 'LepMVA_SF_up', 'LepMVA_SF_down']
+SYS_SHIFTS = ['noSys']
+#SYS_SHIFTS = ['noSys', 'JES_up', 'JES_down', 'PU_wgt_up', 'PU_wgt_down', 'IsoMu_SF_up', 'IsoMu_SF_down', 'LepMVA_SF_up', 'LepMVA_SF_down', 'B_SF_up', 'B_SF_down']
 
 VERBOSE = False ## Verbose printout
 
@@ -324,7 +330,7 @@ def main():
             if len(versions) > 0:
                 if VERBOSE: print versions
                 if VERBOSE: print "\n"
-		if len(PROD) != 0:
+		if len(PROD) != 0 and "SingleMu_2018" in samp.name:
 		  for i in reversed( range( len(versions) ) ):  ## loop from last to first so the index is not changed by pop()
 		    if versions[i][0] != int(PROD): versions.pop(i)
                 versions.sort(key = itemgetter(0, 1), reverse=True)  ## Choose the latest crab submission
@@ -354,6 +360,7 @@ def main():
                     in_files.append(['%s' % subdir, fileMB])
 
             elif not HADD_IN:
+		if subdir != '0000': continue
                 ls_files = Popen(['ls', in_dir_name+'/'+subdir], stdout=PIPE)
                 if VERBOSE: print 'Running command ls %s' % (in_dir_name+'/'+subdir)
                 for in_file in ls_files.communicate()[0].split():

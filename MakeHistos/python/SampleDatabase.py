@@ -111,27 +111,28 @@ def GetSamples(location = 'CERN', year = '2017'):
     ###  Signal  ###
     ################
 
-    if (year == '2017'): mH = '_125'
-    else:                mH = ''
+    if (year == '2017' and location == 'CERN_3l'): mH = '_125'
+    else:                			   mH = ''
 
     if (year == 'Leg2016'): mVH = ''
     else:                   mVH = '_125'
 
-    if (year == '2017'): ORD = '_NLO'
-    else:                ORD = ''
+    if (year == '2017' and location == 'CERN_3l'): ORD = '_NLO'
+    else:                			   ORD = ''
 
     if   (year == 'Leg2016'): ggH_gen = '_13TeV_powheg_pythia8'
     elif (year == '2017'):    ggH_gen = '_13TeV_amcatnloFXFX_pythia8'
     else:                     ggH_gen = '_TuneCP5_PSweights_13TeV_amcatnloFXFX_pythia8'
 
-    if (year == 'Leg2016'): VBF_gen = '_13TeV_powheg_pythia8'
-    else:                   VBF_gen = '_TuneCP5_PSweights_13TeV_amcatnlo_pythia8'
+    if   (year == 'Leg2016'): 			  VBF_gen = '_13TeV_powheg_pythia8'
+    elif (year == '2017' and location == 'CERN'): VBF_gen = '_13TeV_amcatnlo_pythia8'
+    else:                   			  VBF_gen = '_TuneCP5_PSweights_13TeV_amcatnlo_pythia8'
 
     if (year == 'Leg2016'): ggH_str = 'GluGlu_HToMuMu_'
     else:                   ggH_str = 'GluGluHToMuMu_'
 
-    if (year == 'Leg2016'): VBF_str = 'VBF_'
-    else:                   VBF_str = 'VBF'
+    if   (year == 'Leg2016'): 			  VBF_str = 'VBF_'
+    else:                   			  VBF_str = 'VBF'
 
     if (year == 'Leg2016'): WH_pos_str = 'WPlusH_HToMuMu_'
     else:                   WH_pos_str = 'WplusH_HToMuMu_WToAll_'
@@ -145,6 +146,9 @@ def GetSamples(location = 'CERN', year = '2017'):
     if (year == '2016' or year == '2018'): VH_gen = '_TuneCP5_PSweights_13TeV_powheg_pythia8'
     else:                                  VH_gen = '_13TeV_powheg_pythia8'
 
+    if (year == '2017' and location == 'CERN'): ttHm = ''
+    else:					ttHm = '_125'
+
     if (year == '2017'): ttH_gen = '_TuneCP5_13TeV-powheg-pythia8'
     else:                ttH_gen = '_TuneCP5_PSweights_13TeV-powheg-pythia8'
 
@@ -155,7 +159,7 @@ def GetSamples(location = 'CERN', year = '2017'):
     samples.append( SampleInfo('H2Mu_gg_130'+ORD, ggH_str+'M130'+ggH_gen, 0.009618, year, in_dir, 'Sig') ) ## Presumably incorrect? - AWB 16.09.2018
 
     ## H2Mu_VBF
-    if (year == '2017'):
+    if (year == '2017' and location == 'CERN_3l'):
         samples.append( SampleInfo('H2Mu_VBF_125_NLO_1', VBF_str+'HToMuMu_M125'+VBF_gen, 0.0008208, year, in_dir, 'Sig') )
         samples.append( SampleInfo('H2Mu_VBF_125_NLO_2', VBF_str+'HToMuMu_M125'+VBF_gen, 0.0008208, year, in_dir, 'Sig') )
         samples.append( SampleInfo('H2Mu_VBF_120_NLO_2', VBF_str+'HToMuMu_M120'+VBF_gen, 0.0008208, year, in_dir, 'Sig') ) ## Presumably incorrect? - AWB 16.09.2018
@@ -180,9 +184,9 @@ def GetSamples(location = 'CERN', year = '2017'):
     
     ## H2Mu_ttH
     if (year != 'Leg2016'):
-        samples.append( SampleInfo('H2Mu_ttH_120', 'ttHToMuMu_M120'+ttH_gen, 0.0001103, year, in_dir, 'Sig') )  ## 0.5071 x 0.0002176 from YR4 (125 GeV)
-        samples.append( SampleInfo('H2Mu_ttH_125', 'ttHToMuMu_M125'+ttH_gen, 0.0001103, year, in_dir, 'Sig') )  ## 0.5071 x 0.0002176 from YR4 (125 GeV)
-        samples.append( SampleInfo('H2Mu_ttH_130', 'ttHToMuMu_M130'+ttH_gen, 0.0001103, year, in_dir, 'Sig') )  ## 0.5071 x 0.0002176 from YR4 (125 GeV)
+        samples.append( SampleInfo('H2Mu_ttH_120',  'ttHToMuMu_M120'+ttH_gen, 0.0001103, year, in_dir, 'Sig') )  ## 0.5071 x 0.0002176 from YR4 (125 GeV)
+        samples.append( SampleInfo('H2Mu_ttH'+ttHm, 'ttHToMuMu_M125'+ttH_gen, 0.0001103, year, in_dir, 'Sig') )  ## 0.5071 x 0.0002176 from YR4 (125 GeV)
+        samples.append( SampleInfo('H2Mu_ttH_130',  'ttHToMuMu_M130'+ttH_gen, 0.0001103, year, in_dir, 'Sig') )  ## 0.5071 x 0.0002176 from YR4 (125 GeV)
 
     
     ####################
@@ -193,20 +197,20 @@ def GetSamples(location = 'CERN', year = '2017'):
     else:                py_tune = '_TuneCP5_'
  
     ## DYJetsToLL
-    samples.append(     SampleInfo('ZJets',          'Combination_of_ZJets_AMC_ZJets_MG_1_ZJets_MG_2',                             5765.4,             year, in_dir, 'Bkg') )
+    samples.append(     SampleInfo('ZJets',          'Combination_of_ZJets_AMC_ZJets_MG_1_ZJets_MG_2',                             6077.2,             year, in_dir, 'Bkg') ) ## changed from 5765.4 to 6077.2 (https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns) - XWZ 2019.10.12
     samples.append(     SampleInfo('ZJets_hiM',      'Combination_of_ZJets_hiM_AMC_ZJets_hiM_MG',                                    46.948,           year, in_dir, 'Bkg') )
-    samples.append(     SampleInfo('ZJets_AMC',      'DYJetsToLL_M-50'+py_tune+'13TeV-amcatnloFXFX-pythia8',                       5765.4,             year, in_dir, 'Bkg') ) ## A bit lower than TOP-18-008 (6020.85) - AWB 28.09.2018
+    samples.append(     SampleInfo('ZJets_AMC',      'DYJetsToLL_M-50'+py_tune+'13TeV-amcatnloFXFX-pythia8',                       6077.2,             year, in_dir, 'Bkg') ) ## A bit lower than TOP-18-008 (6020.85) - AWB 28.09.2018
     samples.append(     SampleInfo('ZJets_hiM_MG',   'DYJetsToLL_M-105To160_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8',            46.948,           year, in_dir, 'Bkg') ) ## xsec taken from 2017
     if (not '2016' in year):
-        samples.append( SampleInfo('ZJets_MG_1',     'DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8',                          5765.4,             year, in_dir, 'Bkg') )
+        samples.append( SampleInfo('ZJets_MG_1',     'DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8',                          6077.2,             year, in_dir, 'Bkg') )
     if (year == '2016'):
-        samples.append( SampleInfo('ZJets_MG_1',     'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',                     5765.4,             year, in_dir, 'Bkg') )
-        samples.append( SampleInfo('ZJets_MG_2',     'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',                     5765.4,             year, in_dir, 'Bkg') )
+        samples.append( SampleInfo('ZJets_MG_1',     'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',                     6077.2,             year, in_dir, 'Bkg') )
+        samples.append( SampleInfo('ZJets_MG_2',     'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',                     6077.2,             year, in_dir, 'Bkg') )
         samples.append( SampleInfo('ZJets_hiM_AMC',  'DYJetsToLL_M-105To160_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',                46.948,           year, in_dir, 'Bkg') ) ## xsec taken from 2017
     if (not '2016' in year):
         samples.append( SampleInfo('ZJets_hiM_AMC',  'DYJetsToLL_M-105To160_TuneCP5_PSweights_13TeV-amcatnloFXFX-pythia8',           46.948,           year, in_dir, 'Bkg') ) ## xsec taken from 2017
     if (year == '2017'):
-        samples.append( SampleInfo('ZJets_MG_2',      'DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8',                         5765.4,             year, in_dir, 'Bkg') )
+        samples.append( SampleInfo('ZJets_MG_2',      'DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8',                         6077.2,             year, in_dir, 'Bkg') )
         samples.append( SampleInfo('ZJets_m_10_50',   'DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8',                    18610.0,             year, in_dir, 'Bkg') )
 
     if (year == 'Leg2016'):
@@ -216,7 +220,7 @@ def GetSamples(location = 'CERN', year = '2017'):
         ## samples.append( SampleInfo('ZJets_AMC_0j_B', 'DYToLL_0J_13TeV-amcatnloFXFX-pythia8',                              4754   * 0.96,               year, in_dir, 'Bkg') ) ## Not used? - AWB 16.09.2018
         ## samples.append( SampleInfo('ZJets_AMC_1j_B', 'DYToLL_1J_13TeV-amcatnloFXFX-pythia8',                                888.9 * 0.86*0.985*0.995,  year, in_dir, 'Bkg') ) ## Not used? - AWB 16.09.2018
         ## samples.append( SampleInfo('ZJets_AMC_2j_B', 'DYToLL_2J_13TeV-amcatnloFXFX-pythia8',                                348.8 * 0.88*0.975*0.992,  year, in_dir, 'Bkg') ) ## Not used? - AWB 16.09.2018
-        samples.append( SampleInfo('ZJets_MG',              'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',              5765.4,             year, in_dir, 'Bkg') )
+        samples.append( SampleInfo('ZJets_MG',              'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',              6077.2,             year, in_dir, 'Bkg') )
         samples.append( SampleInfo('ZJets_MG_HT_70_100',    'DYJetsToLL_M-50_HT-70to100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',    178.952    * 0.98, year, in_dir, 'Bkg') )
         samples.append( SampleInfo('ZJets_MG_HT_100_200_A', 'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',   181.302    * 0.96, year, in_dir, 'Bkg') )
         samples.append( SampleInfo('ZJets_MG_HT_100_200_B', 'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',   181.302    * 0.96, year, in_dir, 'Bkg') )
@@ -233,6 +237,8 @@ def GetSamples(location = 'CERN', year = '2017'):
     samples.append(     SampleInfo('tt_ll',     'Combination_of_tt_ll_MG_tt_ll_POW_tt_ll_AMC',             85.656,       year, in_dir, 'Bkg') )
     if (year != 'Leg2016'):
         samples.append( SampleInfo('tt_ll_MG',  'TTJets_DiLept'+py_tune+'13TeV-madgraphMLM-pythia8',       85.656,       year, in_dir, 'Bkg') ) ## A bit lower than TOP-18-008 (87.315) - AWB 28.09.2018
+    if (year == '2017' and location == 'CERN'):
+	samples.append( SampleInfo('tt', 	'TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8',        	   85.656,       year, in_dir, 'Bkg') )
     if (year == '2016' or year == '2017'):
         samples.append( SampleInfo('tt_ll_POW', 'TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8',        85.656,       year, in_dir, 'Bkg') ) ## A bit lower than TOP-18-008 (87.315) - AWB 28.09.2018
     if (year == '2018'):

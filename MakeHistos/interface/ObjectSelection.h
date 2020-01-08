@@ -36,6 +36,7 @@ struct ObjectSelectionConfig {  // Default values taken from 2016
   float       ele_dZ_max   =  -99.0;  // Maximum electron |dZ| from vertex
   float       ele_SIP_max  =  -99.0;  // Maximum impact parameter significance
   float       ele_MVA_min  =  -99.0;  // Minimum prompt electron lepton MVA (lepMVA) BDT score
+  float	      ele_POG_MVA  =  -99.0;  // Minimum POG MVA score
   std::string ele_CSV_max  = "NONE";  // Veto electrons with pT < 20 GeV with matching jet passing b-tag threshold
 
   // Jet selection

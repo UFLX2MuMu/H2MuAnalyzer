@@ -269,6 +269,11 @@ bool InCategory( const ObjectSelectionConfig & cfg, const NTupleBranches & br,
     PASS = true;
   } // End if (sel == "inclusive_2jets")
 
+  else if (sel == "BB" or sel == "BE" or sel == "EE" or sel == "XX" or sel == "nonBB" or sel == "posBarrel" or sel == "posOverlap" or sel == "posEndcap") {
+    // a few selections that will be customized in the macros
+    if (verbose) std::cout << "  * Applying " << sel << " cuts" << std::endl;
+    PASS = true;
+  } // End if (sel == "BB" or sel == "BE" or sel == "EE" or sel == "nonBB") 
 
   else {
     std::cout << "\nInside CategoryCuts.cc, don't recognize category " << sel << std::endl;
