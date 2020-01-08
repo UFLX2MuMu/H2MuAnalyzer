@@ -7,11 +7,16 @@
 ##############################
 
 import sys
+import os
 
 import ROOT as R
 import ROOT.RooFit as RF
 import ROOT.TMath as TM
 
+from ROOT import gInterpreter, gSystem
+#gInterpreter.ProcessLine('#include "H2MuAnalyzer/FitBackground/python/Custom_DSCB/My_double_CB.h"')
+gSystem.Load("/afs/cern.ch/work/x/xzuo/h2mm_944/src/H2MuAnalyzer/FitBackground/python/Custom_DSCB/HZZ2L2QRooPdfs_cc.so")
+from ROOT import RooDoubleCB
 
 class FitFunction:
 
@@ -57,6 +62,8 @@ class FitFunction:
             InitPolyPlusBWZ(self)
         elif fit_type == 'Gaus':
             InitGaus(self)
+	elif fit_type == 'DSCB':
+	    InitDSCB(self)
         else:
             print 'Fit type %s does not match any valid option!!! Exiting.' % fit_type
             sys.exit()
@@ -389,3 +396,29 @@ def InitGaus(FF):
     FF.model = R.RooAddPdf('mod_'+FF.name, 'Sum of %d Gaussians' % FF.order, FF.func_list, FF.coef_list, R.kTRUE)
 
 ## End function InitGaus()
+
+
+def InitDSCB(FF):
+
+    if (FF.order > 1):
+        print '\n\nNo need to use sum of DBCB, initiating ONE double sided crystal ball. \n' 
+
+    h_mean = FF.hist.GetMean()
+    h_rms  = FF.hist.GetRMS()
+
+    FF.params[0].append( R.RooRealVar('%s_mean' %(FF.name),  'mean',  h_mean, h_mean - 1.5*h_rms, h_mean + 1.5*h_rms) )
+    FF.params[0].append( R.RooRealVar('%s_sigma' %(FF.name), 'sigma', h_rms,  0.0,                5.0*h_rms) )
+    FF.params[0].append( R.RooRealVar('%s_a1' %(FF.name),    'a1',    1.0,    0.0,                5.0) )
+    FF.params[0].append( R.RooRealVar('%s_n1' %(FF.name),    'n2',    2.0,    2.0,                2.0) )
+    FF.params[0].append( R.RooRealVar('%s_a2' %(FF.name),    'a2',    1.0,    0.0,                5.0) )
+    FF.params[0].append( R.RooRealVar('%s_n2' %(FF.name),    'n2',    2.0,    2.0,                2.0) )
+
+    FF.funcs    .append( RooDoubleCB('%s_DSCB' %(FF.name), 'DSCB', FF.var, FF.params[0][0], FF.params[0][1], FF.params[0][2], FF.params[0][3], FF.params[0][4], FF.params[0][5]) )
+    FF.arg_sets .append( R.RooArgSet(FF.funcs[0]) )
+    FF.amp_vars .append( R.RooRealVar('%s_DSCB_amp' %(FF.name), 'Amplitude of DSCB', 1.0, 1.0, 1.0) )
+    FF.func_list.add(FF.funcs[0])
+    FF.coef_list.add(FF.amp_vars[0])
+
+    FF.model = FF.funcs[0]
+
+## End function InitDBCB()
