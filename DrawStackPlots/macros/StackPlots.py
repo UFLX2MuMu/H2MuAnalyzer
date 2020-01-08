@@ -50,15 +50,22 @@ if USER == 'abrinke1':
     SCALE     = 'lin' ## 'log' or 'lin' scaling of y-axis
     RATIO_MIN = 0.0   ## Minimum value in ratio plot
     RATIO_MAX = 2.0   ## Maximum value in ratio plot
+
 elif USER == 'xzuo':
     YEAR = '2018'
     PLOT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/%s/Histograms' %YEAR
 
-    CONFIG   = 'WH_lep'
-    LABEL    = 'WH_lep_AWB_2018_data_from_skim'
-    CATEGORY = '3lep_medLepMVA_noZ_noBtag_mass12'
+    CONFIG   = '2l'
+    LABEL    = 'data_MC_2019_11_06_GeoFitBS'
+    CATEGORY = 'NONE'
 
-    IN_FILE  = 'histos_Presel2017_%s.root' %CATEGORY
+#    CONFIG   = 'WH_lep'
+#    CONFIG   = 'WH_lep_allMass'
+#    LABEL    = 'WH_lep_AWB_2019_10_20_BtagSF'
+#    CATEGORY = '3lep_hiPt_lep20_medLepMVA_onZ10_noBtag_noSys'
+
+#    IN_FILE  = 'histos_PreselRun2_%s_merged.root' % CATEGORY
+    IN_FILE  = 'all_NONE_%s.root' %CATEGORY
     SCALE    = 'lin' ## 'log' or 'lin' scaling of y-axis
     RATIO_MIN = 0.0   ## Minimum value in ratio plot
     RATIO_MAX = 2.0   ## Maximum value in ratio plot
@@ -138,14 +145,17 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
         h_data.Draw('SAME')
 
     ## Draw the signal histogram, normalized to total MC area
-    h_sig = sig_stack.GetStack().Last().Clone('tmp')
-    if h_sig.Integral() > 0: h_sig.Scale( all_stack.GetStack().Last().Integral() / h_sig.Integral() )
-    h_sig.Draw('HISTSAME')
+    h_sig = False
+    if sig_stack.GetNhists() != 0:
+        h_sig = sig_stack.GetStack().Last().Clone('tmp')
+        if h_sig.Integral() > 0: h_sig.Scale( all_stack.GetStack().Last().Integral() / h_sig.Integral() )
+        h_sig.Draw('HISTSAME')
 
     ## Save the net signal, net background, and net data histograms
-    h_net_sig  = sig_stack.GetStack().Last().Clone(dist+'_Net_Sig')
     h_net_bkg  = all_stack.GetStack().Last().Clone(dist+'_Net_Bkg')
-    h_net_bkg.Add(h_net_sig, -1)
+    if h_sig:
+        h_net_sig  = sig_stack.GetStack().Last().Clone(dist+'_Net_Sig')
+	h_net_bkg.Add(h_net_sig, -1)
     if h_data: h_net_data = h_data.Clone(dist+'_Net_Data')
 
     ## Draw the legend
@@ -169,7 +179,9 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
         ratio_hist.SetMaximum(RATIO_MAX)
         # ratio_hist.GetYaxis().SetNdivisions(502)  ## For some reason causes segfault after a dozen or so plots - AWB 09.10.2018
         ratio_hist.SetMarkerStyle(20)
-        ratio_hist.Draw()
+        ratio_hist.GetXaxis().SetLabelSize(0.15)
+	ratio_hist.GetYaxis().SetLabelSize(0.13)
+	ratio_hist.Draw()
 
     canv.Update()
     if not ('BDT' in dist and 'zoom' in dist):
@@ -180,13 +192,14 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
     out_file_loc = R.TFile.Open(out_file_name, 'UPDATE')
     out_file_loc.cd()
     canv.Write()
-    h_net_sig.Write()
+    if h_sig: h_net_sig.Write()
     h_net_bkg.Write()
     if h_data: h_net_data.Write()
     out_file_loc.Close()
 
     ## Delete objects created in DrawOneStack()
-    del canv, upper_pad, lower_pad, h_sig, h_net_sig, h_net_bkg, out_file_loc
+    del canv, upper_pad, lower_pad, h_net_bkg, out_file_loc
+    if h_sig:  del h_sig, h_net_sig
     if h_data: del ratio_hist, h_net_data
 
 ## End function: DrawOneStack()
@@ -365,7 +378,7 @@ def main():
 
 
     ## Drop empty groups
-    for kind in ['Data', 'Sig', 'Bkg']:
+    for kind in ['Data', 'Bkg']:  
         for group in groups[kind]:
             if len(groups[kind][group]) == 0:
                 print '\nRemoving group %s from %s!!!  Found no input samples' % (group, kind)
@@ -441,7 +454,7 @@ def main():
             group_hist[group].SetLineColor(colors[group])
             group_hist[group].SetLineWidth(2)
 	    stack_sig.Add(group_hist[group])
-	group_hist['Sig'] = stack_sig.GetStack().Last()
+	if stack_sig.GetNhists() != 0: group_hist['Sig'] = stack_sig.GetStack().Last()
         ## Fill the signal + background stack, saving individual stack components
         out_file_loc = R.TFile.Open(out_file_name, 'UPDATE')
         out_file_loc.cd('groups')
@@ -465,17 +478,19 @@ def main():
             group_hist['Dat'] = 0
 
         ## Set aliases for final histograms
-        h_sig = group_hist['Sig']
+	h_sig = False
+        if 'Sig' in group_hist.keys(): h_sig = group_hist['Sig']
         h_bkg = group_hist['MC']
         h_dat = group_hist['Dat']
-        nSig  = h_sig.Integral()
+        nSig  = 0 if not h_sig else h_sig.Integral()
         nBkg  = h_bkg.Integral()
         nDat  = 0 if MC_only else h_dat.Integral()
 
         ## Compute B/S and S/sqrt(B) for this distribution
         B_to_S = (nBkg/nSig) if (nSig > 0) else 0
         sigSq  = 0
-        for i in range(1, h_sig.GetNbinsX()+1):
+	if h_sig:
+          for i in range(1, h_sig.GetNbinsX()+1):
             numB = h_bkg.GetBinContent(i)
             errB = h_bkg.GetBinError(i)
             ## Don't consider empty bins (statistically limited)

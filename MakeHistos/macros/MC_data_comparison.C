@@ -19,6 +19,9 @@
 #include "H2MuAnalyzer/MakeHistos/interface/EventWeight.h"       // Common event weight
 #include "H2MuAnalyzer/MakeHistos/interface/CategoryCuts.h"       // Common category definitions
 
+#include "H2MuAnalyzer/MakeHistos/src/CustomCorrections.C"
+#include "/afs/cern.ch/work/x/xzuo/public/H2Mu/Run2/pt_correction/GeoFit.C"
+
 // Load the library of the local, compiled H2MuAnalyzer/MakeHistos directory
 R__LOAD_LIBRARY(../../../tmp/slc6_amd64_gcc630/src/H2MuAnalyzer/MakeHistos/src/H2MuAnalyzerMakeHistos/libH2MuAnalyzerMakeHistos.so)
 
@@ -33,22 +36,25 @@ const bool verbose = false; // Print extra information
 
 // const TString IN_DIR   = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/data_2017_and_mc_fall17/SingleMuon/SingleMu_2017F/180802_164117/0000";
 // const TString SAMPLE   = "SingleMu_2017F";
-const TString IN_DIR   = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2018/102X/SingleMuon/SingleMu_2018A/190426_124916/0000";
-const TString SAMPLE   = "SingleMu_2018A";
+//const TString IN_DIR   = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2018/102X/SingleMuon/SingleMu_2018A/190426_124916/0000";
+//const TString SAMPLE   = "SingleMu_2018A";
+const TString IN_DIR  = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2016/94X_v3/prod-v16.0.7/SingleMuon/SingleMu_2016B/190714_182320/0000";
+const TString SAMPLE  = "SingleMu_2016B";
+
 const std::string YEAR = "2017";
 const std::string SLIM = "notSlim"; // "Slim" or "notSlim" - original 2016 NTuples were in "Slim" format, some 2017 NTuples are "Slim"
 const TString OUT_DIR  = "plots";
 const TString HIST_TREE = "Hist"; // "Hist", "Tree", or "HistTree" to output histograms, trees, or both. Not in use in this macro
 
-const std::vector<std::string> SEL_CUTS = {"Presel2017"}; // Cuts which every event must pass
+const std::vector<std::string> SEL_CUTS = {"PreselRun2"}; // Cuts which every event must pass
 const std::vector<std::string> OPT_CUTS = {"NONE"}; // Multiple selection cuts, applied independently in parallel
-const std::vector<std::string> CAT_CUTS = {"NONE"}; // Event selection categories, also applied in parallel
+const std::vector<std::string> CAT_CUTS = {"NONE", "onZ", "onSig", "mu1d0PVout3"}; // Event selection categories, also applied in parallel
 
 // Command-line options for running in batch.  Running "root -b -l -q macros/ReadNTupleChain.C" will use hard-coded options above.
 void MC_data_comparison( TString sample = "", TString in_dir = "", TString out_dir = "",
 		         std::vector<TString> in_files = {}, TString out_file_str = "",
 		         int max_evt = 0, int prt_evt = 0, float samp_weight = 1.0,
-			 TString hist_tree = "" ) {
+			 TString hist_tree = "", std::string SYS = "" ) {
 
   // Set variables to hard-coded values if they are not initialized
   if (sample.Length()    == 0) sample  	   = SAMPLE;
@@ -104,6 +110,8 @@ void MC_data_comparison( TString sample = "", TString in_dir = "", TString out_d
   ConfigureEventSelection (evt_sel, YEAR);
   ConfigureEventWeight    (evt_wgt, YEAR);
 
+  obj_sel.mu_pt_corr = "Roch";
+
 //  evt_sel.muPair_mass_min = 105; // Require at least one Higgs candidate pair, default is 60
   // obj_sel.muPair_Higgs = "sort_WH_3_mu_v1"; // Choose Higgs candidate based on MT(W muon, MET)
 
@@ -121,9 +129,9 @@ void MC_data_comparison( TString sample = "", TString in_dir = "", TString out_d
 
     // Set branch addresses, from interface/LoadNTupleBranches.h
     if (sample.Contains("SingleMu"))
-      SetBranchAddresses(*in_chain, br, {YEAR, SLIM}, false); // Options in {} include "JES", "Flags", and "SFs"
+      SetBranchAddresses(*in_chain, br, {YEAR, SLIM}, "noSys", false); // Options in {} include "JES", "Flags", and "SFs"
     else
-      SetBranchAddresses(*in_chain, br, {YEAR, SLIM, "GEN", "Wgts"}, false); // Options in {} include "JES", "Flags", and "SFs"
+      SetBranchAddresses(*in_chain, br, {YEAR, SLIM, "GEN", "Wgts"}, "noSys", false); // Options in {} include "JES", "Flags", and "SFs"
   }
 
   std::cout << "\n******* About to enter the event loop *******" << std::endl;
@@ -186,8 +194,10 @@ void MC_data_comparison( TString sample = "", TString in_dir = "", TString out_d
 
 	  MuPairInfo dimu  = SelectedCandPair(obj_sel, br);
 	  if ( dimu.mass < 70 ||
-               dimu.mass > 170 ) continue;  // 70-110 for Z mass validation, 105-160 for analysis window
+               dimu.mass > 160 ) continue;  // 70-110 for Z mass validation, 105-160 for analysis window
 
+	  if ( CAT_CUTS.at(iCat) == "onZ"   and dimu.mass > 110 ) continue;
+	  if ( CAT_CUTS.at(iCat) == "onSig" and dimu.mass < 110 ) continue;
 
 	  MuonInfos  muons = SelectedMuons(obj_sel, br);
           EleInfos   eles  = SelectedEles(obj_sel, br);
@@ -196,29 +206,81 @@ void MC_data_comparison( TString sample = "", TString in_dir = "", TString out_d
 	  MuonInfo   mu_1 = br.muons->at(dimu.iMu1);
           MuonInfo   mu_2 = br.muons->at(dimu.iMu2);
 
+	  if ( CAT_CUTS.at(iCat) == "mu1d0PVout3" and abs(mu_1.d0_PV) < 0.003 ) continue;
+
 	  TLorentzVector dimu_vec = FourVec( dimu, PTC);
   	  TLorentzVector mu1_vec  = FourVec(br.muons->at(dimu.iMu1), PTC);
   	  TLorentzVector mu2_vec  = FourVec(br.muons->at(dimu.iMu2), PTC);
 	  TLorentzVector met_vec;
 
+	  TLorentzVector mu1_vec_KinRoch, mu2_vec_KinRoch, dimu_vec_KinRoch;
+	  TLorentzVector mu1_vec_GeoRoch, mu2_vec_GeoRoch, dimu_vec_GeoRoch;
+	  TLorentzVector mu1_vec_GeoBSRoch, mu2_vec_GeoBSRoch, dimu_vec_GeoBSRoch;
+
+	  mu1_vec_KinRoch.SetPtEtaPhiM( mu_1.pt_kinfit * mu_1.pt_Roch / mu_1.pt, mu_1.eta, mu_1.phi, 0.105658367);
+	  mu2_vec_KinRoch.SetPtEtaPhiM( mu_2.pt_kinfit * mu_2.pt_Roch / mu_2.pt, mu_2.eta, mu_2.phi, 0.105658367);
+	  dimu_vec_KinRoch = mu1_vec_KinRoch + mu2_vec_KinRoch;
+
+	  mu1_vec_GeoRoch.SetPtEtaPhiM( PtGeoCor::PtGeoFit_mod(mu_1.d0_PV * mu_1.charge, mu_1.pt_Roch, mu_1.eta, std::stoi(YEAR)), mu_1.eta, mu_1.phi, 0.105658367 );
+	  mu2_vec_GeoRoch.SetPtEtaPhiM( PtGeoCor::PtGeoFit_mod(mu_2.d0_PV * mu_2.charge, mu_2.pt_Roch, mu_2.eta, std::stoi(YEAR)), mu_2.eta, mu_2.phi, 0.105658367 );
+	  dimu_vec_GeoRoch = mu1_vec_GeoRoch + mu2_vec_GeoRoch;
+
+	  mu1_vec_GeoBSRoch.SetPtEtaPhiM( PtGeoCor_UF::PtGeo_BS_Roch(mu_1.d0_BS * mu_1.charge, mu_1.pt_Roch, mu_1.eta, std::stoi(YEAR)), mu_1.eta, mu_1.phi, 0.105658367 );
+          mu2_vec_GeoBSRoch.SetPtEtaPhiM( PtGeoCor_UF::PtGeo_BS_Roch(mu_2.d0_BS * mu_2.charge, mu_2.pt_Roch, mu_2.eta, std::stoi(YEAR)), mu_2.eta, mu_2.phi, 0.105658367 );
+          dimu_vec_GeoBSRoch = mu1_vec_GeoBSRoch + mu2_vec_GeoBSRoch;
+
 	  // Function from interface/HistoHelper.h that books a histogram (if it has not already been booked), then fills it
 	  if (not sample.Contains("SingleMu") or dimu_vec.M() < 120 or dimu_vec.M() > 130) {
-	    BookAndFill(h_map_1D, h_pre+"dimuon_mass", 50, 110, 160, dimu_vec.M(), event_wgt);
+	    BookAndFill(h_map_1D, h_pre+"dimuon_mass",         90, 70, 160, dimu_vec.M(),         event_wgt);
 	  }
-	  BookAndFill(h_map_1D, h_pre+"dimuon_pt", 50, 20, 520, dimu_vec.Pt(), event_wgt);
-	  BookAndFill(h_map_1D, h_pre+"dimuon_eta", 50, -5, 5, dimu.eta, event_wgt);
+	  if (not sample.Contains("SingleMu") or dimu_vec_KinRoch.M() < 120 or dimu_vec_KinRoch.M() > 130) {
+	    BookAndFill(h_map_1D, h_pre+"dimuon_mass_KinRoch", 90, 70, 160, dimu_vec_KinRoch.M(), event_wgt);
+	  }
+	  if (not sample.Contains("SingleMu") or dimu_vec_GeoRoch.M() < 120 or dimu_vec_GeoRoch.M() > 130) {
+	    BookAndFill(h_map_1D, h_pre+"dimuon_mass_GeoRoch", 90, 70, 160, dimu_vec_GeoRoch.M(), event_wgt);
+	  }
+	  if (not sample.Contains("SingleMu") or dimu_vec_GeoBSRoch.M() < 120 or dimu_vec_GeoBSRoch.M() > 130) {
+            BookAndFill(h_map_1D, h_pre+"dimuon_mass_GeoBSRoch", 90, 70, 160, dimu_vec_GeoBSRoch.M(), event_wgt);
+          }
+	  BookAndFill(h_map_1D, h_pre+"dimuon_pt",           50, 20, 520, dimu_vec.Pt(),           event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"dimuon_pt_KinRoch",   50, 20, 520, dimu_vec_KinRoch.Pt(),   event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"dimuon_pt_GeoRoch",   50, 20, 520, dimu_vec_GeoRoch.Pt(),   event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"dimuon_pt_GeoBSRoch", 50, 20, 520, dimu_vec_GeoBSRoch.Pt(), event_wgt);
+
+	  BookAndFill(h_map_1D, h_pre+"dimuon_eta",           50, -5, 5, dimu_vec.Eta(),           event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"dimuon_eta_KinRoch",   50, -5, 5, dimu_vec_KinRoch.Eta(),   event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"dimuon_eta_GeoRoch",   50, -5, 5, dimu_vec_GeoRoch.Eta(),   event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"dimuon_eta_GeoBSRoch", 50, -5, 5, dimu_vec_GeoBSRoch.Eta(), event_wgt);
+
 	  BookAndFill(h_map_1D, h_pre+"dimuon_delta_eta", 50, -5, 5, dimu.dEta, event_wgt);
           BookAndFill(h_map_1D, h_pre+"dimuon_delta_phi", 50, -4, 4, dimu.dPhi, event_wgt);
 	  BookAndFill(h_map_1D, h_pre+"dimuon_dR", 50, 0, 5, dimu.dR, event_wgt);
-	  float d0_diff = 2 * (mu_1.d0_PV - mu_2.d0_PV) / (mu_1.charge - mu_2.charge);
-	  BookAndFill(h_map_1D, h_pre+"dimuon_d0_diff", 50, -0.1, 0.1, d0_diff, event_wgt);
+	  float d0PV_diff = 2 * (mu_1.d0_PV - mu_2.d0_PV) / (mu_1.charge - mu_2.charge);
+	  float d0BS_diff = 2 * (mu_1.d0_BS - mu_2.d0_BS) / (mu_1.charge - mu_2.charge);
+	  float mu1_d0off = (mu_1.d0_BS - mu_1.d0_PV) * mu_1.charge;
+	  float mu2_d0off = (mu_2.d0_BS - mu_2.d0_PV) * mu_2.charge;
+	  BookAndFill(h_map_1D, h_pre+"dimuon_d0PV_diff", 200, -0.02, 0.02, d0PV_diff, event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"dimuon_d0BS_diff", 200, -0.02, 0.02, d0BS_diff, event_wgt);
 
-          BookAndFill(h_map_1D, h_pre+"leading_muon_pt", 50, 20, 270, mu1_vec.Pt(), event_wgt);
-          BookAndFill(h_map_1D, h_pre+"leading_muon_eta", 50, -2.5, 2.5, mu_1.eta, event_wgt);
-	  BookAndFill(h_map_1D, h_pre+"leading_muon_d0", 50, -0.1, 0.1, mu_1.d0_PV, event_wgt);
-          BookAndFill(h_map_1D, h_pre+"subleading_muon_pt", 50, 20, 270, mu2_vec.Pt(), event_wgt);
-          BookAndFill(h_map_1D, h_pre+"subleading_muon_eta", 50, -2.5, 2.5, mu_2.eta, event_wgt);
-	  BookAndFill(h_map_1D, h_pre+"subleading_muon_d0", 50, -0.1, 0.1, mu_2.d0_PV, event_wgt);
+          BookAndFill(h_map_1D, h_pre+"leading_muon_pt",           50, 20, 270, mu1_vec.Pt(),           event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"leading_muon_pt_KinRoch",   50, 20, 270, mu1_vec_KinRoch.Pt(),   event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"leading_muon_pt_GeoRoch",   50, 20, 270, mu1_vec_GeoRoch.Pt(),   event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"leading_muon_pt_GeoBSRoch", 50, 20, 270, mu1_vec_GeoBSRoch.Pt(), event_wgt);
+
+          BookAndFill(h_map_1D, h_pre+"leading_muon_eta",   50, -2.5, 2.5,          mu_1.eta,                 event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"leading_muon_d0PV_charge", 200, -0.02, 0.02, mu_1.d0_PV * mu_1.charge, event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"leading_muon_d0BS_charge", 200, -0.02, 0.02, mu_1.d0_BS * mu_1.charge, event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"leading_muon_d0off", 200, -0.02, 0.02,       mu1_d0off,                event_wgt);
+
+          BookAndFill(h_map_1D, h_pre+"subleading_muon_pt",           50, 20, 270, mu2_vec.Pt(),           event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"subleading_muon_pt_KinRoch",   50, 20, 270, mu2_vec_KinRoch.Pt(),   event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"subleading_muon_pt_GeoRoch",   50, 20, 270, mu2_vec_GeoRoch.Pt(),   event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"subleading_muon_pt_GeoBSRoch", 50, 20, 270, mu2_vec_GeoBSRoch.Pt(), event_wgt);
+
+          BookAndFill(h_map_1D, h_pre+"subleading_muon_eta", 50, -2.5, 2.5,            mu_2.eta,                 event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"subleading_muon_d0PV_charge", 200, -0.02, 0.02, mu_2.d0_PV * mu_2.charge, event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"subleading_muon_d0BS_charge", 200, -0.02, 0.02, mu_2.d0_BS * mu_2.charge, event_wgt);
+	  BookAndFill(h_map_1D, h_pre+"subleading_muon_d0off", 200, -0.02, 0.02,       mu2_d0off,                event_wgt);
 //          BookAndFill(h_map_1D, h_pre+, event_wgt);
 //          BookAndFill(h_map_1D, h_pre+, event_wgt);
 

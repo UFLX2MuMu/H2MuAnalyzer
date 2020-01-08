@@ -166,6 +166,40 @@ def ConfigStackPlot(known_config, year):
 
         else: print 'Year %s not valid for config %s. Exiting.' % (year, known_config), sys.exit()
 
+    if ( known_config == '2l' ):
+	cfg.year       = year
+        cfg.ntuple_loc = 'CERN'
+        cfg.sig_mass   = '125'
+
+	if ( year == '2016' ):
+	    cfg.groups['Data']['Data']  = []  ## By default, all data samples go into 'Data'
+            cfg.groups['Sig']['Signal'] = []  ## By default, all signal samples go into 'Signal'
+            cfg.excl_samps              = []  ## Samples to exclude from consideration
+
+	    cfg.groups['Bkg']['ZJets'] = ['ZJets_AMC']
+	    cfg.groups['Bkg']['ttbar'] = ['tt_ll_POW']
+
+	if ( year == '2017' ):
+            cfg.groups['Data']['Data']  = []  ## By default, all data samples go into 'Data'
+            cfg.groups['Sig']['Signal'] = []  ## By default, all signal samples go into 'Signal'
+            cfg.excl_samps              = []  ## Samples to exclude from consideration
+
+            cfg.groups['Bkg']['ZJets'] = ['ZJets_AMC']
+            cfg.groups['Bkg']['ttbar'] = ['tt']
+
+	    cfg.weight['ZJets_AMC'] = 0.7
+            cfg.weight['tt']        = 0.7
+	if ( year == '2018' ):
+            cfg.groups['Data']['Data']  = []  ## By default, all data samples go into 'Data'
+            cfg.groups['Sig']['Signal'] = []  ## By default, all signal samples go into 'Signal'
+            cfg.excl_samps              = []  ## Samples to exclude from consideration
+
+            cfg.groups['Bkg']['ZJets'] = ['ZJets_MG_1']
+            cfg.groups['Bkg']['ttbar'] = ['tt_ll_POW']
+
+	    cfg.weight['ZJets_MG_1'] = 0.8
+	    cfg.weight['tt_ll_POW']  = 0.8
+    ## End of if ( known_config == '2l' )
 
     if (year == '2016' or year == '2017' or year == '2018' or year == 'Run2'):
 
@@ -186,6 +220,7 @@ def ConfigStackPlot(known_config, year):
             cfg.colors['ttW']        = R.kSpring
             cfg.colors['ttZ']        = R.kGreen+3
             cfg.colors['ttH']        = R.kYellow-7
+
 
 
     ## End conditional: if (known_config == 'ttH_3l')
