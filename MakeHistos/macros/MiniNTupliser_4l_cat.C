@@ -332,7 +332,8 @@ void MiniNTupliser_4l_cat( TString sample = "", TString in_dir = "", TString out
         /////////////////////////
 	if (OPT_CUT == "ZH_4l_ele") {
           if (muons.size() != 2 or SelectedMuPairs(obj_sel, br).size() != 1 or SelectedEles(obj_sel, br).size() != 2) continue;
-	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() != 0 or SelectedJets(obj_sel, br, "BTagLoose").size() > 1 ) continue;
+//	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() != 0 or SelectedJets(obj_sel, br, "BTagLoose").size() > 1 ) continue;
+	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() < 1 and SelectedJets(obj_sel, br, "BTagLoose").size() < 2 ) continue;   // gap between ttH4l and ZH4l
 
 	  for (const auto & electron : SelectedEles(obj_sel, br)) {  // this is for if more than 2 electrons, select highest pt ones
 	     if (electron.lepMVA > -1.0) { //-1.0 as a place holder
@@ -381,7 +382,8 @@ void MiniNTupliser_4l_cat( TString sample = "", TString in_dir = "", TString out
         if (OPT_CUT == "ZH_4l_mu") {
 	  if ( muons.size() != 4 or eles.size() != 0 ) continue;
 	  if ( SelectedMuPairs(obj_sel, br).size() != 4 ) continue; //two + and two -, comment out if more than 4 muons
-	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() != 0 or SelectedJets(obj_sel, br, "BTagLoose").size() > 1 ) continue;
+//	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() != 0 or SelectedJets(obj_sel, br, "BTagLoose").size() > 1 ) continue;
+	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() < 1 and SelectedJets(obj_sel, br, "BTagLoose").size() < 2 ) continue;   // gap between ttH4l and ZH4l
 
 	  MuPairInfo Z_cand, H_cand;
 	  Z_cand.init();

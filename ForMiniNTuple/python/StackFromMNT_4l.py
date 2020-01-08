@@ -24,14 +24,16 @@ if USER == 'xzuo':     PLOT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/Run2/His
 
 #LABEL = 'miniNtuple_WH_2016_v5'  ## Sub-folder within PLOT_DIR containing histograms
 #LABEL = 'VH_selection_2019april/pt10_iso04/ZH_mu_massBDT'
-LABEL = 'ZH_lep_2019_08_14'
+#LABEL = 'ZH_lep_2019_08_25_medLep_veto12'
+#LABEL = 'ZH_Val_lep_2019_08_25_medLep_veto12'
+LABEL = 'leftover_of_ttH_and_ZH_2019_09_08'
 #LEP = "muon"
 
 def InitHists(histos, terms, signals, bkgs):
     for sample in signals + bkgs + ["Data"]:
-	histos["mu1_pt"][sample] 	= TH1F("mu1_pt" + "_" + sample, "mu1_pt" + "_" + sample,			50,0,400 )
+	histos["mu1_pt"][sample] 	= TH1F("mu1_pt" + "_" + sample, "mu1_pt" + "_" + sample,			10,0,400 )#50
 	histos["mu2_pt"][sample] 	= TH1F("mu2_pt" + "_" + sample, "mu2_pt" + "_" + sample, 			50,0,250 )
-	histos["mu1_abs_eta"][sample] 	= TH1F("mu1_abs_eta" + "_" + sample, "mu1_abs_eta" + "_" + sample, 		50,0,2.5)
+	histos["mu1_abs_eta"][sample] 	= TH1F("mu1_abs_eta" + "_" + sample, "mu1_abs_eta" + "_" + sample, 		5,0,2.5)#50
         histos["mu2_abs_eta"][sample] 	= TH1F("mu2_abs_eta" + "_" + sample, "mu2_abs_eta" + "_" + sample, 		50,0,2.5)
 	histos["mu1_lepMVA"][sample]	= TH1F("mu1_lepMVA" + "_" + sample, "mu1_lepMVA" + "_" + sample, 		50,-1,1)
 	histos["mu2_lepMVA"][sample]    = TH1F("mu2_lepMVA" + "_" + sample, "mu2_lepMVA" + "_" + sample, 		50,-1,1)
@@ -39,8 +41,8 @@ def InitHists(histos, terms, signals, bkgs):
 	histos["mu2_charge"][sample]	= TH1F("mu2_charge" + "_" + sample, "mu2_charge" + "_" + sample, 		8,-2,2)
 
 	histos["dimu_gen_ID"][sample]   = TH1F("dimu_gen_ID" + "_" + sample, "dimu_gen_ID" + "_" + sample,              30,0,30)
-	histos["dimu_mass"][sample] 	= TH1F("dimu_mass" + "_" + sample, "dimu_mass" + "_" + sample, 			30,100,160)
-        histos["dimu_pt"][sample] 	= TH1F("dimu_pt" + "_" + sample, "dimu_pt" + "_" + sample, 			50,0,400)	
+	histos["dimu_mass"][sample] 	= TH1F("dimu_mass" + "_" + sample, "dimu_mass" + "_" + sample, 			10,110,160)  #50
+        histos["dimu_pt"][sample] 	= TH1F("dimu_pt" + "_" + sample, "dimu_pt" + "_" + sample, 			10,0,400)#50	
 	histos["dimu_mass_err"][sample] = TH1F("dimu_mass_err" + "_" + sample, "dimu_mass_err" + "_" + sample, 		50,0,10)
 	histos["dimu_abs_eta"][sample] 	= TH1F("dimu_abs_eta" + "_" + sample, "dimu_abs_eta" + "_" + sample, 		50,0,6)
         histos["dimu_abs_dEta"][sample] = TH1F("dimu_abs_dEta" + "_" + sample, "dimu_abs_dEta" + "_" + sample, 		50,0,4)
@@ -49,8 +51,8 @@ def InitHists(histos, terms, signals, bkgs):
         histos["cts_mu1"][sample] 	= TH1F("cts_mu1" + "_" + sample, "cts_mu1" + "_" + sample, 			50,-1,1)
         histos["cts_mu_pos"][sample] 	= TH1F("cts_mu_pos" + "_" + sample, "cts_mu_pos" + "_" + sample, 		50,-1,1)
 
-	histos["lep1_pt"][sample] 	= TH1F("lep1_pt" + "_" + sample, "lep1_pt" + "_" + sample, 			50,0,300)
-        histos["lep1_abs_eta"][sample] 	= TH1F("lep1_abs_eta" + "_" + sample, "lep1_abs_eta" + "_" + sample, 		50,0,2.5)
+	histos["lep1_pt"][sample] 	= TH1F("lep1_pt" + "_" + sample, "lep1_pt" + "_" + sample, 			10,0,300)#50
+        histos["lep1_abs_eta"][sample] 	= TH1F("lep1_abs_eta" + "_" + sample, "lep1_abs_eta" + "_" + sample, 		5,0,2.5)#50
 	histos["lep1_lepMVA"][sample]   = TH1F("lep1_lepMVA" + "_" + sample, "lep1_lepMVA" + "_" + sample,	 	50,-1,1)
 	histos["lep1_charge"][sample]	= TH1F("lep1_charge" + "_" + sample, "lep1_charge" + "_" + sample, 		8,-2,2)
 	histos["lep2_pt"][sample]       = TH1F("lep2_pt" + "_" + sample, "lep1_pt" + "_" + sample,                      50,0,200)
@@ -60,8 +62,8 @@ def InitHists(histos, terms, signals, bkgs):
 
 	histos["lep_ID"][sample]        = TH1F("lep_ID" + "_" + sample, "lep_ID" + "_" + sample,                        20,0,20)
 	histos["dilep_gen_ID"][sample]  = TH1F("dilep_gen_ID" + "_" + sample, "dilep_gen_ID" + "_" + sample,            30,0,30)
-	histos["dilep_mass"][sample]	= TH1F("dilep_mass" + "_" + sample, "dilep_mass" + "_" + sample, 		30,70,110)
-	histos["dilep_pt"][sample]	= TH1F("dilep_pt" + "_" + sample, "dilep_pt" + "_" + sample, 			50,0,300)
+	histos["dilep_mass"][sample]	= TH1F("dilep_mass" + "_" + sample, "dilep_mass" + "_" + sample, 		10,70,110)#40
+	histos["dilep_pt"][sample]	= TH1F("dilep_pt" + "_" + sample, "dilep_pt" + "_" + sample, 			10,0,300)#50
 	histos["dilep_abs_eta"][sample]	= TH1F("dilep_abs_eta" + "_" + sample, "dilep_abs_eta" + "_" + sample, 		50,0,6)
 	histos["dilep_abs_dEta"][sample]= TH1F("dilep_abs_dEta" + "_" + sample, "dilep_abs_dEta" + "_" + sample, 	50,0,4)
 	histos["dilep_abs_dPhi"][sample]= TH1F("dilep_abs_dPhi" + "_" + sample, "dilep_abs_dPhi" + "_" + sample, 	50,0,4)
@@ -116,7 +118,7 @@ def InitHists(histos, terms, signals, bkgs):
         histos["nBJets_Tight"][sample] 	= TH1F("nBJets_Tight" + "_" + sample, "nBJets_Tight" + "_" + sample, 		5,0,5)
         histos["nMuons"][sample] 	= TH1F("nMuons" + "_" + sample, "nMuons" + "_" + sample, 			5,0,5)
         histos["nEles"][sample] 	= TH1F("nEles" + "_" + sample, "nEles" + "_" + sample, 				5,0,5)
-	histos["BDT_noMass_v3"][sample] = TH1F("BDT_noMass_v3" + "_" + sample, "BDT_noMass_v3" + "_" + sample,          50,-1,1)
+	histos["BDT_noMass_v3"][sample] = TH1F("BDT_noMass_v3" + "_" + sample, "BDT_noMass_v3" + "_" + sample,          20,-1,1)#50
 	histos["BDT_mass_more"][sample] = TH1F("BDT_mass_more" + "_" + sample, "BDT_mass_more" + "_" + sample,          50,-1,1)
 	histos["BDT_mass_min"][sample]  = TH1F("BDT_mass_min"  + "_" + sample, "BDT_mass_min"  + "_" + sample,          50,-1,1)
 	histos["BDT_and_mass"][sample]  = TH1F("BDT_and_mass"  + "_" + sample, "BDT_and_mass"  + "_" + sample,          50,-1,1)
@@ -139,7 +141,7 @@ def PrintEventYield(histos, signals, bkgs):
     print "sig_num = %f" %sig_num + "      ZZ_num = %f" %ZZ_num + "      bkgs_num = %f" %bkgs_num
 
 def main():
-    out_name = "stack_plots.root"
+    out_name = "stack_plots_lepMVAp04.root"
 
     file_dir = PLOT_DIR+"/"+LABEL+"/"
     out_file = TFile( file_dir + "plots/" + out_name , "RECREATE")
@@ -185,7 +187,7 @@ def main():
         stack_data[term] = THStack("data_stack"+term, "data_"+term)
 	
     
-    MVA_str = "mu1_lepMVA > -0.4 && mu2_lepMVA > -0.4 && lep1_lepMVA > -0.4 && lep2_lepMVA > -0.4"
+    MVA_str = "mu1_lepMVA > 0.4 && mu2_lepMVA > 0.4 && lep1_lepMVA > 0.4 && lep2_lepMVA > 0.4"
     wgt_str = "event_wgt * xsec_norm * all_lepMVA_SF"
     for bdt_cut in [ -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7]:
       file_chain.Draw("dimu_mass >> sig_p(20,123,127)", "(Sample_ID > 0 && BDT_noMass_v3 > %f && %s ) * %s" %(bdt_cut, MVA_str, wgt_str) )
@@ -212,15 +214,20 @@ def main():
 	if (iEvt % 10000 == 1):
 	    print "looking at event %d" %iEvt
 
-	MVA_cut = -0.4
+	if file_chain.dilep_mass < 70 or file_chain.dilep_mass > 110: continue
+
+	MVA_cut = 0.4
 	if ( file_chain.mu1_lepMVA < MVA_cut or file_chain.mu2_lepMVA < MVA_cut or file_chain.lep1_lepMVA < MVA_cut or file_chain.lep2_lepMVA < MVA_cut):
 	    continue
+
 #	mu1_SF = GetSF("muon", file_chain.mu1_pt, file_chain.mu1_abs_eta, MVA_cut)
 #        mu2_SF = GetSF("muon", file_chain.mu2_pt, file_chain.mu2_abs_eta, MVA_cut)
 #        lep1_SF = GetSF(LEP,    file_chain.lep1_pt, file_chain.lep1_abs_eta, MVA_cut)
 #	lep2_SF = GetSF(LEP,    file_chain.lep2_pt, file_chain.lep2_abs_eta, MVA_cut)
 #        MVA_SF = mu1_SF * mu2_SF * lep1_SF * lep2_SF
+
 	MVA_SF = file_chain.all_lepMVA_SF
+#	MVA_SF = 1.0
 
 	FillHistTerm(histos, "mu1_pt"	      	, cfg, file_chain.mu1_pt		, file_chain.Sample_ID	, file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
 	FillHistTerm(histos, "mu2_pt"		, cfg, file_chain.mu2_pt		, file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
@@ -301,6 +308,7 @@ def main():
         FillHistTerm(histos, "nBJets_Tight"   	, cfg, file_chain.nBJets_Tight   	, file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
         FillHistTerm(histos, "nMuons"   	, cfg, file_chain.nMuons  	  	, file_chain.Sample_ID	, file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
         FillHistTerm(histos, "nEles"  		, cfg, file_chain.nEles  		, file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
+	if file_chain.Sample_ID == 0 and file_chain.dimu_mass > 120 and file_chain.dimu_mass < 130: continue
 	FillHistTerm(histos, "BDT_noMass_v3"    , cfg, file_chain.BDT_noMass_v3         , file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
 	FillHistTerm(histos, "BDT_mass_more"    , cfg, file_chain.BDT_mass_more         , file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
 	FillHistTerm(histos, "BDT_mass_min"     , cfg, file_chain.BDT_mass_min          , file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
@@ -332,7 +340,7 @@ def main():
 	scaled_signal[term].SetLineWidth(2)
 	scaled_signal[term].SetFillStyle(0)
 
-	legend[term] = TLegend(0.7,0.7,1,1)
+	legend[term] = TLegend(0.6,0.6,0.9,0.9)
 	legend[term].AddEntry(histos[term]["Data"], "Data")
 	legend[term].AddEntry(histos[term]["signal"], "signal sum")
 	for sample in cfg.bkgs:

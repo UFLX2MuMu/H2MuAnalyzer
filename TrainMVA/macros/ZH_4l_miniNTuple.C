@@ -127,7 +127,7 @@ void ZH_4l_miniNTuple( TString myMethodList = "",
   
   // Here the preparation phase begins
   TString out_file_name;
-  out_file_name.Form( "%s/2017_ZH_lep_against_inclu_with_mass.root", out_dir.Data() );
+  out_file_name.Form( "%s/temp_for_tank_2017_ZH_lep_against_inclu_with_mass.root", out_dir.Data() );
   TFile * out_file = TFile::Open( out_file_name, "RECREATE" );
 
   ///////////////////////////////////////////////////////
