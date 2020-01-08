@@ -36,7 +36,7 @@ def main():
     fit_dir  = out_file.mkdir("fits_specifics")
 
     samples = ["ZJets_AMC", "data"]
-    pt_cals = ["PF", "Roch", "Kinfit", "KinRoch"]
+    pt_cals = ["PF", "Roch"]#, "Kinfit", "KinRoch"]
 #    pt_cals = ["PF", "Kinfit", "good_Kinfit", "Kin_vs_d0kin"]
 #    pt_cals = ["Kin_vs_d0kin", "Kin_vs_d0kin_BB", "Kin_vs_d0kin_BE", "Kin_vs_d0kin_EE"]
 #    pt_cals = ["Kin_vs_d0kin_d0PV_N50_N15", "Kin_vs_d0kin_d0PV_N15_N05", "Kin_vs_d0kin_d0PV_P05_P15", "Kin_vs_d0kin_d0PV_P15_P50"]
@@ -64,7 +64,7 @@ def main():
 	  hist_name = hist_name.replace(' ','').replace("-","m").replace(".","p")
 	  print hist_name
 	  mass_hist = in_file.Get(hist_name).Clone()
-	  mean_val, mean_err, reso_val, reso_err = FitVoigtian(mass_hist)
+	  mean_val, mean_err, reso_val, reso_err = FitVoigtian(mass_hist, exp = True)
 	  mean_plots[sample+pt_cal].SetPoint(i, x_val, mean_val)
 	  mean_plots[sample+pt_cal].SetPointError(i, x_err, mean_err)
 

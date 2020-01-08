@@ -26,6 +26,8 @@ LABEL = 'MassCal_KinRoch_approx/2D_muP_d0_muN_d0'
 nameX = "muP_d0"
 nameY = "muN_d0"
 CAT   = "NONE_NONE"
+PEAK  = "Z"
+if 'sig' in LABEL: PEAK = "H"
 
 def main():
     file_dir = PLOT_DIR+"/"+LABEL

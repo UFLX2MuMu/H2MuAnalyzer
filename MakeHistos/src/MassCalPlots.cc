@@ -17,6 +17,12 @@ void ConfigureMassCal(MassCalConfig & cfg, const TString peak_name, const TStrin
     cfg.maxM    = 130.0;
     cfg.nbinsM  = 50;
   }
+  else if (peak_name == "off_set") {
+    cfg.minM    = -6.0;
+    cfg.maxM    =  6.0;
+    cfg.nbinsM  = 60;
+  }
+
   else {
     std::cout << "invalid peak option: peak_name = " << peak_name << std::endl;
     assert(false);
@@ -87,6 +93,12 @@ void ConfigureMassCal(MassCalConfig & cfg, const TString peak_name, const TStrin
     float width = 1.0 * (cfg.maxX - cfg.minX) / cfg.nbinsX;
     for (int i=0; i<cfg.nbinsX+1; i++) cfg.binningX.push_back( cfg.minX + width * i );
   }
+  else if (xname == "muP_d0_rebin") {
+    cfg.minX     = -0.01;
+    cfg.maxX     = 0.01;
+    cfg.binningX = {-0.01, -0.005, -0.003, -0.002, -0.001, 0, 0.001, 0.002, 0.003, 0.005, 0.01};
+    cfg.nbinsX   = cfg.binningX.size()-1;
+  }
   else if (xname == "muN_d0") {
     cfg.minX    = -0.01;
     cfg.maxX    = 0.01;
@@ -94,6 +106,18 @@ void ConfigureMassCal(MassCalConfig & cfg, const TString peak_name, const TStrin
     cfg.binningX.clear();
     float width = 1.0 * (cfg.maxX - cfg.minX) / cfg.nbinsX;
     for (int i=0; i<cfg.nbinsX+1; i++) cfg.binningX.push_back( cfg.minX + width * i );
+  }
+  else if (xname == "muN_d0_rebin") {
+    cfg.minX     = -0.01;
+    cfg.maxX     = 0.01;
+    cfg.binningX = {-0.01, -0.005, -0.003, -0.002, -0.001, 0, 0.001, 0.002, 0.003, 0.005, 0.01};
+    cfg.nbinsX   = cfg.binningX.size()-1;
+  }
+  else if (xname == "d0_*_charge") {
+    cfg.minX     = -0.01;
+    cfg.maxX     = 0.01;
+    cfg.binningX = {-0.01, -0.005, -0.003, -0.002, -0.001, 0, 0.001, 0.002, 0.003, 0.005, 0.01};
+    cfg.nbinsX   = cfg.binningX.size()-1;
   }
   else if (xname == "muP_eta") {
     cfg.minX    = -2.5;
@@ -106,6 +130,22 @@ void ConfigureMassCal(MassCalConfig & cfg, const TString peak_name, const TStrin
   else if (xname == "muN_eta") {
     cfg.minX    = -2.5;
     cfg.maxX    = 2.5;
+    cfg.nbinsX  = 20;
+    cfg.binningX.clear();
+    float width = 1.0 * (cfg.maxX - cfg.minX) / cfg.nbinsX;
+    for (int i=0; i<cfg.nbinsX+1; i++) cfg.binningX.push_back( cfg.minX + width * i );
+  }
+  else if (xname == "muP_phi") {
+    cfg.minX    = -3.2;
+    cfg.maxX    = 3.2;
+    cfg.nbinsX  = 20;
+    cfg.binningX.clear();
+    float width = 1.0 * (cfg.maxX - cfg.minX) / cfg.nbinsX;
+    for (int i=0; i<cfg.nbinsX+1; i++) cfg.binningX.push_back( cfg.minX + width * i );
+  }
+  else if (xname == "muN_phi") {
+    cfg.minX    = -3.2;
+    cfg.maxX    = 3.2;
     cfg.nbinsX  = 20;
     cfg.binningX.clear();
     float width = 1.0 * (cfg.maxX - cfg.minX) / cfg.nbinsX;
@@ -174,6 +214,62 @@ void ConfigureMassCal(MassCalConfig & cfg, const TString peak_name, const TStrin
     cfg.binningY.clear();
     float width = 1.0 * (cfg.maxY - cfg.minY) / cfg.nbinsY;
     for (int i=0; i<cfg.nbinsY+1; i++) cfg.binningY.push_back( cfg.minY + width * i );
+  }
+  else if (yname == "muN_d0_rebin") {
+    cfg.minY     = -0.01;
+    cfg.maxY     = 0.01;
+    cfg.binningY = {-0.01, -0.005, -0.003, -0.002, -0.001, 0, 0.001, 0.002, 0.003, 0.005, 0.01};
+    cfg.nbinsY   = cfg.binningY.size()-1;
+  }
+  else if (yname == "muP_eta") {
+    cfg.minY    = -2.5;
+    cfg.maxY    = 2.5;
+    cfg.nbinsY  = 20;
+    cfg.binningY.clear();
+    float width = 1.0 * (cfg.maxY - cfg.minY) / cfg.nbinsY;
+    for (int i=0; i<cfg.nbinsY+1; i++) cfg.binningY.push_back( cfg.minY + width * i );
+  }
+  else if (yname == "muP_eta_rebin") {
+    cfg.minY     = -2.5;
+    cfg.maxY     = 2.5;
+    cfg.binningY = {-2.5, -1.7, -1.2, -0.9, 0, 0.9, 1.2, 1.7, 2.5};
+    cfg.nbinsY   = cfg.binningY.size()-1;
+  }
+  else if (yname == "muP_phi") {
+    cfg.minY    = -3.2;
+    cfg.maxY    = 3.2;
+    cfg.nbinsY  = 20;
+    cfg.binningY.clear();
+    float width = 1.0 * (cfg.maxY - cfg.minY) / cfg.nbinsY;
+    for (int i=0; i<cfg.nbinsY+1; i++) cfg.binningY.push_back( cfg.minY + width * i );
+  }
+  else if (yname == "muN_phi") {
+    cfg.minY    = -3.2;
+    cfg.maxY    = 3.2;
+    cfg.nbinsY  = 20;
+    cfg.binningY.clear();
+    float width = 1.0 * (cfg.maxY - cfg.minY) / cfg.nbinsY;
+    for (int i=0; i<cfg.nbinsY+1; i++) cfg.binningY.push_back( cfg.minY + width * i );
+  }
+  else if (yname == "phi_*_charge") {
+    cfg.minY    = -3.2;
+    cfg.maxY    = 3.2;
+    cfg.nbinsY  = 20;
+    cfg.binningY.clear();
+    float width = 1.0 * (cfg.maxY - cfg.minY) / cfg.nbinsY;
+    for (int i=0; i<cfg.nbinsY+1; i++) cfg.binningY.push_back( cfg.minY + width * i );
+  }
+  else if (yname == "muP_pt") {
+    cfg.minY     = 0;
+    cfg.maxY     = 500;
+    cfg.binningY = {10,20,30,40,50,70,100,200,500};
+    cfg.nbinsY   = cfg.binningY.size()-1;
+  }
+  else if (yname == "dimu_pt") {
+    cfg.minY     = 0;
+    cfg.maxY     = 500;
+    cfg.binningY = {0,10,20,30,40,50,70,100,200,500};
+    cfg.nbinsY   = cfg.binningY.size()-1;
   }
   else if (yname == "") {
   }
