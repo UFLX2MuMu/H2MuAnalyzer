@@ -20,14 +20,17 @@
 #include "H2MuAnalyzer/MakeHistos/interface/CategoryCuts.h"       // Common category definitions
 #include "H2MuAnalyzer/MakeHistos/interface/MiniNTupleHelper.h"   // "PlantTree" and "BookBranch" functions
 #include "H2MuAnalyzer/MakeHistos/interface/ReadMVA.h"            // Read and evaluate XMLs for MVA
+#include "H2MuAnalyzer/MakeHistos/interface/BtagSFHelper.h"       // Common Btag utilities
 
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
-// const std::string YEAR = "2017";
+//const std::string YEAR = "2017";
 // // Load the library of the local, compiled H2MuAnalyzer/MakeHistos directory
 // R__LOAD_LIBRARY(../../../tmp/slc6_amd64_gcc630/src/H2MuAnalyzer/MakeHistos/src/H2MuAnalyzerMakeHistos/libH2MuAnalyzerMakeHistos.so)
 
-// const std::string YEAR = "2016";
-const std::string YEAR = "2018";
+const std::string YEAR = "2016";
+//const std::string YEAR = "2018";
 // Load the library of the local, compiled H2MuAnalyzer/MakeHistos directory
 R__LOAD_LIBRARY(../../../tmp/slc6_amd64_gcc630/src/H2MuAnalyzer/MakeHistos/src/H2MuAnalyzerMakeHistos/libH2MuAnalyzerMakeHistos.so)
 
@@ -36,15 +39,15 @@ R__LOAD_LIBRARY(../../../tmp/slc6_amd64_gcc630/src/H2MuAnalyzer/MakeHistos/src/H
 // Options passed in as arguments to ReadNTupleChain when running in batch mode
 const int MIN_FILE = 1;    // Minimum index of input files to process
 const int MAX_FILE = 4;    // Maximum index of input files to process
-const int MAX_EVT  = 1000; // Maximum number of events to process
+const int MAX_EVT  = 10000; // Maximum number of events to process
 const int PRT_EVT  = 100;  // Print every N events
 const float SAMP_WGT = 1.0;
 // const float LUMI = 36814; // pb-1
 const bool verbose = false; // Print extra information
 
 
-// const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/WplusH_HToMuMu_WToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_WH_pos_125/190625_204210/0000";
-// const TString SAMPLE = "H2Mu_WH_pos_125";
+const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/WplusH_HToMuMu_WToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_WH_pos_125/190625_204210/0000";
+const TString SAMPLE = "H2Mu_WH_pos_125";
 // const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/SingleMuon/SingleMu_2016E/190625_203954/0000";
 // const TString SAMPLE = "SingleMu";
 
@@ -57,8 +60,8 @@ const bool verbose = false; // Print extra information
 // const TString IN_DIR = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2017/94X_v2/2019_01_15_LepMVA_3l_test_v1/SingleMuon/SingleMu_2017D";
 // const TString SAMPLE = "SingleMu";
 
-const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2018/102X/prod-v18.1.6.skim3l/WplusH_HToMuMu_WToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_WH_pos_125/190528_111606/0000";
-const TString SAMPLE = "H2Mu_WH_pos_125";
+//const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2018/102X/prod-v18.1.6.skim3l/WplusH_HToMuMu_WToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_WH_pos_125/190528_111606/0000";
+//const TString SAMPLE = "H2Mu_WH_pos_125";
 //const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2018/102X/prod-v18.1.6.skim3l/SingleMuon/SingleMu_2018D/190528_111415/0000";
 //const TString SAMPLE = "SingleMu";
 
@@ -68,7 +71,8 @@ const TString HIST_TREE = "HistTree"; // "Hist", "Tree", or "HistTree" to output
 
 // Systematic shifts to apply
 // {"JES_", "PU_wgt_", "MuID_SF_", "MuIso_SF_", "IsoMu_SF_", "LepMVA_SF_", "Roch_sys_", "KaMu_sys_", "KaMu_clos_"}  X  {"up", "down"}
- const std::string SYS_SHIFT = "noSys";
+// const std::string SYS_SHIFT = "noSys";
+const std::string SYS_SHIFT = "B_SF_up";
 // const std::string SYS_SHIFT = "LepMVA_SF_up";
 // const std::string SYS_SHIFT = "JES_up";
 // const std::string SYS_SHIFT = "IsoMu_SF_down";
@@ -85,8 +89,8 @@ const std::vector<std::string> OPT_CUTS = {"3lep"};
 // 					    "medLepMVA_noZ10_noBtag",
 // 					    "hiPt_lepW20_medLepMVA_noZ10_noBtag" };
 //                                             "hiPt_lepW20_medLepMVA_onZ10_noBtag" };
-const std::vector<std::string> CAT_CUTS = { "hiPt_lepW20_medLepMVA_noZ10_noBtag",
-                                            "hiPt_lepW20_medLepMVA_onZ10_noBtag" };
+const std::vector<std::string> CAT_CUTS = { "hiPt_lep20_medLepMVA_noZ10_noBtag",
+                                            "hiPt_lep20_medLepMVA_onZ10_noBtag" };
 
 
 // Command-line options for running in batch.  Running "root -b -l -q macros/ReadNTupleChain.C" will use hard-coded options above.
@@ -220,6 +224,7 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
   ConfigureEventSelection (evt_sel, YEAR);
   ConfigureEventWeight    (evt_wgt, YEAR, SYS);
 
+//  obj_sel.mu_pt_min  = 10;
   evt_wgt.muon_ID  = false;
   evt_wgt.muon_Iso = false;
   evt_sel.muPair_mass_min = 12;  // Allow masses down to 12 GeV (instead of 60 GeV) for background studies
@@ -234,6 +239,32 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 
   std::string PTC = obj_sel.mu_pt_corr; // Store muon pT correction in a shorter string; not changed later
 
+  // set up Btag SF
+  std::cout << "\n****** setting up Btag efficiency and SF tools ******" << std::endl;
+  BtagEffEntry BTE;
+  GetBtagEff(BTE, YEAR, (std::string) sample);
+
+  std::string CSV_name = "";
+  if (YEAR == "2016")      CSV_name = "data/deepCSV/DeepCSV_2016LegacySF_V1.csv";
+  else if (YEAR == "2017") CSV_name = "data/deepCSV/DeepCSV_94XSF_V4_B_F.csv";
+  else if (YEAR == "2018") CSV_name = "data/deepCSV/DeepCSV_102XSF_V1.csv";
+  BTagCalibration Bcalib("DeepCSV", CSV_name);
+
+  BTagCalibrationReader readerL(BTagEntry::OP_LOOSE,  // operating point
+                             "central",             // central sys type
+                             {"up", "down"});      // other sys types
+  readerL.load(Bcalib,                // calibration instance
+            BTagEntry::FLAV_B,    // btag flavour
+            "comb");               // measurement type
+  readerL.load(Bcalib, BTagEntry::FLAV_C, "comb");
+  readerL.load(Bcalib, BTagEntry::FLAV_UDSG, "incl");
+
+  BTagCalibrationReader readerM(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
+  readerM.load(Bcalib, BTagEntry::FLAV_B, "comb");
+  readerM.load(Bcalib, BTagEntry::FLAV_C, "comb");
+  readerM.load(Bcalib, BTagEntry::FLAV_UDSG, "incl");
+
+  // set up lepMVA SF
   std::cout << "\n******* About to load 2D LepMVA efficiency scale factor histograms *******" << std::endl;
   std::map<std::string, TH2F *> lepSF;
   lepSF["mu_T"]  = LoadSFsLepMVA(YEAR,  "mu", "T");
@@ -416,6 +447,7 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	  // Get selected muons and electrons in event
 	  MuonInfos muons = SelectedMuons(obj_sel, br);
 	  EleInfos  eles  = SelectedEles(obj_sel, br);
+	  JetInfos  jets  = SelectedJets(obj_sel, br);
 	  int sum_lep_charge = 0;
 	  if (MU) {
 	    ASSERT(muons.size() == 3 && eles.size() == 0, "muons.size() == 3 && eles.size() == 0");
@@ -635,6 +667,10 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	    CAT_UNCUT.erase( CAT_UNCUT.find("noBtag"), std::string("noBtag").length() );
 	  }
 
+	  if ( CAT_CUT.find("noBSF") != std::string::npos ) { // this option is not used here
+	    CAT_UNCUT.erase( CAT_UNCUT.find("noBSF"), std::string("noBSF").length() );
+	  }
+
 	  // Remove "_" characters left over after all known category sub-strings have been removed
 	  while ( CAT_UNCUT.find("_") != std::string::npos ) {
 	    CAT_UNCUT.erase( CAT_UNCUT.find("_"), std::string("_").length() );
@@ -676,13 +712,72 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	  b_map_flt["lepMVA_wgt_OPT_"+OPT_CUT+"_CAT_"+CAT_CUT] = lepMVA_wgt;
 
 
+	  // Compute Btag SF
+	  float Btag_wgt = 1.0;
+	  // only get B_SF for MC
+	  if ( CAT_CUT.find("noBtag") != std::string::npos and (not isData) and (CAT_CUT.find("noBSF") == std::string::npos) ) {
+	    std::string jet_FLV = "none";
+	    std::string B_sys   = "none";
+	    if      ( SYS == "B_SF_up")   B_sys = "up";
+	    else if ( SYS == "B_SF_down") B_sys = "down";
+	    else    			  B_sys = "central";
+
+	    for (const auto & jet : jets) {
+	      float jet_SF = 1.0;
+	      if ( abs(jet.eta) > 2.4 ) continue;
+
+	      if ( JetPass(obj_sel, jet, br, "BTagMedium") ) {
+		std::cout << "\nBizzare case: having medium tagged jet" << std::endl;
+		if      ( abs(jet.partonID) == 5 ) jet_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_B, jet.eta, jet.pt);
+		else if ( abs(jet.partonID) == 4 ) jet_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_C, jet.eta, jet.pt);
+		else				   jet_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_UDSG, jet.eta, jet.pt);
+	      } // if ( JetPass(obj_sel, jet, br, "BTagMedium") )
+	      else if ( JetPass(obj_sel, jet, br, "BTagLoose") ) {
+		float loose_SF  = 1.0;
+	        float medium_SF = 1.0;
+		if      ( abs(jet.partonID) == 5 ) {
+		  loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_B, jet.eta, jet.pt); 
+		  medium_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_B, jet.eta, jet.pt);
+		  jet_SF = CalBtagSF( BTE, "FLAV_B", loose_SF, medium_SF);		  
+		}
+		else if ( abs(jet.partonID) == 4 ) {
+		  loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_C, jet.eta, jet.pt);         
+                  medium_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_C, jet.eta, jet.pt);
+                  jet_SF = CalBtagSF( BTE, "FLAV_C", loose_SF, medium_SF);
+		}
+	  	else {
+		  loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_UDSG, jet.eta, jet.pt);         
+                  medium_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_UDSG, jet.eta, jet.pt);
+                  jet_SF = CalBtagSF( BTE, "FLAV_UDSG", loose_SF, medium_SF);
+		}
+	      } // end of if ( JetPass(obj_sel, jet, br, "BTagLoose") )
+	      else {
+		float loose_SF  = 1.0;
+		if      ( abs(jet.partonID) == 5 ) {
+		  loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_B, jet.eta, jet.pt); 
+		  jet_SF = CalBtagSF( BTE, "FLAV_B", loose_SF, 0.0);
+		}
+		else if ( abs(jet.partonID) == 4 ) {
+		  loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_C, jet.eta, jet.pt);
+                  jet_SF = CalBtagSF( BTE, "FLAV_C", loose_SF, 0.0);
+		}
+		else {
+		  loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_UDSG, jet.eta, jet.pt);
+                  jet_SF = CalBtagSF( BTE, "FLAV_UDSG", loose_SF, 0.0);
+		}
+	      } //end of else, (not BTagLoose)
+	      Btag_wgt *= jet_SF;
+	      if (jet_SF < 0.8 or jet_SF > 1.1) std::cout << "jet_SF = " << jet_SF << ", jet_ID = " << jet.partonID << ", jet_pt = " << jet.pt << ", jet_eta = " << jet.eta << std::endl;
+	    } // end of for (const auto & jet : jets)
+
+	  } // end of if ( CAT_CUT.find("noBtag" != std::string::npos and (not isData) and (CAT_CUT.find("noBSF") == std::string::npos) )
+
+
 	  //////////////////////////////////////
 	  ///  Compute a few more variables  ///
 	  //////////////////////////////////////
 
 	  // Full event variables
-	  JetInfos jets = SelectedJets(obj_sel, br);
-
 	  TLorentzVector MET_vec     = FourVec(*br.met);
 	  TLorentzVector lep_MET_vec = lep_vecT + MET_vec;
 	  TLorentzVector evt_vec     = FourVec(muons, PTC, eles, jets);
@@ -763,14 +858,15 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	  BookAndFill(b_map_flt, out_tree, h_pre, "samp_wgt", samp_weight );  // Sample cross section x luminosity weight
 
 	  // Store event weights
-	  BookAndFill(tupF, "PU_wgt",    40, -2, 2, isData ? 1.0 : br.PU_wgt  );
-	  BookAndFill(tupF, "muon_wgt",  40, -2, 2, isData ? 1.0 : MuonWeight(br, evt_wgt, verbose) );
-	  BookAndFill(tupF, "GEN_wgt",   40, -2, 2, isData ? 1.0 : br.GEN_wgt );
-	  BookAndFill(tupF, "event_wgt", 40, -2, 2, isData ? 1.0 : event_wgt  );  // Event-by-event PU, NLO, eff SF, etc. weights
+	  BookAndFill(tupF, "PU_wgt",     40, -2, 2, isData ? 1.0 : br.PU_wgt  );
+	  BookAndFill(tupF, "muon_wgt",   40, -2, 2, isData ? 1.0 : MuonWeight(br, evt_wgt, verbose) );
+	  BookAndFill(tupF, "GEN_wgt",    40, -2, 2, isData ? 1.0 : br.GEN_wgt );
+	  BookAndFill(tupF, "event_wgt",  40, -2, 2, isData ? 1.0 : event_wgt  );  // Event-by-event PU, NLO, eff SF, etc. weights
 
 	  // Scale event weight by lepMVA weight (varies by category)
-	  float cat_evt_wgt = event_wgt * lepMVA_wgt;
+	  float cat_evt_wgt = event_wgt * lepMVA_wgt * Btag_wgt;
 	  ASSERT(lepMVA_wgt > 0, "lepMVA_wgt > 0");
+	  ASSERT(Btag_wgt > 0, "Btag_wgt > 0");
 
 	  // Plot kinematic histograms
 	  BookAndFill(tupI, "nPV",   12, -0.5, 59.5, br.nVertices, cat_evt_wgt );
@@ -852,6 +948,7 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	  BookAndFill(h_map_1D,            h_pre+ "H_pair_mass_window", 10, 110, 160, H_pair_vec.M(),  cat_evt_wgt, false );  // Don't include overflow
 	  BookAndFill(h_map_1D,            h_pre+ "H_pair_mass_wide",   40,   0, 400, H_pair_vec.M(),  cat_evt_wgt );
 	  BookAndFill(h_map_1D,            h_pre+ "OS_pair_mass_zoomZ", 40,  81, 101, OS_pair_vec.M(), cat_evt_wgt, false );  // Don't include overflow
+	  BookAndFill(h_map_1D, 	   h_pre+ "Btag_wgt",	       100,   0,   2, Btag_wgt,	       1.0, false );
 
 	  BookAndFill(tupF, "H_pair_mass_err",   40,   0,   4, H_pair.massErr,   cat_evt_wgt );
 	  BookAndFill(tupF, "H_pair_pt",         30,   0, 300, H_pair_vec.Pt(),  cat_evt_wgt );
