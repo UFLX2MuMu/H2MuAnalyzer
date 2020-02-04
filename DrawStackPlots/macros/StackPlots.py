@@ -53,19 +53,20 @@ if USER == 'abrinke1':
 
 elif USER == 'xzuo':
     YEAR = '2018'
+#    YEAR = 'Run2'
     PLOT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/%s/Histograms' %YEAR
 
-    CONFIG   = '2l'
-    LABEL    = 'data_MC_2019_11_06_GeoFitBS'
-    CATEGORY = 'NONE'
+#    CONFIG   = '2l'
+#    LABEL    = 'data_MC_2019_11_06_GeoFitBS'
+#    CATEGORY = 'NONE'
 
-#    CONFIG   = 'WH_lep'
-#    CONFIG   = 'WH_lep_allMass'
-#    LABEL    = 'WH_lep_AWB_2019_10_20_BtagSF'
-#    CATEGORY = '3lep_hiPt_lep20_medLepMVA_onZ10_noBtag_noSys'
+    CONFIG   = 'WH_lep'
+    CONFIG   = 'WH_lep_allMass'
+    LABEL    = 'WH_lep_AWB_2019_10_20_BtagSF'
+    CATEGORY = '3lep_hiPt_lep20_medLepMVA_noZ10_noBtag_noSys'
 
-#    IN_FILE  = 'histos_PreselRun2_%s_merged.root' % CATEGORY
-    IN_FILE  = 'all_NONE_%s.root' %CATEGORY
+    IN_FILE  = 'histos_PreselRun2_%s_merged.root' % CATEGORY
+#    IN_FILE  = 'all_NONE_%s.root' %CATEGORY
     SCALE    = 'lin' ## 'log' or 'lin' scaling of y-axis
     RATIO_MIN = 0.0   ## Minimum value in ratio plot
     RATIO_MAX = 2.0   ## Maximum value in ratio plot
@@ -102,14 +103,14 @@ if len(sys.argv) > 6:
 def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):   # Do not use TRatioPlot! It is a devil! - XWZ 19.09.2018
 
     ## Create a new TCanvas
-    canv = R.TCanvas('can_'+dist, 'can_'+dist, 1)
+    canv = R.TCanvas('can_'+dist, 'can_'+dist, 600, 600)
     canv.Clear()
     canv.cd()
     
     ## Draw the upper pad, with the stack histogram
-    upper_pad = R.TPad('upperPad_'+dist, 'upperPad_'+dist, 0, 0.3, 1, 1)
-    upper_pad.SetBottomMargin(0.05);
-    upper_pad.SetRightMargin(0.20)
+    upper_pad = R.TPad('upperPad_'+dist, 'upperPad_'+dist, 0, 0.25, 1, 1)
+    upper_pad.SetBottomMargin(0.04);
+    #upper_pad.SetRightMargin(0.20)
     upper_pad.Draw()
     upper_pad.cd()
 
@@ -121,11 +122,17 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
         else:      all_stack.SetMaximum( 10.0*all_stack.GetMaximum() )
     elif SCALE == 'lin':
         all_stack.SetMinimum(0)
-        if h_data: all_stack.SetMaximum( 1.2*max(h_data.GetMaximum(), all_stack.GetMaximum()) )
-        else:      all_stack.SetMaximum( 1.2*all_stack.GetMaximum() )
+        if h_data: all_stack.SetMaximum( 1.5*max(h_data.GetMaximum(), all_stack.GetMaximum()) )
+        else:      all_stack.SetMaximum( 1.5*all_stack.GetMaximum() )
     else: print 'Invalid SCALE = %s. Exiting.' % SCALE, sys.exit()
         
     all_stack.Draw('HIST')
+    all_stack.SetTitle('')
+    all_stack.GetXaxis().SetLabelSize(0)
+    all_stack.GetYaxis().SetLabelSize(0.05)
+    all_stack.GetYaxis().SetTitle('Events / Bin')
+    all_stack.GetYaxis().SetTitleSize(0.05)
+    all_stack.GetYaxis().SetTitleOffset(1.0)
 
     ## Draw the data histogram
     if h_data:
@@ -148,7 +155,8 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
     h_sig = False
     if sig_stack.GetNhists() != 0:
         h_sig = sig_stack.GetStack().Last().Clone('tmp')
-        if h_sig.Integral() > 0: h_sig.Scale( all_stack.GetStack().Last().Integral() / h_sig.Integral() )
+#        if h_sig.Integral() > 0: h_sig.Scale( all_stack.GetStack().Last().Integral() / h_sig.Integral() )
+	if h_sig.Integral() > 0: h_sig.Scale(50)
         h_sig.Draw('HISTSAME')
 
     ## Save the net signal, net background, and net data histograms
@@ -161,12 +169,24 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
     ## Draw the legend
     legend.Draw()
 
+    cms_label = R.TLatex()
+    cms_label.SetTextSize(0.04)    
+    cms_label.DrawLatexNDC(0.15, 0.85, '#scale[1.5]{CMS} #bf{#it{Preliminary}}')
+    cms_label.Draw('same')
+    lumi_label = R.TLatex()
+    lumi_label.SetTextSize(0.035)
+    lumi_label.SetTextAlign(31)
+    lumi_label.DrawLatexNDC(0.90, 0.91, '#bf{137.1 fb^{-1} (13 TeV)}' )
+    lumi_label.Draw('same')
+
     ## Draw the lower pad, with the ratio histogram
     canv.cd()
 
-    lower_pad = R.TPad('lowerPad_'+dist, 'lowerPad_'+dist, 0, 0.05, 1, 0.3)
-    lower_pad.SetTopMargin(0.05)
-    lower_pad.SetRightMargin(0.20)
+    lower_pad = R.TPad('lowerPad_'+dist, 'lowerPad_'+dist, 0, 0, 1, 0.25)
+    lower_pad.SetTopMargin(0.04)
+    #lower_pad.SetRightMargin(0.20)
+    lower_pad.SetBottomMargin(0.3)
+    lower_pad.SetGridy()
     lower_pad.Draw()
     lower_pad.cd()
 
@@ -177,16 +197,37 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
         ratio_hist.SetTitle('')
         ratio_hist.SetMinimum(RATIO_MIN)
         ratio_hist.SetMaximum(RATIO_MAX)
-        # ratio_hist.GetYaxis().SetNdivisions(502)  ## For some reason causes segfault after a dozen or so plots - AWB 09.10.2018
+        ratio_hist.GetYaxis().SetNdivisions(505)  ## For some reason causes segfault after a dozen or so plots - AWB 09.10.2018
         ratio_hist.SetMarkerStyle(20)
         ratio_hist.GetXaxis().SetLabelSize(0.15)
-	ratio_hist.GetYaxis().SetLabelSize(0.13)
+	if dist == 'H_pair_mass_window':
+	    ratio_hist.GetXaxis().SetTitle("M(#mu#mu) (GeV)")
+	elif dist == 'H_pair_pt':
+	    ratio_hist.GetXaxis().SetTitle("p_{T}(#mu#mu) (GeV)")
+	elif dist == 'muH1_pt':
+            ratio_hist.GetXaxis().SetTitle("p_{T}(#mu_{leading}) (GeV)")
+	elif dist == 'muH1_eta':
+            ratio_hist.GetXaxis().SetTitle("#eta(#mu_{leading})")
+	elif dist == 'lep_pt':
+            ratio_hist.GetXaxis().SetTitle("p_{T}(lep) (GeV)")
+	elif dist == 'lep_eta':
+            ratio_hist.GetXaxis().SetTitle("#eta(lep)")
+	elif dist == 'BDT_AWB_v3_noMass':
+	    ratio_hist.GetXaxis().SetTitle("BDT output")
+	else:
+	    ratio_hist.GetXaxis().SetTitle(dist)
+	ratio_hist.GetXaxis().SetTitleSize(0.15)
+        ratio_hist.GetXaxis().SetTitleOffset(0.8)
+	ratio_hist.GetYaxis().SetLabelSize(0.15)
+	ratio_hist.GetYaxis().SetTitle("data/MC")
+        ratio_hist.GetYaxis().SetTitleSize(0.15)
+        ratio_hist.GetYaxis().SetTitleOffset(0.3)
 	ratio_hist.Draw()
 
     canv.Update()
     if not ('BDT' in dist and 'zoom' in dist):
-        canv.SaveAs(PLOT_DIR+'/'+LABEL+'/plots/'+CATEGORY+'/'+dist+'.png')
-        canv.SaveAs(PLOT_DIR+'/'+LABEL+'/plots/'+CATEGORY+'/'+dist+'.pdf')
+        canv.SaveAs(PLOT_DIR+'/'+LABEL+'/plots/'+CATEGORY+'/new_style/'+dist+'.png')
+        canv.SaveAs(PLOT_DIR+'/'+LABEL+'/plots/'+CATEGORY+'/new_style/'+dist+'.pdf')
 
     ## Open output root file and save canvas and net histograms
     out_file_loc = R.TFile.Open(out_file_name, 'UPDATE')
@@ -498,15 +539,17 @@ def main():
             sigSq += ( pow(h_sig.GetBinContent(i), 2) / (numB + pow(errB, 2)) )
 
         ## Create TLegend
-        legend = R.TLegend(0.82, 0.1, 0.98, 0.9)
+        legend = R.TLegend(0.6, 0.5, 0.9, 0.9)
         for evt_type in groups.keys():
             for group in groups[evt_type].keys():
                 if MC_only and group == 'Data': continue
-                if   evt_type == 'Data' and nBkg > 0.0:   ## Display data integral and data / MC ration in the legend
-                    legend.AddEntry( group_hist[group], '%s (%d, %.2f)'  % (group, nDat, nDat / nBkg) )
-                elif evt_type == 'Sig'  and nSig > 0.0:  ## Display signal integral and scale factor in the legend
-                    legend.AddEntry( group_hist[group], '%s (%.3f)' % (group, nSig) )
-                    legend.AddEntry( group_hist[group], 'B/S=%d, %.3f#sigma' % (B_to_S, math.sqrt(sigSq)) )
+#                if   evt_type == 'Data' and nBkg > 0.0:   ## Display data integral and data / MC ration in the legend
+#                    legend.AddEntry( group_hist[group], '%s (%d, %.2f)'  % (group, nDat, nDat / nBkg) )
+#                elif evt_type == 'Sig'  and nSig > 0.0:  ## Display signal integral and scale factor in the legend
+#                    legend.AddEntry( group_hist[group], '%s (%.3f)' % (group, nSig) )
+#                    legend.AddEntry( group_hist[group], 'B/S=%d, %.3f#sigma' % (B_to_S, math.sqrt(sigSq)) )
+	 	if evt_type == 'Sig' and nSig > 0.0:
+		    legend.AddEntry( group_hist[group], '%s X50' %group)
                 else:
                     legend.AddEntry(group_hist[group], group)
 

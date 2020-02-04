@@ -109,9 +109,9 @@ def ConfigStackPlot(known_config, year):
             cfg.excl_samps              = []  ## Samples to exclude from consideration
 
             ## Start by excluding component histograms merged in MakeHistos/scripts/MergeHists.py
-            cfg.excl_samps += ['H2Mu_VBF_120_NLO_1', 'H2Mu_VBF_120_NLO_2']  ## Merged into H2Mu_VBF_120
-            cfg.excl_samps += ['H2Mu_VBF_125_NLO_1', 'H2Mu_VBF_125_NLO_2']  ## Merged into H2Mu_VBF
-            cfg.excl_samps += ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2']  ## Merged into H2Mu_VBF_130
+            cfg.excl_samps += ['H2Mu_VBF_120_NLO_1', 'H2Mu_VBF_120_NLO_2', 'H2Mu_VBF_120']  ## Merged into H2Mu_VBF_120
+            cfg.excl_samps += ['H2Mu_VBF_125_NLO_1', 'H2Mu_VBF_125_NLO_2', 'H2Mu_VBF']  ## Merged into H2Mu_VBF, in 2017 the H2Mu_VBF is not in the SampleDatabase (NLO_1 and _2), ignore for now
+            cfg.excl_samps += ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2', 'H2Mu_VBF_130']  ## Merged into H2Mu_VBF_130
             cfg.excl_samps += ['ZJets_AMC', 'ZJets_MG_1', 'ZJets_MG_2']     ## Merged into ZJets
             cfg.excl_samps += ['ZJets_hiM_AMC', 'ZJets_hiM_MG']             ## Merged into ZJets_hiM
             cfg.excl_samps += ['tt_ll_POW', 'tt_ll_MG', 'tt_ll_AMC']        ## Merged into tt_ll

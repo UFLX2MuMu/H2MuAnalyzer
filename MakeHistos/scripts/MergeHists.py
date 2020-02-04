@@ -67,7 +67,7 @@ elif USER == 'xzuo':
     SAMPLES = {}  ## Sets of samples to merge
     SAMPLES['H2Mu_VBF_120'] = ['H2Mu_VBF_120_NLO_1', 'H2Mu_VBF_120_NLO_2']
     SAMPLES['H2Mu_VBF']     = ['H2Mu_VBF_125_NLO_1', 'H2Mu_VBF_125_NLO_2']
-    SAMPLES['H2Mu_VBF_130'] = ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2']
+    SAMPLES['H2Mu_VBF_130'] = ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2', 'H2Mu_VBF_130']
     SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_MG_1', 'ZJets_MG_2']
     SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_MG']
     SAMPLES['tt_ll']        = ['tt_ll_POW', 'tt_ll_MG', 'tt_ll_AMC']
