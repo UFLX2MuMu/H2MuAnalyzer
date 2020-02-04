@@ -30,6 +30,7 @@ from StackPlotConfig import ConfigStackPlot
 ## Configure the script user
 if 'abrinke1' in os.getcwd(): USER = 'abrinke1'
 if 'bortigno' in os.getcwd(): USER = 'bortigno'
+if 'eyigitba' in os.getcwd(): USER = 'eyigitba'
 if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 
 ## Settings for this stack-drawing job
@@ -50,6 +51,27 @@ if USER == 'abrinke1':
     SCALE     = 'lin' ## 'log' or 'lin' scaling of y-axis
     RATIO_MIN = 0.0   ## Minimum value in ratio plot
     RATIO_MAX = 2.0   ## Maximum value in ratio plot
+
+elif USER == 'eyigitba':
+    YEAR = '2018'
+#    YEAR = 'Run2'
+    PLOT_DIR = '/afs/cern.ch/work/e/eyigitba/public/H2Mu/%s/Histograms' %YEAR
+
+#    CONFIG   = '2l'
+#    LABEL    = 'data_MC_2019_11_06_GeoFitBS'
+#    CATEGORY = 'NONE'
+
+    CONFIG   = 'WH_lep'
+    CONFIG   = 'WH_lep_allMass'
+    LABEL    = 'WH_lep_AWB_2019_10_20_BtagSF'
+    CATEGORY = '3lep_hiPt_lep20_medLepMVA_noZ10_noBtag_noSys'
+
+    IN_FILE  = 'histos_PreselRun2_%s_merged.root' % CATEGORY
+#    IN_FILE  = 'all_NONE_%s.root' %CATEGORY
+    SCALE    = 'lin' ## 'log' or 'lin' scaling of y-axis
+    RATIO_MIN = 0.0   ## Minimum value in ratio plot
+    RATIO_MAX = 2.0   ## Maximum value in ratio plot
+
 
 elif USER == 'xzuo':
     YEAR = '2018'
@@ -255,9 +277,10 @@ def main():
     ###  Set up input and output files  ###
     #######################################
 
-    if USER == 'abrinke1': in_file_dir = PLOT_DIR+'/'+LABEL+'/files/HADD'
-    if USER == 'xzuo': 	   in_file_dir = PLOT_DIR+'/'+LABEL+'/files/HADD'
-    else:                  in_file_dir = PLOT_DIR+'/'+LABEL+'/files/sum'
+    if USER == 'abrinke1':   in_file_dir = PLOT_DIR+'/'+LABEL+'/files/HADD'
+    elif USER == 'eyigitba': in_file_dir = PLOT_DIR+'/'+LABEL+'/files/HADD'
+    elif USER == 'xzuo':     in_file_dir = PLOT_DIR+'/'+LABEL+'/files/HADD'
+    else:                    in_file_dir = PLOT_DIR+'/'+LABEL+'/files/sum'
 
     in_file_name  = in_file_dir+'/'+IN_FILE
     out_dir       = PLOT_DIR+'/'+LABEL+'/plots/'+CATEGORY

@@ -15,6 +15,7 @@ import Plot_Configs as PC
 ## Configure the script user
 if 'abrinke1' in os.getcwd(): USER = 'abrinke1'
 if 'bortigno' in os.getcwd(): USER = 'bortigno'
+if 'eyigitba' in os.getcwd(): USER = 'eyigitba'
 if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 
 ## Directory for input histograms and output plots
@@ -26,6 +27,8 @@ BDT_WITH_MASS = '2017_WH_mu_against_inclu_lepMVA04.root'
 BDT_WITHOUT_MASS = '2017_WH_mu_against_inclu_lepMVA04.root'
 
 
+if USER == 'eyigitba':
+    OUT_DIR = '/afs/cern.ch/work/e/eyigitba/public/H2Mu/Run2/Histograms'
 if USER == 'xzuo':     
     OUT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/Run2/Histograms'
 #    OUT_DIR = OUT_DIR + '/VH_selection_2019april/pt10_iso04/ZH_ele_massBDT'

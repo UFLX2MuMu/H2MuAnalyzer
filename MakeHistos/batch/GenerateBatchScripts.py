@@ -30,7 +30,9 @@ from SampleHelper import GetNormForSample, GetSampleID
 ## Configure the script user
 if 'abrinke1' in os.getcwd(): USER = 'abrinke1'
 if 'bortigno' in os.getcwd(): USER = 'bortigno'
+if 'eyigitba' in os.getcwd(): USER = 'eyigitba'
 if 'xzuo'     in os.getcwd(): USER = 'xzuo'
+
 
 ## Root macro to run from each job
 #MACRO = 'macros/ReadNTupleChain.C'
@@ -62,7 +64,9 @@ PROD   = '190521'  ## choose given product version instead of the latest one, th
 
 ## Directory for logs and output root files
 if USER == 'abrinke1': OUT_DIR = '/afs/cern.ch/work/a/abrinke1/public/H2Mu/%s/Histograms' % YEAR
+if USER == 'eyigitba': OUT_DIR = '/afs/cern.ch/work/e/eyigitba/public/H2Mu/%s/Histograms' % YEAR
 if USER == 'xzuo':     OUT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/%s/Histograms' % YEAR
+
 
 #LABEL = 'ggH_VBF_2l_AWB_2019_04_17_v2'
 #LABEL = 'WH_lep_AWB_2019_07_08_sideband_v1'

@@ -27,9 +27,11 @@ import ROOT as R
 ## Configure the script user
 if 'abrinke1' in os.getcwd(): USER = 'abrinke1'
 if 'bortigno' in os.getcwd(): USER = 'bortigno'
+if 'eyigitba' in os.getcwd(): USER = 'eyigitba'
 if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 
-IN_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/'
+if USER =='eyigitba': IN_DIR = '/afs/cern.ch/work/e/eyigitba/public/H2Mu/'
+if USER =='xzuo':     IN_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/'
 #LABEL  = 'WH_lep_AWB_2019_07_23_signal_sys_v1'
 LABEL  = 'WH_lep_AWB_2019_10_20_BtagSF_sys'
 #CATE   = 'noZ10_noBtag'

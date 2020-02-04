@@ -42,6 +42,7 @@ import SystematicsHelper as SH ## From WorkspaceDatacard/python/SystematicsHelpe
 ## Configure the script user
 if 'abrinke1' in os.getcwd(): USER = 'abrinke1'
 if 'bortigno' in os.getcwd(): USER = 'bortigno'
+if 'eyigitba' in os.getcwd(): USER = 'eyigitba'
 if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 
 ## Configure the channels, distributions, and fits to use
