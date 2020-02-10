@@ -126,10 +126,12 @@ def ConfigStackPlot(known_config, year):
             cfg.groups['Bkg']['ZZ'] = ['ZZ_4l']
             if (year == '2017' or year == 'Run2'):
                 cfg.groups['Bkg']['ZZ'] += ['ZZ_4l_gg_4mu', 'ZZ_4l_gg_2e2mu']
-            if (year == '2018' or year == 'Run2'):
+            if (year == '2016' or year == '2018' or year == 'Run2'):
                 cfg.groups['Bkg']['ZZ'] += ['ggZZ_4mu', 'ggZZ_4tau', 'ggZZ_2e2mu', 'ggZZ_2mu2tau']
 
             cfg.groups['Bkg']['ttbar'] = ['tt_ll', 'tW_pos', 'tW_neg']
+
+	    cfg.groups['Bkg']['VVV'] = ['WWW', 'WWZ', 'WZZ', 'ZZZ']
 
             if ('allMass' in known_config):
                 ## Inclusive (mass > 50 GeV) Z+jets samples, to use for Z mass background validation plots
@@ -207,6 +209,7 @@ def ConfigStackPlot(known_config, year):
         cfg.colors = {}
         cfg.colors['Signal']     = R.kRed
         cfg.colors['Data']       = R.kBlack
+	cfg.colors['VVV']	 = R.kOrange
         cfg.colors['WZ']         = R.kViolet
         cfg.colors['ZZ']         = R.kPink+7
         cfg.colors['ZJets']      = R.kAzure

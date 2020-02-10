@@ -39,16 +39,17 @@ if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 #MACRO = 'macros/MC_data_comparison.C'
 #MACRO = 'macros/ggH_VBF_2l.C'
 #MACRO = 'macros/WH_lep.C'
-#MACRO = 'macros/WH_lep_systematics.C'
+MACRO = 'macros/WH_lep_systematics.C'
 #MACRO = 'macros/ttH_3l.C'
 #MACRO = 'macros/MiniNTupliser.C'
 #MACRO = 'macros/MiniNTupliser_4l_cat.C'
 #MACRO = 'macros/MassCalibration.C'
 #MACRO = 'macros/Btag_eff.C'
-MACRO = 'macros/SimpleTreeForDas.C'
+#MACRO = 'macros/SimpleTreeForDas.C'
 
-LOC  = 'CERN'
+#LOC  = 'CERN'
 #LOC  = 'CERN_3l'  ## Location of input files ('CERN', 'CERN_hiM', 'CERN_3l', or 'UF')
+LOC = 'CERN_3l_final'
 #LOC  = 'CERN_lepMVA_test_v2'  ## Location of input files ('CERN', 'CERN_hiM', or 'UF', or 'CERN_lepMVA_test_v1')
 #LOC  = 'CERN_lepMVA_3l_test_v1'
 YEAR = '2018'  ## Dataset year (2016, 2017, or 2018)
@@ -58,9 +59,9 @@ LUMI = 59740   ## 35920 for 2016, 41530 for 2017, 59740 for 2018   ## Lumi value
 #IN_DIR  = '/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2017/94X_v2/2019_01_14_LepMVA_2l_hiM_test_v2'
 #IN_DIR = '/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2017/94X_v2/2019_01_14_LepMVA_2l_test_v2'
 IN_DIR = ''
-HADD_IN = False   ## Use pre-hadded root files (NTuple_*.root) instead of original files (tuple_*.root)
-PROD   = '190521'  ## choose given product version instead of the latest one, this one is only for 2018 2l skim
-#PROD  = ''
+HADD_IN = True   ## Use pre-hadded root files (NTuple_*.root) instead of original files (tuple_*.root)
+#PROD   = '190521'  ## choose given product version instead of the latest one, this one is only for 2018 2l skim
+PROD  = ''
 
 ## Directory for logs and output root files
 if USER == 'abrinke1': OUT_DIR = '/afs/cern.ch/work/a/abrinke1/public/H2Mu/%s/Histograms' % YEAR
@@ -84,13 +85,14 @@ if USER == 'xzuo':     OUT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/%s/Histog
 #LABEL = 'WH_lep_AWB_2018_data_from_skim_AD'
 #LABEL = 'WH_lep_AWB_2019_08_19_signal_sys'
 #LABEL = 'WH_lep_AWB_2019_10_20_BtagSF_sys'
+LABEL = 'WH_lep_final_ntuple_old_selection_2020_02_05'
 #LABEL = 'data_MC_2019_11_06_GeoFitBS'
-LABEL = 'DAS_ntuple_1percentdata_baseline_OS60'
+#LABEL = 'DAS_ntuple_1percentdata_baseline_OS60'
 
 NJOBS   =   -1  ## Maximum number of jobs to generate
 # JOBSIZE = 1000  ## Size of input NTuples in MB, per job (default 1000)
 # JOBSIZE =  200  ## Size of input NTuples in MB, per job (WH with multiple categories)
-JOBSIZE =   5000  ## Size of input NTuples in MB, per job (ttH with BDT reconstruction)
+JOBSIZE =   500  ## Size of input NTuples in MB, per job (ttH with BDT reconstruction)
 
 MAX_EVT = -1     ## Maximum number of events to process per job
 PRT_EVT = 10000  ## Print every Nth event in each job
@@ -325,7 +327,7 @@ def main():
         # for ver in subprocess.check_output(['ls', in_dir_name]).splitlines():  ## Only available in Python >= 2.7
         ls_files = Popen(['ls', in_dir_name], stdout=PIPE)
 
-        if not HADD_IN:  ## Using original tuple_*.root files produced by crab, not hadd-ed versions
+        if not HADD_IN or LOC == 'CERN_3l_final':  ## Using original tuple_*.root files produced by crab, not hadd-ed versions
             for ver in ls_files.communicate()[0].split():
                 if 'root' in ver: continue
                 if VERBOSE: print '  * Appending [%d, %d]' % ( int(ver.split('_')[0]), int(ver.split('_')[1]) )
@@ -349,7 +351,7 @@ def main():
 #	if samp.name is 'ZJets_AMC':        # temporary for 2017 WH
 #		in_dir_name += '/180802_165055'
 	if PROD == '190521' and samp.name is "SingleMu_2018D":
-		in_dir_name += '/190522_140309'
+	    in_dir_name += '/190522_140309'
 	else:
             in_dir_name += '/%d_%06d' % (versions[0][0], versions[0][1])
  
