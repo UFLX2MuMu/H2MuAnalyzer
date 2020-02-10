@@ -29,8 +29,8 @@
 // // Load the library of the local, compiled H2MuAnalyzer/MakeHistos directory
 // R__LOAD_LIBRARY(../../../tmp/slc6_amd64_gcc630/src/H2MuAnalyzer/MakeHistos/src/H2MuAnalyzerMakeHistos/libH2MuAnalyzerMakeHistos.so)
 
-const std::string YEAR = "2016";
-//const std::string YEAR = "2018";
+//const std::string YEAR = "2016";
+const std::string YEAR = "2018";
 // Load the library of the local, compiled H2MuAnalyzer/MakeHistos directory
 R__LOAD_LIBRARY(../../../tmp/slc6_amd64_gcc630/src/H2MuAnalyzer/MakeHistos/src/H2MuAnalyzerMakeHistos/libH2MuAnalyzerMakeHistos.so)
 
@@ -46,8 +46,11 @@ const float SAMP_WGT = 1.0;
 const bool verbose = false; // Print extra information
 
 
-const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/WplusH_HToMuMu_WToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_WH_pos_125/190625_204210/0000";
+const TString IN_DIR = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2018/102X/prod-v18.2.0.skim3l/WplusH_HToMuMu_WToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_WH_pos_125/191209_170335";
 const TString SAMPLE = "H2Mu_WH_pos_125";
+
+//const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/WplusH_HToMuMu_WToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_WH_pos_125/190625_204210/0000";
+//const TString SAMPLE = "H2Mu_WH_pos_125";
 // const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/SingleMuon/SingleMu_2016E/190625_203954/0000";
 // const TString SAMPLE = "SingleMu";
 
@@ -65,7 +68,8 @@ const TString SAMPLE = "H2Mu_WH_pos_125";
 //const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2018/102X/prod-v18.1.6.skim3l/SingleMuon/SingleMu_2018D/190528_111415/0000";
 //const TString SAMPLE = "SingleMu";
 
-const std::string SLIM  = (YEAR == "2017" ? "Slim" : "notSlim");  // "Slim" or "notSlim" - Some 2017 NTuples are "Slim"
+//const std::string SLIM  = (YEAR == "2017" ? "Slim" : "notSlim");  // "Slim" or "notSlim" - Some 2017 NTuples are "Slim"
+const std::string SLIM = "notSlim";
 const TString OUT_DIR   = "plots";
 const TString HIST_TREE = "HistTree"; // "Hist", "Tree", or "HistTree" to output histograms, trees, or both
 
@@ -121,7 +125,7 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
     in_file_names.push_back(in_file_name);
   }
   if (in_files.size() == 0) {
-    if (YEAR != "2017") {
+    if (IN_DIR.Contains("0000")) {
       for (int i = MIN_FILE; i <= MAX_FILE; i++) {
 	in_file_name.Form("%s/tuple_%d.root", in_dir.Data(), i);
 	std::cout << "Adding file " << in_file_name.Data() << std::endl;

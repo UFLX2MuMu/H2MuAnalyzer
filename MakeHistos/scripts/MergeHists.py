@@ -28,8 +28,8 @@ if USER == 'abrinke1':
     SAMPLES['H2Mu_VBF_120'] = ['H2Mu_VBF_120_NLO_1', 'H2Mu_VBF_120_NLO_2']
     SAMPLES['H2Mu_VBF']     = ['H2Mu_VBF_125_NLO_1', 'H2Mu_VBF_125_NLO_2']
     SAMPLES['H2Mu_VBF_130'] = ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2']
-    SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_MG_1', 'ZJets_MG_2']
-    SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_MG']
+    SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_AMC-ext', 'ZJets_MG_1', 'ZJets_MG_2']
+    SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_AMC-ext', 'ZJets_hiM_MG']
     SAMPLES['tt_ll']        = ['tt_ll_POW', 'tt_ll_MG', 'tt_ll_AMC']
     SAMPLES['ttZ']          = ['ttZ', 'ttZ_1', 'ttZ_2']
 
@@ -69,8 +69,8 @@ elif USER == 'eyigitba':
     SAMPLES['H2Mu_VBF_120'] = ['H2Mu_VBF_120_NLO_1', 'H2Mu_VBF_120_NLO_2']
     SAMPLES['H2Mu_VBF']     = ['H2Mu_VBF_125_NLO_1', 'H2Mu_VBF_125_NLO_2']
     SAMPLES['H2Mu_VBF_130'] = ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2', 'H2Mu_VBF_130']
-    SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_MG_1', 'ZJets_MG_2']
-    SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_MG']
+    SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_AMC-ext', 'ZJets_MG_1', 'ZJets_MG_2']
+    SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_AMC-ext', 'ZJets_hiM_MG']
     SAMPLES['tt_ll']        = ['tt_ll_POW', 'tt_ll_MG', 'tt_ll_AMC']
     SAMPLES['ttZ']          = ['ttZ', 'ttZ_1', 'ttZ_2']
 
@@ -79,19 +79,19 @@ elif USER == 'eyigitba':
                   '3lep_hiPt_lep20_medLepMVA_onZ10_noBtag_noSys']
 
 elif USER == 'xzuo':
-    YEARS    = ['2016', '2017', '2018']  ## Dataset years (2016, 2017, 2018)
+    YEARS    = ['2018']  ## Dataset years (2016, 2017, 2018)
     PLOT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/YEAR/Histograms'
 
     SAMPLES = {}  ## Sets of samples to merge
     SAMPLES['H2Mu_VBF_120'] = ['H2Mu_VBF_120_NLO_1', 'H2Mu_VBF_120_NLO_2']
     SAMPLES['H2Mu_VBF']     = ['H2Mu_VBF_125_NLO_1', 'H2Mu_VBF_125_NLO_2']
     SAMPLES['H2Mu_VBF_130'] = ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2', 'H2Mu_VBF_130']
-    SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_MG_1', 'ZJets_MG_2']
-    SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_MG']
+    SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_AMC-ext', 'ZJets_MG_1', 'ZJets_MG_2']
+    SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_AMC-ext', 'ZJets_hiM_MG']
     SAMPLES['tt_ll']        = ['tt_ll_POW', 'tt_ll_MG', 'tt_ll_AMC']
     SAMPLES['ttZ']          = ['ttZ', 'ttZ_1', 'ttZ_2']
 
-    LABEL      = 'WH_lep_AWB_2019_10_20_BtagSF'
+    LABEL      = 'WH_lep_final_ntuple_old_selection_2020_02_05'
     CATEGORIES = ['3lep_hiPt_lep20_medLepMVA_noZ10_noBtag_noSys', 
 		  '3lep_hiPt_lep20_medLepMVA_onZ10_noBtag_noSys']
 

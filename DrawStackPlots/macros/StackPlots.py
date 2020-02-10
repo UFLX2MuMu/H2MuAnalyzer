@@ -84,7 +84,7 @@ elif USER == 'xzuo':
 
     CONFIG   = 'WH_lep'
     CONFIG   = 'WH_lep_allMass'
-    LABEL    = 'WH_lep_AWB_2019_10_20_BtagSF'
+    LABEL    = 'WH_lep_final_ntuple_old_selection_2020_02_05'
     CATEGORY = '3lep_hiPt_lep20_medLepMVA_noZ10_noBtag_noSys'
 
     IN_FILE  = 'histos_PreselRun2_%s_merged.root' % CATEGORY
@@ -198,7 +198,7 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
     lumi_label = R.TLatex()
     lumi_label.SetTextSize(0.035)
     lumi_label.SetTextAlign(31)
-    lumi_label.DrawLatexNDC(0.90, 0.91, '#bf{137.1 fb^{-1} (13 TeV)}' )
+    lumi_label.DrawLatexNDC(0.90, 0.91, '#bf{59.7 fb^{-1} (13 TeV)}' )
     lumi_label.Draw('same')
 
     ## Draw the lower pad, with the ratio histogram
@@ -248,8 +248,8 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
 
     canv.Update()
     if not ('BDT' in dist and 'zoom' in dist):
-        canv.SaveAs(PLOT_DIR+'/'+LABEL+'/plots/'+CATEGORY+'/new_style/'+dist+'.png')
-        canv.SaveAs(PLOT_DIR+'/'+LABEL+'/plots/'+CATEGORY+'/new_style/'+dist+'.pdf')
+        canv.SaveAs(PLOT_DIR+'/'+LABEL+'/plots/'+CATEGORY+'/'+dist+'.png')
+        canv.SaveAs(PLOT_DIR+'/'+LABEL+'/plots/'+CATEGORY+'/'+dist+'.pdf')
 
     ## Open output root file and save canvas and net histograms
     out_file_loc = R.TFile.Open(out_file_name, 'UPDATE')
