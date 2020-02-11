@@ -455,6 +455,14 @@ TLorentzVector FourVec( const MuonInfos & muons, const std::string pt_corr, cons
   if (opt == "T") vec.SetPtEtaPhiM( vec.Pt(), 0, vec.Phi(), 0 );
   return vec;
 }
+TLorentzVector FourVec( const PhotInfo & phot, const std::string opt ) {
+  TLorentzVector vec;
+  if (opt == "T")
+    vec.SetPtEtaPhiM(phot.pt,       0, phot.phi, 0 );
+  else
+    vec.SetPtEtaPhiM(phot.pt, phot.eta, phot.phi, 0 );
+  return vec;
+}
 
 
 ///////////////////////////////

@@ -47,6 +47,16 @@ struct ObjectSelectionConfig {  // Default values taken from 2016
   std::string jet_PU_ID_cut = "NONE";   // Jet passes PU ID cut
   std::vector<float> jet_btag_cuts = {99,99,99}; // Loose, medium, and tight b-tag thresholds 
 
+  // Photon selection
+  float phot_pt_min            =      -99.0;  // Minimum photon pT
+  float phot_eta_max           =      -99.0;  // Maximum photon |eta|
+  float phot_eta_gap_min       =      -99.0;  // Minimum photon gap eta
+  float phot_eta_gap_max       =      -99.0;  // Maximum photon gap eta
+  float phot_mu_dR_max         =      -99.0;  // Maximum dR(muon, photon)
+  float phot_rel_iso_max       =      -99.0;  // Maximum photon iso
+  float phot_et_over_mu_et_max =      -99.0;  // Maximum ET ratio phot/muon 
+  float phot_dR_over_et2_max   =      -99.0;  // Maximum dR(mu,phot)/ET^2(phot)
+
   // Higgs candidate pair selection
   std::string muPair_Higgs = "NONE"; // How to choose dimuon candidate pair
                                      // e.g. sort_OS_sum_muon_pt, sort_OS_dimuon_pt, etc.
@@ -70,6 +80,7 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
 bool MuonPass ( const ObjectSelectionConfig & cfg, const MuonInfo & muon, const NTupleBranches & br, const bool verbose = false );
 bool ElePass  ( const ObjectSelectionConfig & cfg, const EleInfo & ele, const NTupleBranches & br, const bool verbose = false );
 bool JetPass  ( const ObjectSelectionConfig & cfg, const JetInfo & jet, const NTupleBranches & br, const std::string sel = "", const bool verbose = false );
+bool PhotPass ( const ObjectSelectionConfig & cfg, const PhotInfo & phot, const NTupleBranches & br, const bool verbose = false );
 
 int JetMuonClean( const ObjectSelectionConfig & cfg, const JetInfo & jet, const MuonInfo & mu, const NTupleBranches & br, const bool verbose = false );
 int JetEleClean ( const ObjectSelectionConfig & cfg, const JetInfo & jet, const EleInfo & ele, const NTupleBranches & br, const bool verbose = false );
@@ -80,5 +91,6 @@ MuPairInfo   SelectedCandPair ( const ObjectSelectionConfig & cfg, const NTupleB
 EleInfos     SelectedEles     ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const bool verbose = false );  // Return selected electrons in event
 JetInfos     SelectedJets     ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const std::string sel = "", const bool verbose = false );  // Return selected jets in event
 JetPairInfos SelectedJetPairs ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const std::string sel = "", const bool verbose = false );  // Return selected dijet pairs in event
+PhotInfos    SelectedPhots    ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const bool verbose = false );  // Return selected photons in event
 
 #endif  // #ifndef OBJECT_SELECTION

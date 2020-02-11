@@ -69,6 +69,16 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
     if (_year == "2017") cfg.jet_btag_cuts  = {0.1522, 0.4941, 0.8001}; // DeepCSV recommendation from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
     if (_year == "2018") cfg.jet_btag_cuts  = {0.1241, 0.4184, 0.7527}; // DeepCSV recommendation from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
 
+    // Photon selection
+    cfg.phot_pt_min             =  2.0;   // Minimum photon pT
+    cfg.phot_eta_max            =  2.4;   // Maximum photon |eta|
+    cfg.phot_eta_gap_min        =  1.4;   // Minimum photon gap eta
+    cfg.phot_eta_gap_max        =  1.6;   // Maximum photon gap eta
+    cfg.phot_mu_dR_max          =  0.5;   // Maximum dR(photon, muon)
+    cfg.phot_rel_iso_max        =  1.8;   // Maximum photon isolation
+    cfg.phot_et_over_mu_et_max  =  0.4;   // Maximum ET(phot)/ET(muon)
+    cfg.phot_dR_over_et2_max    =  0.012; // Maximum dR(phot,mu)/ET^2(phot)
+
     // Higgs candidate selection
     cfg.muPair_Higgs = "sort_OS_sum_muon_pt";
 
@@ -193,6 +203,34 @@ bool JetPass( const ObjectSelectionConfig & cfg, const JetInfo & jet, const NTup
 
   return true;
 } // End function: bool JetPass()
+
+// Select photons passing kinematic cuts
+bool PhotPass ( const ObjectSelectionConfig & cfg, const PhotInfo & phot, const NTupleBranches & br, const bool verbose ) {
+
+  if ( cfg.phot_pt_min  != -99 )
+    if ( phot.pt                     < cfg.phot_pt_min                                  ) return false;
+  if ( cfg.phot_eta_max != -99 )
+    if ( fabs(phot.eta)              > cfg.phot_eta_max                                 ) return false;
+  if ( cfg.phot_eta_gap_min != -99 && cfg.phot_eta_gap_max != -99 )
+    if ( fabs(phot.eta) > cfg.phot_eta_gap_min && fabs(phot.eta) < cfg.phot_eta_gap_max ) return false;
+  if ( cfg.phot_mu_dR_max != -99 )
+    if ( phot.dRPhoMu                > cfg.phot_mu_dR_max                               ) return false;
+  if ( cfg.phot_rel_iso_max != -99 )
+    if ( phot.relIso                 > cfg.phot_rel_iso_max                             ) return false;
+  if ( cfg.phot_dR_over_et2_max   != -99 )
+    if ( phot.dROverEt2              > cfg.phot_dR_over_et2_max                         ) return false;
+  if ( cfg.phot_et_over_mu_et_max   != -99 ){
+    float mu_pt = -99.0;
+    int mu_idx = 0; 
+    for ( const auto & muon : (*br.muons) ){
+      if (mu_idx == phot.mu_idx) mu_pt = muon.pt;
+      mu_idx += 1;
+    }
+    if ( phot.pt / mu_pt    > cfg.phot_et_over_mu_et_max                                ) return false;
+  }
+  
+  return true;
+} // End function: bool PhotPass()
 
 
 // Decide whether jet or lepton passes jet-lepton cleaning algorithm
@@ -423,6 +461,21 @@ JetInfos SelectedJets ( const ObjectSelectionConfig & cfg, const NTupleBranches 
   return selJets;
 }
 
+// Return selected photons in event
+PhotInfos SelectedPhots ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const bool verbose ) {
+
+  PhotInfos selPhots;
+  // std::cout << "selPhots" << std::endl;
+  for (const auto & phot : (*br.phots)) {
+    // std::cout << "in for loop selected phots" << std::endl;
+    if ( PhotPass(cfg, phot, br) ) {
+      // std::cout << "if photPass" << std::endl;
+      selPhots.push_back(phot);
+    }
+  }
+  // std::cout << "return selPhots" << std::endl;
+  return selPhots;
+}
 
 // Return selected dijet pairs in event
 JetPairInfos SelectedJetPairs ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const std::string sel, const bool verbose ) {

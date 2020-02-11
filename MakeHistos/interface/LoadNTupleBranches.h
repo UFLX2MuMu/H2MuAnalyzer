@@ -27,6 +27,8 @@ struct NTupleBranches {
   SlimJetInfos * slimJets_JES_up = 0;
   SlimJetInfos * slimJets_JES_down = 0;
   
+  PhotInfos * phots = 0;
+
   JetPairInfos * jetPairs = 0;
   JetPairInfos * jetPairs_JES_up = 0;
   JetPairInfos * jetPairs_JES_down = 0;

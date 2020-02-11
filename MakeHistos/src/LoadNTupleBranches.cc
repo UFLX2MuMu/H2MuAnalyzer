@@ -57,6 +57,7 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
   ch->SetBranchAddress("muons", &(br.muons));
   ch->SetBranchAddress("muPairs", &(br.muPairs));
   ch->SetBranchAddress("eles", &(br.eles));
+  ch->SetBranchAddress("phots", &(br.phots));
   if ( isSlim) ch->SetBranchAddress("jets", &(br.slimJets));
   if (!isSlim) ch->SetBranchAddress("jets", &(br.jets));
   ch->SetBranchAddress("jetPairs", &(br.jetPairs));

@@ -29,7 +29,7 @@
 // // Load the library of the local, compiled H2MuAnalyzer/MakeHistos directory
 // R__LOAD_LIBRARY(../../../tmp/slc6_amd64_gcc630/src/H2MuAnalyzer/MakeHistos/src/H2MuAnalyzerMakeHistos/libH2MuAnalyzerMakeHistos.so)
 
-const std::string YEAR = "2016";
+const std::string YEAR = "2017";
 //const std::string YEAR = "2018";
 // Load the library of the local, compiled H2MuAnalyzer/MakeHistos directory
 R__LOAD_LIBRARY(../../../tmp/slc6_amd64_gcc630/src/H2MuAnalyzer/MakeHistos/src/H2MuAnalyzerMakeHistos/libH2MuAnalyzerMakeHistos.so)
@@ -46,7 +46,8 @@ const float SAMP_WGT = 1.0;
 const bool verbose = false; // Print extra information
 
 
-const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/WplusH_HToMuMu_WToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_WH_pos_125/190625_204210/0000";
+// const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/WplusH_HToMuMu_WToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_WH_pos_125/190625_204210/0000";
+const TString IN_DIR = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2017/94X_v4/prod-v17.2.0.skim3l/WplusH_HToMuMu_WToAll_M125_13TeV_powheg_pythia8/H2Mu_WH_pos_125/191212_100608/";
 const TString SAMPLE = "H2Mu_WH_pos_125";
 // const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/SingleMuon/SingleMu_2016E/190625_203954/0000";
 // const TString SAMPLE = "SingleMu";
@@ -65,14 +66,15 @@ const TString SAMPLE = "H2Mu_WH_pos_125";
 //const TString IN_DIR = "/eos/cms/store/user/bortigno/h2mm/ntuples/2018/102X/prod-v18.1.6.skim3l/SingleMuon/SingleMu_2018D/190528_111415/0000";
 //const TString SAMPLE = "SingleMu";
 
-const std::string SLIM  = (YEAR == "2017" ? "Slim" : "notSlim");  // "Slim" or "notSlim" - Some 2017 NTuples are "Slim"
+// const std::string SLIM  = (YEAR == "2017" ? "Slim" : "notSlim");  // "Slim" or "notSlim" - Some 2017 NTuples are "Slim"
+const std::string SLIM  = "notSlim";  // "Slim" or "notSlim" - Some 2017 NTuples are "Slim"
 const TString OUT_DIR   = "plots";
 const TString HIST_TREE = "HistTree"; // "Hist", "Tree", or "HistTree" to output histograms, trees, or both
 
 // Systematic shifts to apply
 // {"JES_", "PU_wgt_", "MuID_SF_", "MuIso_SF_", "IsoMu_SF_", "LepMVA_SF_", "Roch_sys_", "KaMu_sys_", "KaMu_clos_"}  X  {"up", "down"}
-// const std::string SYS_SHIFT = "noSys";
-const std::string SYS_SHIFT = "B_SF_up";
+const std::string SYS_SHIFT = "noSys";
+// const std::string SYS_SHIFT = "B_SF_up";
 // const std::string SYS_SHIFT = "LepMVA_SF_up";
 // const std::string SYS_SHIFT = "JES_up";
 // const std::string SYS_SHIFT = "IsoMu_SF_down";
@@ -447,7 +449,9 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	  // Get selected muons and electrons in event
 	  MuonInfos muons = SelectedMuons(obj_sel, br);
 	  EleInfos  eles  = SelectedEles(obj_sel, br);
-	  JetInfos  jets  = SelectedJets(obj_sel, br);
+    JetInfos  jets  = SelectedJets(obj_sel, br);
+    PhotInfos phots = SelectedPhots(obj_sel, br);
+    // std::cout << "photon size: " << phots.size() << std::endl;
 	  int sum_lep_charge = 0;
 	  if (MU) {
 	    ASSERT(muons.size() == 3 && eles.size() == 0, "muons.size() == 3 && eles.size() == 0");
@@ -782,6 +786,8 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	  TLorentzVector lep_MET_vec = lep_vecT + MET_vec;
 	  TLorentzVector evt_vec     = FourVec(muons, PTC, eles, jets);
 	  TLorentzVector MHT_vec     = FourVec(muons, PTC, eles, jets, "T");
+    TLorentzVector phot_vec(0.,0.,0.,0.);
+    if (phots.size() > 0) phot_vec = FourVec(phots.at(0));
 	  MHT_vec.RotateZ(TMath::Pi());
 	  TLorentzVector lep_MHT_vec = lep_vecT + MHT_vec;
 
@@ -870,7 +876,8 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 
 	  // Plot kinematic histograms
 	  BookAndFill(tupI, "nPV",   12, -0.5, 59.5, br.nVertices, cat_evt_wgt );
-	  BookAndFill(tupI, "nEles",  2,  0.5,  1.5, eles.size(),  cat_evt_wgt );
+    BookAndFill(tupI, "nEles",  2,  0.5,  1.5, eles.size(),  cat_evt_wgt );
+    BookAndFill(tupI, "nPhots",  4,  0.5,  3.5, phots.size(),  cat_evt_wgt );
 
 	  BookAndFill(tupI, "nJets",       8, -0.5, 7.5, jets.size(),                                    cat_evt_wgt );
 	  BookAndFill(tupI, "nBJetsLoose", 6, -0.5, 5.5, SelectedJets(obj_sel, br, "BTagLoose").size(),  cat_evt_wgt );
@@ -897,6 +904,7 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	  BookAndFill(tupF, "muH1_pt", 30, 0, 300, muH1_vec.Pt(), cat_evt_wgt );
 	  BookAndFill(tupF, "muH2_pt", 20, 0, 200, muH2_vec.Pt(), cat_evt_wgt );
 	  BookAndFill(tupF, "lep_pt",  20, 0, 200, lep_vec.Pt(),  cat_evt_wgt );
+    BookAndFill(tupF, "phot_pt", 20, 0, 100, phot_vec.Pt(), cat_evt_wgt );
 
 	  BookAndFill(tupF, "muOS_pt",   20, 0, 200, muOS_vec.Pt(),   cat_evt_wgt );
 	  BookAndFill(tupF, "muSS_pt",   20, 0, 200, muSS_vec.Pt(),   cat_evt_wgt );  // "Wrong combo" of lep_pt
