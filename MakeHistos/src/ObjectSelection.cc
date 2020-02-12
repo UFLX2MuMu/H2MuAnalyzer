@@ -70,6 +70,16 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
     if (_year == "2017") cfg.jet_btag_cuts  = {0.1522, 0.4941, 0.8001}; // DeepCSV recommendation from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
     if (_year == "2018") cfg.jet_btag_cuts  = {0.1241, 0.4184, 0.7527}; // DeepCSV recommendation from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
 
+    // Photon selection
+    cfg.phot_pt_min             =  2.0;   // Minimum photon pT
+    cfg.phot_eta_max            =  2.4;   // Maximum photon |eta|
+    cfg.phot_eta_gap_min        =  1.4;   // Minimum photon gap eta
+    cfg.phot_eta_gap_max        =  1.6;   // Maximum photon gap eta
+    cfg.phot_mu_dR_max          =  0.5;   // Maximum dR(photon, muon)
+    cfg.phot_rel_iso_max        =  1.8;   // Maximum photon isolation
+    cfg.phot_pt_over_mu_pt_max  =  0.4;   // Maximum ET(phot)/ET(muon)
+    cfg.phot_dR_over_et2_max    =  0.012; // Maximum dR(phot,mu)/ET^2(phot)
+
     // Higgs candidate selection
     cfg.muPair_Higgs = "sort_OS_sum_muon_pt";
 
@@ -213,9 +223,9 @@ bool PhotPass ( const ObjectSelectionConfig & cfg, const PhotInfo & phot, const 
     if ( phot.relIso                 > cfg.phot_rel_iso_max                             ) return false;
   if ( cfg.phot_dR_over_et2_max   != -99 )
     if ( phot.dROverEt2              > cfg.phot_dR_over_et2_max                         ) return false;
-  if ( cfg.phot_et_over_mu_et_max   != -99 ){
-    float mu_et = FourVec(br.muons->at(phot.mu_idx), cfg.mu_pt_corr).Et();
-    if ( phot.pt / mu_et    > cfg.phot_et_over_mu_et_max                                ) return false;
+  if ( cfg.phot_pt_over_mu_pt_max   != -99 ){
+    float mu_pt = FourVec(br.muons->at(phot.mu_idx), cfg.mu_pt_corr).Pt();
+    if ( phot.pt / mu_pt    > cfg.phot_pt_over_mu_pt_max                                ) return false;
   }
   
   return true;

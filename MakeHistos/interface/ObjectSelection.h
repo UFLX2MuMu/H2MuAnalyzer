@@ -48,6 +48,16 @@ struct ObjectSelectionConfig {  // Default values taken from 2016
   std::string jet_PU_ID_cut = "NONE";   // Jet passes PU ID cut
   std::vector<float> jet_btag_cuts = {99,99,99}; // Loose, medium, and tight b-tag thresholds 
 
+  // Photon selection
+  float phot_pt_min            =      -99.0;  // Minimum photon pT
+  float phot_eta_max           =      -99.0;  // Maximum photon |eta|
+  float phot_eta_gap_min       =      -99.0;  // Minimum photon gap eta
+  float phot_eta_gap_max       =      -99.0;  // Maximum photon gap eta
+  float phot_mu_dR_max         =      -99.0;  // Maximum dR(muon, photon)
+  float phot_rel_iso_max       =      -99.0;  // Maximum photon iso
+  float phot_pt_over_mu_pt_max =      -99.0;  // Maximum ET ratio phot/muon 
+  float phot_dR_over_et2_max   =      -99.0;  // Maximum dR(mu,phot)/ET^2(phot)
+
   // Higgs candidate pair selection
   std::string muPair_Higgs = "NONE"; // How to choose dimuon candidate pair
                                      // e.g. sort_OS_sum_muon_pt, sort_OS_dimuon_pt, etc.
