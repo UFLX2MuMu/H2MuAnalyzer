@@ -70,6 +70,7 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
   ch->SetBranchAddress("nEles", &(br.nEles));
   ch->SetBranchAddress("nPhots", &(br.nPhots));
   ch->SetBranchAddress("nJets", &(br.nJets));
+  ch->SetBranchAddress("nPhots", &(br.nPhots));
   ch->SetBranchAddress("nJetPairs", &(br.nJetPairs));
   ch->SetBranchAddress("nJetsCent", &(br.nJetsCent));
   ch->SetBranchAddress("nJetsFwd", &(br.nJetsFwd));
