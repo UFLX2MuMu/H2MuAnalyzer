@@ -220,13 +220,8 @@ bool PhotPass ( const ObjectSelectionConfig & cfg, const PhotInfo & phot, const 
   if ( cfg.phot_dR_over_et2_max   != -99 )
     if ( phot.dROverEt2              > cfg.phot_dR_over_et2_max                         ) return false;
   if ( cfg.phot_et_over_mu_et_max   != -99 ){
-    float mu_pt = -99.0;
-    int mu_idx = 0; 
-    for ( const auto & muon : (*br.muons) ){
-      if (mu_idx == phot.mu_idx) mu_pt = muon.pt;
-      mu_idx += 1;
-    }
-    if ( phot.pt / mu_pt    > cfg.phot_et_over_mu_et_max                                ) return false;
+    float mu_et = FourVec(br.muons->at(phot.mu_idx), cfg.mu_pt_corr).Et();
+    if ( phot.pt / mu_et    > cfg.phot_et_over_mu_et_max                                ) return false;
   }
   
   return true;
@@ -465,15 +460,11 @@ JetInfos SelectedJets ( const ObjectSelectionConfig & cfg, const NTupleBranches 
 PhotInfos SelectedPhots ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const bool verbose ) {
 
   PhotInfos selPhots;
-  // std::cout << "selPhots" << std::endl;
   for (const auto & phot : (*br.phots)) {
-    // std::cout << "in for loop selected phots" << std::endl;
     if ( PhotPass(cfg, phot, br) ) {
-      // std::cout << "if photPass" << std::endl;
       selPhots.push_back(phot);
     }
   }
-  // std::cout << "return selPhots" << std::endl;
   return selPhots;
 }
 

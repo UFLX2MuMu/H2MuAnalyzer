@@ -455,7 +455,7 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	  EleInfos  eles  = SelectedEles(obj_sel, br);
     JetInfos  jets  = SelectedJets(obj_sel, br);
     PhotInfos phots = SelectedPhots(obj_sel, br);
-    // std::cout << "photon size: " << phots.size() << std::endl;
+
 	  int sum_lep_charge = 0;
 	  if (MU) {
 	    ASSERT(muons.size() == 3 && eles.size() == 0, "muons.size() == 3 && eles.size() == 0");
@@ -881,7 +881,8 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	  // Plot kinematic histograms
 	  BookAndFill(tupI, "nPV",   12, -0.5, 59.5, br.nVertices, cat_evt_wgt );
     BookAndFill(tupI, "nEles",  2,  0.5,  1.5, eles.size(),  cat_evt_wgt );
-    BookAndFill(tupI, "nPhots",  4,  0.5,  3.5, phots.size(),  cat_evt_wgt );
+    BookAndFill(tupI, "nPhots_selected",  4,  -0.5,  3.5, phots.size(),  cat_evt_wgt );
+    BookAndFill(tupI, "nPhots_branch",  4,  -0.5,  3.5, br.nPhots,  cat_evt_wgt );
 
 	  BookAndFill(tupI, "nJets",       8, -0.5, 7.5, jets.size(),                                    cat_evt_wgt );
 	  BookAndFill(tupI, "nBJetsLoose", 6, -0.5, 5.5, SelectedJets(obj_sel, br, "BTagLoose").size(),  cat_evt_wgt );
