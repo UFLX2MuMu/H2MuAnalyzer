@@ -27,7 +27,8 @@ bool  IsGenMatched  ( const MuPairInfo & muPair, const MuonInfos & muons, const 
 TH2F* LoadSFsLepMVA ( const std::string year, const std::string flavor, const std::string WP ); // Return a 2D histogram with LepMVA efficiency scale factors
 float LepMVASF      ( const TH2F * h_SF, const float pt, const float eta, const std::string SF_sys = "noSys" );   // Return the LepMVA efficiency scale factor for a single lepton
 
-bool  EleID ( const EleInfo & ele, const std::string ele_ID ); // Return loose, medium, or tight electron ID
+bool  EleID ( const EleInfo & ele, const std::string ele_ID ); // Return loose, medium, tight or tZq electron ID
+bool  EleMVAID ( const EleInfo & ele, const std::string ele_MVA_ID ); // Return MvaWpLooseID or MvaWp90ID electron ID
 
 float GetLepMVASF(const std::string lep_type, float pt, float eta, float lepMVA_cut); // return lepMVA SF, lep_type is "muon" or "ele" 
 

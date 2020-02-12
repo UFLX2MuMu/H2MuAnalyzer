@@ -51,7 +51,8 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
     // Electron selection
     cfg.ele_pt_min  = 20.0;     // Minimum electron pT
     cfg.ele_eta_max =  2.5;     // Maximum electron |eta|
-    cfg.ele_ID_cut  = "loose";  // Electron ID: "loose", "medium", or "tight"
+    cfg.ele_ID_cut  = "tZq";    // Electron ID: "veto", loose", "medium", "tight", or "tZq"
+    cfg.ele_MVA_ID_cut  = "MvaWp90ID";  // Electron MVA ID: "MvaWp90ID" or "MvaWpLooseID"
     cfg.ele_mIso_max =  0.4;    // Maximum electron relative miniIsolation
     cfg.ele_d0_max  =   0.05;   // Maximum electron |dXY| from vertex
     cfg.ele_dZ_max  =   0.1;    // Maximum electron |dZ| from vertex
@@ -137,6 +138,8 @@ bool ElePass ( const ObjectSelectionConfig & cfg, const EleInfo & ele, const NTu
     if ( fabs(ele.eta)               > cfg.ele_eta_max  ) return false;
   if ( cfg.ele_ID_cut  != "NONE" )
     if ( EleID(ele, cfg.ele_ID_cut) != true             ) return false;
+  if ( cfg.ele_MVA_ID_cut  != "NONE" )
+    if ( EleMVAID(ele, cfg.ele_MVA_ID_cut) != true      ) return false;
   if ( cfg.ele_iso_max != -99 )
     if ( ele.relIso                  > cfg.ele_iso_max  ) return false;
   if ( cfg.ele_mIso_max != -99 )

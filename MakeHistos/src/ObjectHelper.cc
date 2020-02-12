@@ -208,11 +208,18 @@ bool EleID ( const EleInfo & ele, const std::string ele_ID ) {
   if ( ele_ID == "loose" ) return ele.isLooseID;
   if ( ele_ID == "medium") return ele.isMediumID;
   if ( ele_ID == "tight" ) return ele.isTightID;
+  if ( ele_ID == "tZq"   ) return ele.isTZqID;
   std::cout << "\n\nInside ObjectHelper.cc, invalid option ele_ID = " << ele_ID << std::endl;
   assert(false);
 }
 
-
+// Return MvaWpLooseID or MvaWp90ID electron ID
+bool EleMVAID ( const EleInfo & ele, const std::string ele_MVA_ID ) {
+  if ( ele_MVA_ID == "MvaWp90ID" ) return ele.isMvaWp90ID;
+  if ( ele_MVA_ID == "MvaWpLooseID") return ele.isMvaWpLooseID;
+  std::cout << "\n\nInside ObjectHelper.cc, invalid option ele_MVA_ID = " << ele_MVA_ID << std::endl;
+  assert(false);
+}
 
 ///////////////////
 ///  lepMVA SF  ///
