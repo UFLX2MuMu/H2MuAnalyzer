@@ -29,7 +29,8 @@ struct ObjectSelectionConfig {  // Default values taken from 2016
   // Electron selection
   float       ele_pt_min   =  -99.0;  // Minimum electron pT
   float       ele_eta_max  =  -99.0;  // Maximum electron |eta|
-  std::string ele_ID_cut   = "NONE";  // Electron ID: "loose", "medium", or "tight"
+  std::string ele_ID_cut   = "NONE";  // Electron ID: "veto", loose", "medium", or "tight"
+  std::string ele_MVA_ID_cut   = "NONE";  // Electron MVA ID: "MvaWp90ID" or "MvaWpLooseID"
   float       ele_iso_max  =  -99.0;  // Maximum electron relative isolation
   float       ele_mIso_max =  -99.0;  // Maximum electron relative miniIsolation
   float       ele_d0_max   =  -99.0;  // Maximum electron |dXY| from vertex
