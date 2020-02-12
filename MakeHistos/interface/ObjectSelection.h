@@ -55,7 +55,7 @@ struct ObjectSelectionConfig {  // Default values taken from 2016
   float phot_eta_gap_max       =      -99.0;  // Maximum photon gap eta
   float phot_mu_dR_max         =      -99.0;  // Maximum dR(muon, photon)
   float phot_rel_iso_max       =      -99.0;  // Maximum photon iso
-  float phot_et_over_mu_et_max =      -99.0;  // Maximum ET ratio phot/muon 
+  float phot_pt_over_mu_pt_max =      -99.0;  // Maximum ET ratio phot/muon 
   float phot_dR_over_et2_max   =      -99.0;  // Maximum dR(mu,phot)/ET^2(phot)
 
   // Higgs candidate pair selection

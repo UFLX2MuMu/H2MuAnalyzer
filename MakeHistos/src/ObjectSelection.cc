@@ -77,7 +77,7 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
     cfg.phot_eta_gap_max        =  1.6;   // Maximum photon gap eta
     cfg.phot_mu_dR_max          =  0.5;   // Maximum dR(photon, muon)
     cfg.phot_rel_iso_max        =  1.8;   // Maximum photon isolation
-    cfg.phot_et_over_mu_et_max  =  0.4;   // Maximum ET(phot)/ET(muon)
+    cfg.phot_pt_over_mu_pt_max  =  0.4;   // Maximum ET(phot)/ET(muon)
     cfg.phot_dR_over_et2_max    =  0.012; // Maximum dR(phot,mu)/ET^2(phot)
 
     // Higgs candidate selection
@@ -222,9 +222,9 @@ bool PhotPass ( const ObjectSelectionConfig & cfg, const PhotInfo & phot, const 
     if ( phot.relIso                 > cfg.phot_rel_iso_max                             ) return false;
   if ( cfg.phot_dR_over_et2_max   != -99 )
     if ( phot.dROverEt2              > cfg.phot_dR_over_et2_max                         ) return false;
-  if ( cfg.phot_et_over_mu_et_max   != -99 ){
-    float mu_et = FourVec(br.muons->at(phot.mu_idx), cfg.mu_pt_corr).Et();
-    if ( phot.pt / mu_et    > cfg.phot_et_over_mu_et_max                                ) return false;
+  if ( cfg.phot_pt_over_mu_pt_max   != -99 ){
+    float mu_pt = FourVec(br.muons->at(phot.mu_idx), cfg.mu_pt_corr).Pt();
+    if ( phot.pt / mu_pt    > cfg.phot_pt_over_mu_pt_max                                ) return false;
   }
   
   return true;
