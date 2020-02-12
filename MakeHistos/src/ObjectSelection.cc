@@ -195,6 +195,30 @@ bool JetPass( const ObjectSelectionConfig & cfg, const JetInfo & jet, const NTup
 } // End function: bool JetPass()
 
 
+// Select photons passing kinematic cuts
+bool PhotPass ( const ObjectSelectionConfig & cfg, const PhotInfo & phot, const NTupleBranches & br, const bool verbose ) {
+
+  if ( cfg.phot_pt_min  != -99 )
+    if ( phot.pt                     < cfg.phot_pt_min                                  ) return false;
+  if ( cfg.phot_eta_max != -99 )
+    if ( fabs(phot.eta)              > cfg.phot_eta_max                                 ) return false;
+  if ( cfg.phot_eta_gap_min != -99 && cfg.phot_eta_gap_max != -99 )
+    if ( fabs(phot.eta) > cfg.phot_eta_gap_min && fabs(phot.eta) < cfg.phot_eta_gap_max ) return false;
+  if ( cfg.phot_mu_dR_max != -99 )
+    if ( phot.dRPhoMu                > cfg.phot_mu_dR_max                               ) return false;
+  if ( cfg.phot_rel_iso_max != -99 )
+    if ( phot.relIso                 > cfg.phot_rel_iso_max                             ) return false;
+  if ( cfg.phot_dR_over_et2_max   != -99 )
+    if ( phot.dROverEt2              > cfg.phot_dR_over_et2_max                         ) return false;
+  if ( cfg.phot_et_over_mu_et_max   != -99 ){
+    float mu_et = FourVec(br.muons->at(phot.mu_idx), cfg.mu_pt_corr).Et();
+    if ( phot.pt / mu_et    > cfg.phot_et_over_mu_et_max                                ) return false;
+  }
+  
+  return true;
+} // End function: bool PhotPass()
+
+
 // Decide whether jet or lepton passes jet-lepton cleaning algorithm
 // Returns a bit mask: 0 for both fail, 1 for jet passes, 2 for lepton passes, 3 for both pass
 int JetMuonClean( const ObjectSelectionConfig & cfg, const JetInfo & jet, const MuonInfo & mu, const NTupleBranches & br, const bool verbose ) {
@@ -423,6 +447,17 @@ JetInfos SelectedJets ( const ObjectSelectionConfig & cfg, const NTupleBranches 
   return selJets;
 }
 
+// Return selected photons in event
+PhotInfos SelectedPhots ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const bool verbose ) {
+
+  PhotInfos selPhots;
+  for (const auto & phot : (*br.phots)) {
+    if ( PhotPass(cfg, phot, br) ) {
+      selPhots.push_back(phot);
+    }
+  }
+  return selPhots;
+}
 
 // Return selected dijet pairs in event
 JetPairInfos SelectedJetPairs ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const std::string sel, const bool verbose ) {
