@@ -41,6 +41,7 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
     cfg.mu_eta_max  =  2.4;     // Maximum muon |eta|
     cfg.mu_ID_cut   = "medium"; // Muon ID: "loose", "medium", or "tight"
     cfg.mu_mIso_max =  0.4;     // Maximum muon relative miniIsolation
+    cfg.mu_iso_max  =  0.25;    // Maximum muon relative isolation
     cfg.mu_d0_max   =  0.05;    // Maximum muon |dXY| from vertex
     cfg.mu_dZ_max   =  0.1;     // Maximum muon |dZ| from vertex
     cfg.mu_SIP_max  =  8.0;     // Maximum muon impact parameter significance
