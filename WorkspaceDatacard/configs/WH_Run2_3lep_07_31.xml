@@ -39,201 +39,96 @@
           <order>  6 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
 
-
-    <mass>
-      <dist>     H_pair_mass_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
+	<fit>
+          <shape>  Bern </shape>
+          <order>  6 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
-        <fit>
+	<fit>
           <shape>  Bern </shape>
           <order>  5 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
 
-    <mass>
-      <dist>     H_pair_mass_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
+	<fit>
+          <shape>  Bern </shape>
+          <order>  5 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
-        <fit>
+	<fit>
           <shape>  Bern </shape>
           <order>  4 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
 
-
-    <mass>
-      <dist>     H_pair_mass_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
+	<fit>
+          <shape>  Bern </shape>
+          <order>  4 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
-        <fit>
+	<fit>
           <shape>  Bern </shape>
           <order>  3 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
 
-    <mass>
-      <dist>     H_pair_mass_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-      
-      <sig_fits>
 	<fit>
-	  <shape>  Gaus </shape>
-	  <order>  3 </order>
-	  <freeze> [Coefs, Params] </freeze>
-	</fit>
-      </sig_fits>
-      
-      <bkg_fits>
-	<fit>
-	  <shape>  Bern </shape>
-	  <order>  2 </order>
-	  <freeze> [] </freeze>
-	</fit>
-      </bkg_fits>
-    </mass>
-
-    <mass>
-      <dist>     H_pair_mass_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
+          <shape>  Bern </shape>
           <order>  3 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
-        <fit>
+	<fit>
           <shape>  BWZ </shape>
           <order>  1 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
-
-    <mass>
-      <dist>     H_pair_mass_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
+	
+	<fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
-        <fit>
+	<fit>
           <shape>  BWZRed </shape>
           <order>  2 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
 
-
-    <mass>
-      <dist>     H_pair_mass_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
+	<fit>
+          <shape>  BWZRed </shape>
+          <order>  2 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
-        <fit>
+	<fit>
           <shape>  expo </shape>
           <order>  1 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
-    
-    <mass>
-      <dist>     H_pair_mass_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
 
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
+	<fit>
+          <shape>  expo </shape>
+          <order>  1 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
-        <fit>
+	<fit>
           <shape>  expo </shape>
           <order>  2 </order>
           <freeze> [] </freeze>
         </fit>
+	
+	<fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
       </bkg_fits>
     </mass>
 
@@ -256,183 +151,50 @@
       <bkg_fits>
         <fit>
           <shape>  Bern </shape>
-          <order>  2 </order>
+          <order>  3 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
 
-    <mass>
-      <dist>     H_pair_mass_BDT_n02_p02_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
+	<fit>
+          <shape>  Bern </shape>
           <order>  3 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
-        <fit>
+	<fit>
           <shape>  Bern </shape>
           <order>  2 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
-   
-   
-    <mass>
-      <dist>     H_pair_mass_BDT_p02_p06_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
+      
         <fit>
           <shape>  Bern </shape>
           <order>  2 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p06_p10_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
-        <fit>
-          <shape>  Bern </shape>
+	<fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  expo </shape>
           <order>  2 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
-
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p060_p068_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  Bern </shape>
+	
+	<fit>
+          <shape>  expo </shape>
           <order>  2 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p068_p076_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
           <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  Bern </shape>
-          <order>  2 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p076_p10_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  Bern </shape>
-          <order>  2 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-
-
-
-    <mass>
-      <dist>     H_pair_mass_BDT_n10_n02_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  Bern </shape>
-          <order>  3 </order>
-          <freeze> [] </freeze>
         </fit>
       </bkg_fits>
     </mass>
@@ -458,7 +220,49 @@
           <order>  3 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
+
+	<fit>
+          <shape>  Bern </shape>
+          <order>  3 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+      
+        <fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+	
+	<fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+     </bkg_fits>
     </mass>
    
    
@@ -482,6 +286,48 @@
           <shape>  Bern </shape>
           <order>  3 </order>
           <freeze> [] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  Bern </shape>
+          <order>  3 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+      
+        <fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+	<fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+	
+	<fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
         </fit>
       </bkg_fits>
     </mass>
@@ -508,6 +354,48 @@
           <order>  3 </order>
           <freeze> [] </freeze>
         </fit>
+
+        <fit>
+          <shape>  Bern </shape>
+          <order>  3 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
       </bkg_fits>
     </mass>
 
@@ -533,6 +421,48 @@
           <order>  3 </order>
           <freeze> [] </freeze>
         </fit>
+
+        <fit>
+          <shape>  Bern </shape>
+          <order>  3 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
       </bkg_fits>
     </mass>
 
@@ -556,6 +486,48 @@
           <shape>  Bern </shape>
           <order>  3 </order>
           <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  Bern </shape>
+          <order>  3 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  expo </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
         </fit>
       </bkg_fits>
     </mass>
@@ -582,357 +554,50 @@
           <order>  3 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
 
-    
-    <mass>
-      <dist>     H_pair_mass_BDT_n10_n02_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
         <fit>
-          <shape>  Gaus </shape>
+          <shape>  Bern </shape>
           <order>  3 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
+        <fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+        <fit>
+          <shape>  Bern </shape>
+          <order>  2 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+
         <fit>
           <shape>  BWZ </shape>
           <order>  1 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
 
-    <mass>
-      <dist>     H_pair_mass_BDT_n02_p02_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
         <fit>
           <shape>  BWZ </shape>
           <order>  1 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-   
-   
-    <mass>
-      <dist>     H_pair_mass_BDT_p02_p06_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
 
-      <bkg_fits>
-        <fit>
-          <shape>  BWZ </shape>
-          <order>  1 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p06_p10_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  BWZ </shape>
-          <order>  1 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p060_p068_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  BWZ </shape>
-          <order>  1 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p068_p076_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  BWZ </shape>
-          <order>  1 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p076_p10_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  BWZ </shape>
-          <order>  1 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-
-    
-    <mass>
-      <dist>     H_pair_mass_BDT_n10_n02_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
         <fit>
           <shape>  expo </shape>
           <order>  2 </order>
           <freeze> [] </freeze>
         </fit>
-      </bkg_fits>
-    </mass>
 
-    <mass>
-      <dist>     H_pair_mass_BDT_n02_p02_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
         <fit>
           <shape>  expo </shape>
           <order>  2 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-   
-   
-    <mass>
-      <dist>     H_pair_mass_BDT_p02_p06_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
           <freeze> [Coefs, Params] </freeze>
         </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  expo </shape>
-          <order>  2 </order>
-          <freeze> [] </freeze>
-        </fit>
       </bkg_fits>
     </mass>
-
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p06_p10_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  expo </shape>
-          <order>  2 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p060_p068_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  expo </shape>
-          <order>  2 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p068_p076_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  expo </shape>
-          <order>  2 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-
-    <mass>
-      <dist>     H_pair_mass_BDT_p076_p10_zoomH  </dist>
-      <min_max>  [110, 160] </min_max>
-      <blind>    [120, 130] </blind>
-      <rebin>    False </rebin>
-      <models>   [shape] </models>
-
-      <sig_fits>
-        <fit>
-          <shape>  Gaus </shape>
-          <order>  3 </order>
-          <freeze> [Coefs, Params] </freeze>
-        </fit>
-      </sig_fits>
-
-      <bkg_fits>
-        <fit>
-          <shape>  expo </shape>
-          <order>  2 </order>
-          <freeze> [] </freeze>
-        </fit>
-      </bkg_fits>
-    </mass>
-
-
 
 
 
