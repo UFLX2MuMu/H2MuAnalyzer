@@ -35,7 +35,7 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
     cfg.year = _year;
 
     // Muon selection
-    if (_year == "2016") cfg.mu_pt_corr  = "KaMu";   // Muon pT correction: "PF", "Roch", or "KaMu"
+    if (_year == "2016") cfg.mu_pt_corr  = "Roch";   // use "Roch" for all years
     else 		 cfg.mu_pt_corr  = "Roch";   // Muon pT correction: "PF", "Roch", or "KaMu"
     cfg.mu_pt_min   = 20.0;     // Minimum muon pT
     cfg.mu_eta_max  =  2.4;     // Maximum muon |eta|
@@ -92,7 +92,6 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
 
       cfg.ele_pt_min  = 20.0;     // Minimum electron pT
       cfg.ele_MVA_min = -0.4;     // Minimum prompt electron lepton MVA (lepMVA) BDT score
-      cfg.ele_POG_MVA = 0.8;     // Minimum POG MVA score
       cfg.ele_CSV_max = "loose";  // Veto electrons with pT < 20 GeV with matching jet passing b-tag threshold
     }
 
