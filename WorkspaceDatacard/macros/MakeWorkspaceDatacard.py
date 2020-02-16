@@ -69,7 +69,9 @@ if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 #CONFIGS = ['ZH_Run2_lep_08_26']
 #CONFIGS = ['ZH_Run2_lep_BDT_08_26']
 
-CONFIGS = ['WH_Run2_3lep_10_20_DSCB_sig_sys']
+
+#CONFIGS = ['WH_Run2_3lep_10_20_DSCB_sig_sys']
+CONFIGS = ['ZH_Run2_lep_02_07_newcat_sys']
 
 #============================================
 # Main code

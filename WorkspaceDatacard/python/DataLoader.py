@@ -93,6 +93,9 @@ class DataLoader:
         if   (self.source == 'abrinke1'):
             in_file_name = self.in_dir+'/plots/'+self.cat_loc+'/'+self.in_file
 	if   (self.source == 'Sys_test'):
+	  if self.cat_loc == '':
+	    in_file_name = self.in_dir+'/'+self.in_file
+	  else:
             in_file_name = self.in_dir+'/plots/'+self.cat_loc+'/'+self.in_file
 
         elif (self.source == 'abrinke1_TMVA'):
