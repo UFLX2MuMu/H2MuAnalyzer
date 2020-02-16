@@ -19,6 +19,8 @@ struct NTupleBranches {
   MuPairInfos * muPairs = 0;
   
   EleInfos * eles = 0;
+
+  PhotInfos * phots = 0;
   
   JetInfos * jets = 0;
   JetInfos * jets_JES_up = 0;
@@ -50,6 +52,7 @@ struct NTupleBranches {
   int nMuons = -99;
   int nMuPairs = -99;
   int nEles = -99;
+  int nPhots = -99;
   int nJets = -99;
   int nJetPairs = -99;
   int nJetsCent = -99;

@@ -39,10 +39,10 @@ if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 #MACRO = 'macros/MC_data_comparison.C'
 #MACRO = 'macros/ggH_VBF_2l.C'
 #MACRO = 'macros/WH_lep.C'
-MACRO = 'macros/WH_lep_systematics.C'
+#MACRO = 'macros/WH_lep_systematics.C'
 #MACRO = 'macros/ttH_3l.C'
 #MACRO = 'macros/MiniNTupliser.C'
-#MACRO = 'macros/MiniNTupliser_4l_cat.C'
+MACRO = 'macros/MiniNTupliser_4l_cat.C'
 #MACRO = 'macros/MassCalibration.C'
 #MACRO = 'macros/Btag_eff.C'
 #MACRO = 'macros/SimpleTreeForDas.C'
@@ -52,16 +52,18 @@ MACRO = 'macros/WH_lep_systematics.C'
 LOC = 'CERN_3l_final'
 #LOC  = 'CERN_lepMVA_test_v2'  ## Location of input files ('CERN', 'CERN_hiM', or 'UF', or 'CERN_lepMVA_test_v1')
 #LOC  = 'CERN_lepMVA_3l_test_v1'
-YEAR = '2018'  ## Dataset year (2016, 2017, or 2018)
-LUMI = 59740   ## 35920 for 2016, 41530 for 2017, 59740 for 2018   ## Lumi values from https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
+YEAR = '2016'  ## Dataset year (2016, 2017, or 2018)
+LUMI = 35920   ## 35920 for 2016, 41530 for 2017, 59740 for 2018   ## Lumi values from https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
 
 ## Override default sample location from SampleDatabase.py (use IN_DIR = '' to keep default)
 #IN_DIR  = '/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2017/94X_v2/2019_01_14_LepMVA_2l_hiM_test_v2'
 #IN_DIR = '/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2017/94X_v2/2019_01_14_LepMVA_2l_test_v2'
 IN_DIR = ''
-HADD_IN = True   ## Use pre-hadded root files (NTuple_*.root) instead of original files (tuple_*.root)
+HADD_IN = False   ## Use pre-hadded root files (NTuple_*.root) instead of original files (tuple_*.root)
+if LOC == 'CERN_3l_final': HADD_IN = True
 #PROD   = '190521'  ## choose given product version instead of the latest one, this one is only for 2018 2l skim
 PROD  = ''
+
 
 ## Directory for logs and output root files
 if USER == 'abrinke1': OUT_DIR = '/afs/cern.ch/work/a/abrinke1/public/H2Mu/%s/Histograms' % YEAR
@@ -80,12 +82,13 @@ if USER == 'xzuo':     OUT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/%s/Histog
 #LABEL = 'data_MC_2018_M70_170_v1'
 #LABEL = 'MassCal_KinRoch_approx/GeoBSRoch_2D_muP_d0_rebin_muP_phi'
 #LABEL = 'Btag_eff_cal_3l_2019_10_09'
-#LABEL = 'ZH_Val_lep_2019_08_25_medLep_veto12'
+#LABEL = 'ZH_lep_2019_08_25_medLep_veto12_sys'
 #LABEL = 'leftover_of_ttH_and_ZH_2019_09_08'
 #LABEL = 'WH_lep_AWB_2018_data_from_skim_AD'
 #LABEL = 'WH_lep_AWB_2019_08_19_signal_sys'
 #LABEL = 'WH_lep_AWB_2019_10_20_BtagSF_sys'
-LABEL = 'WH_lep_final_ntuple_old_selection_2020_02_05'
+#LABEL = 'WH_lep_final_ntuple_old_selection_2020_02_05'
+LABEL = 'ZZ_lep_final_ntuple_old_selection_2020_02_11'
 #LABEL = 'data_MC_2019_11_06_GeoFitBS'
 #LABEL = 'DAS_ntuple_1percentdata_baseline_OS60'
 
@@ -102,6 +105,7 @@ HIST_TREE = '"HistTree"'  ## Ouptut histograms, trees, or both
 DATA_ONLY = False  ## Only process data samples, not MC
 MC_ONLY   = False  ## Only process MC samples, not data
 SIG_ONLY  = False  ## Only process signal MC samples, no others
+SIG_125   = False
 SAMP_LIST = []  ## Leave [] empty to process multiple samples
 
 #SAMP_LIST = ['SingleMu_2018A', 'SingleMu_2018B', 'SingleMu_2018C', 'SingleMu_2018D', 'ZJets_MG_1'] #masscal study on 2018 data
@@ -111,6 +115,10 @@ SAMP_LIST = []  ## Leave [] empty to process multiple samples
 
 SYS_SHIFTS = ['noSys']
 #SYS_SHIFTS = ['noSys', 'JES_up', 'JES_down', 'PU_wgt_up', 'PU_wgt_down', 'IsoMu_SF_up', 'IsoMu_SF_down', 'LepMVA_SF_up', 'LepMVA_SF_down', 'B_SF_up', 'B_SF_down']
+print len(SYS_SHIFTS)
+if len(SYS_SHIFTS) != 1:
+    SIG_ONLY = True
+    SIG_125  = True
 
 VERBOSE = False ## Verbose printout
 
@@ -308,6 +316,8 @@ def main():
             continue
         if SIG_ONLY and not samp.evt_type == 'Sig':
             continue
+	if SIG_125 and ('_120' in samp.name or '_130' in samp.name):
+	    continue
         if len(SAMP_LIST) > 0 and not samp.name in SAMP_LIST:
             continue
 

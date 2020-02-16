@@ -28,7 +28,10 @@
 #include "H2MuAnalyzer/MakeHistos/interface/KinematicAngles.h"
 #include "H2MuAnalyzer/MakeHistos/interface/ReadMVA.h"            // Read and evaluate XMLs for MVA
 
-// #include "H2MuAnalyzer/MakeHistos/interface/SampleDatabase2016.h" // Input data and MC samples
+#include "H2MuAnalyzer/MakeHistos/interface/BtagSFHelper.h"       // Common Btag utilities
+
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
 // Load the library of the local, compiled H2MuAnalyzer/MakeHistos directory
 R__LOAD_LIBRARY(../../../tmp/slc6_amd64_gcc630/src/H2MuAnalyzer/MakeHistos/src/H2MuAnalyzerMakeHistos/libH2MuAnalyzerMakeHistos.so)
@@ -42,13 +45,13 @@ const int PRT_EVT  = 1000;  // Print every N events
 const float SAMP_WGT = 1.0;
 const bool verbose = false; // Print extra information
 
-const bool CR_validation = false; // whether we are plotting the validation control region or not
+const bool CR_validation = true; // whether we are plotting the validation control region or not
 
-//const TString IN_DIR    = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2018/102X/prod-v18.1.6.skim3l/ZH_HToMuMu_ZToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_ZH_125/190528_111720/0000";
-//const TString SAMPLE    = "H2Mu_ZH_125";
+const TString IN_DIR    = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2018/102X/prod-v18.1.6.skim3l/ZH_HToMuMu_ZToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_ZH_125/190528_111720/0000";
+const TString SAMPLE    = "H2Mu_ZH_125";
 
-const TString IN_DIR   = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/ZH_HToMuMu_ZToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_ZH_125/190625_204256/0000";
-const TString SAMPLE   = "H2Mu_ZH_125";
+//const TString IN_DIR   = "/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR/ZH_HToMuMu_ZToAll_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/H2Mu_ZH_125/190625_204256/0000";
+//const TString SAMPLE   = "H2Mu_ZH_125";
 
 //const TString IN_DIR   = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2017/94X_v2/2019_01_15_LepMVA_3l_test_v1/ZH_HToMuMu_ZToAll_M125_13TeV_powheg_pythia8/H2Mu_ZH_125";
 //const TString SAMPLE   = "H2Mu_ZH_125";
@@ -64,9 +67,13 @@ const TString SAMPLE   = "H2Mu_ZH_125";
 //const TString IN_DIR   = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/Moriond17/Mar13_hiM/SingleMuon";
 //const TString SAMPLE   = "SingleMu";
 const std::string YEAR = "2016";
-const std::string SLIM  = (YEAR == "2017" ? "Slim" : "notSlim");  // "Slim" or "notSlim" - Some 2017 NTuples are "Slim"
+//const std::string SLIM  = (YEAR == "2017" ? "Slim" : "notSlim");  // "Slim" or "notSlim" - Some 2017 NTuples are "Slim"
+const std::string SLIM = "notSlim";
 const TString OUT_DIR  = "plots";
 const TString HIST_TREE = "Tree"; // "Hist", "Tree", or "HistTree" to output histograms, trees, or both. Not in use in this macro
+
+// const std::string SYS_SHIFT = "noSys";
+const std::string SYS_SHIFT = "B_SF_up";
 
 const std::vector<std::string> SEL_CUTS = {"PreselRun2"}; // Cuts which every event must pass
 const std::vector<std::string> OPT_CUTS = {"ZH_4l_ele", "ZH_4l_mu"}; // Multiple selection cuts, applied independently in parallel
@@ -86,7 +93,8 @@ void MiniNTupliser_4l_cat( TString sample = "", TString in_dir = "", TString out
   if (max_evt              == 0) max_evt     = MAX_EVT;
   if (prt_evt              == 0) prt_evt     = PRT_EVT;
   if (samp_weight          == 0) samp_weight = SAMP_WGT;
-    if (hist_tree.Length() == 0) hist_tree   = HIST_TREE;
+  if (hist_tree.Length()   == 0) hist_tree   = HIST_TREE;
+  if (SYS.length()         == 0) SYS         = SYS_SHIFT;
 
   // Initialize empty file to access each file in the list
   TFile *file_tmp(0);
@@ -155,14 +163,14 @@ void MiniNTupliser_4l_cat( TString sample = "", TString in_dir = "", TString out
     if (sample.Contains("SingleMu"))
       SetBranchAddresses(*in_chain, br, {YEAR, SLIM}); // Options in {} include "JES", "Flags", and "SFs"
     else
-      SetBranchAddresses(*in_chain, br, {YEAR, SLIM, "GEN", "Wgts"}, (SYS.find("JES_") != std::string::npos ? SYS : "noSys"), false); // Options in {} include "JES", "Flags", and "SFs"
+      SetBranchAddresses(*in_chain, br, {YEAR, SLIM, "GEN", "Wgts", "JES"}, (SYS.find("JES_") != std::string::npos ? SYS : "noSys"), false); // Options in {} include "JES", "Flags", and "SFs"
   }
 
   // creating output file
 
   TString out_file_name;
-  if (out_file_str.Length() > 0) out_file_name.Form( "%s/histos_%s_%s.root",    out_dir.Data(), sample.Data(), out_file_str.Data() );
-  else                           out_file_name.Form( "%s/histos_%s_%d_%d.root", out_dir.Data(), sample.Data(), MIN_FILE, MAX_FILE );
+  if (out_file_str.Length() > 0) out_file_name.Form( "%s/histos_%s_%s_%s.root",    out_dir.Data(), sample.Data(), SYS.c_str(), out_file_str.Data() );
+  else                           out_file_name.Form( "%s/histos_%s_%s_%d_%d.root", out_dir.Data(), sample.Data(), SYS.c_str(), MIN_FILE, MAX_FILE );
   std::cout << "\nCreating output file " << out_file_name.Data() << std::endl;
   TFile * Out_File = TFile::Open( out_file_name, "RECREATE" );
 
@@ -182,7 +190,7 @@ void MiniNTupliser_4l_cat( TString sample = "", TString in_dir = "", TString out
   EventWeightConfig     evt_wgt;
   ConfigureObjectSelection(obj_sel, YEAR, "lepMVA");
   ConfigureEventSelection (evt_sel, YEAR);
-  ConfigureEventWeight    (evt_wgt, YEAR);
+  ConfigureEventWeight    (evt_wgt, YEAR, SYS);
 
   evt_wgt.muon_ID  = false;
   evt_wgt.muon_Iso = false;
@@ -202,7 +210,32 @@ void MiniNTupliser_4l_cat( TString sample = "", TString in_dir = "", TString out
 
   std::string PTC = obj_sel.mu_pt_corr; // Store muon pT correction in a shorter string; not changed later
 
+  // set up Btag SF
+  std::cout << "\n****** setting up Btag efficiency and SF tools ******" << std::endl;
+  BtagEffEntry BTE;
+  GetBtagEff(BTE, YEAR, (std::string) sample);
 
+  std::string CSV_name = "";
+  if (YEAR == "2016")      CSV_name = "data/deepCSV/DeepCSV_2016LegacySF_V1.csv";
+  else if (YEAR == "2017") CSV_name = "data/deepCSV/DeepCSV_94XSF_V4_B_F.csv";
+  else if (YEAR == "2018") CSV_name = "data/deepCSV/DeepCSV_102XSF_V1.csv";
+  BTagCalibration Bcalib("DeepCSV", CSV_name);
+
+  BTagCalibrationReader readerL(BTagEntry::OP_LOOSE,  // operating point
+                             "central",             // central sys type
+                             {"up", "down"});      // other sys types
+  readerL.load(Bcalib,                // calibration instance
+            BTagEntry::FLAV_B,    // btag flavour
+            "comb");               // measurement type
+  readerL.load(Bcalib, BTagEntry::FLAV_C, "comb");
+  readerL.load(Bcalib, BTagEntry::FLAV_UDSG, "incl");
+
+  BTagCalibrationReader readerM(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
+  readerM.load(Bcalib, BTagEntry::FLAV_B, "comb");
+  readerM.load(Bcalib, BTagEntry::FLAV_C, "comb");
+  readerM.load(Bcalib, BTagEntry::FLAV_UDSG, "incl");
+
+  // set up lepMVA SF
   std::cout << "\n******* About to load 2D LepMVA efficiency scale factor histograms *******" << std::endl;
   std::map<std::string, TH2F *> lepSF;
   lepSF["mu_T"]  = LoadSFsLepMVA(YEAR,  "mu", "T");
@@ -332,8 +365,7 @@ void MiniNTupliser_4l_cat( TString sample = "", TString in_dir = "", TString out
         /////////////////////////
 	if (OPT_CUT == "ZH_4l_ele") {
           if (muons.size() != 2 or SelectedMuPairs(obj_sel, br).size() != 1 or SelectedEles(obj_sel, br).size() != 2) continue;
-//	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() != 0 or SelectedJets(obj_sel, br, "BTagLoose").size() > 1 ) continue;
-	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() < 1 and SelectedJets(obj_sel, br, "BTagLoose").size() < 2 ) continue;   // gap between ttH4l and ZH4l
+	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() != 0 or SelectedJets(obj_sel, br, "BTagLoose").size() > 1 ) continue;
 
 	  for (const auto & electron : SelectedEles(obj_sel, br)) {  // this is for if more than 2 electrons, select highest pt ones
 	     if (electron.lepMVA > -1.0) { //-1.0 as a place holder
@@ -382,8 +414,7 @@ void MiniNTupliser_4l_cat( TString sample = "", TString in_dir = "", TString out
         if (OPT_CUT == "ZH_4l_mu") {
 	  if ( muons.size() != 4 or eles.size() != 0 ) continue;
 	  if ( SelectedMuPairs(obj_sel, br).size() != 4 ) continue; //two + and two -, comment out if more than 4 muons
-//	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() != 0 or SelectedJets(obj_sel, br, "BTagLoose").size() > 1 ) continue;
-	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() < 1 and SelectedJets(obj_sel, br, "BTagLoose").size() < 2 ) continue;   // gap between ttH4l and ZH4l
+	  if ( SelectedJets(obj_sel, br, "BTagMedium").size() != 0 or SelectedJets(obj_sel, br, "BTagLoose").size() > 1 ) continue;
 
 	  MuPairInfo Z_cand, H_cand;
 	  Z_cand.init();
@@ -457,6 +488,67 @@ void MiniNTupliser_4l_cat( TString sample = "", TString in_dir = "", TString out
 	    std::cout << "weird case: no proper lepton found" << std::endl;
 	    continue;
 	}
+
+        // Compute Btag SF
+        float Btag_wgt = 1.0;
+        // only get B_SF for MC
+	if ( not sample.Contains("SingleMu") ) {
+	  std::string jet_FLV = "none";
+          std::string B_sys   = "none";
+          if      ( SYS == "B_SF_up")   B_sys = "up";
+          else if ( SYS == "B_SF_down") B_sys = "down";
+          else                          B_sys = "central";
+
+	  for (const auto & jet : jets) {
+            float jet_SF = 1.0;
+            if ( abs(jet.eta) > 2.4 ) continue;
+
+            if ( JetPass(obj_sel, jet, br, "BTagMedium") ) {
+              std::cout << "\nBizzare case: having medium tagged jet" << std::endl;
+              if      ( abs(jet.partonID) == 5 ) jet_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_B, jet.eta, jet.pt);
+              else if ( abs(jet.partonID) == 4 ) jet_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_C, jet.eta, jet.pt);
+              else                               jet_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_UDSG, jet.eta, jet.pt);
+            } // end of if ( JetPass(obj_sel, jet, br, "BTagMedium") )
+            else if ( JetPass(obj_sel, jet, br, "BTagLoose") ) {
+              float loose_SF  = 1.0;
+              float medium_SF = 1.0;
+              if      ( abs(jet.partonID) == 5 ) {
+                loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_B, jet.eta, jet.pt);
+                medium_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_B, jet.eta, jet.pt);
+                jet_SF = CalBtagSF( BTE, "FLAV_B", loose_SF, medium_SF);
+              }
+              else if ( abs(jet.partonID) == 4 ) {
+                loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_C, jet.eta, jet.pt);
+                medium_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_C, jet.eta, jet.pt);
+                jet_SF = CalBtagSF( BTE, "FLAV_C", loose_SF, medium_SF);
+              }
+              else {
+                loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_UDSG, jet.eta, jet.pt);
+                medium_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_UDSG, jet.eta, jet.pt);
+                jet_SF = CalBtagSF( BTE, "FLAV_UDSG", loose_SF, medium_SF);
+              }
+            } // end of if ( JetPass(obj_sel, jet, br, "BTagLoose") )
+            else {
+              float loose_SF  = 1.0;
+              if      ( abs(jet.partonID) == 5 ) {
+                loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_B, jet.eta, jet.pt);
+                jet_SF = CalBtagSF( BTE, "FLAV_B", loose_SF, 0.0);
+              }
+              else if ( abs(jet.partonID) == 4 ) {
+                loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_C, jet.eta, jet.pt);
+                jet_SF = CalBtagSF( BTE, "FLAV_C", loose_SF, 0.0);
+              }
+              else {
+                loose_SF  = readerL.eval_auto_bounds(B_sys, BTagEntry::FLAV_UDSG, jet.eta, jet.pt);
+                jet_SF = CalBtagSF( BTE, "FLAV_UDSG", loose_SF, 0.0);
+              }
+            } //end of else, (not BTagLoose)
+            Btag_wgt *= jet_SF;
+            if (jet_SF < 0.8 or jet_SF > 1.1) std::cout << "jet_SF = " << jet_SF << ", jet_ID = " << jet.partonID << ", jet_pt = " << jet.pt << ", jet_eta = " << jet.eta << std::endl;
+          } // end of for (const auto & jet : jets)
+
+ 	} // end of if ( not sample.Contains("SingleMu") )
+
 
 	// ********* categories done, lep variables filled *********
 	// now must already be in one of the categories
@@ -609,6 +701,7 @@ void MiniNTupliser_4l_cat( TString sample = "", TString in_dir = "", TString out
 	BookAndFill( b_map_flt, Out_Tree, h_pre, "event_wgt",   	event_wgt);
         BookAndFill( b_map_flt, Out_Tree, h_pre, "xsec_norm",   	xsec_norm);
 	BookAndFill( b_map_flt, Out_Tree, h_pre, "all_lepMVA_SF", 	all_lepMVA_SF);
+	BookAndFill( b_map_flt, Out_Tree, h_pre, "Btag_wgt",		Btag_wgt);
         BookAndFill( b_map_int, Out_Tree, h_pre, "Sample_ID",   	Sample_ID);
         BookAndFill( b_map_str, Out_Tree, h_pre, "Sample_name",    	sample);
 

@@ -57,6 +57,7 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
   ch->SetBranchAddress("muons", &(br.muons));
   ch->SetBranchAddress("muPairs", &(br.muPairs));
   ch->SetBranchAddress("eles", &(br.eles));
+  ch->SetBranchAddress("phots", &(br.phots));
   if ( isSlim) ch->SetBranchAddress("jets", &(br.slimJets));
   if (!isSlim) ch->SetBranchAddress("jets", &(br.jets));
   ch->SetBranchAddress("jetPairs", &(br.jetPairs));
@@ -67,6 +68,7 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
   ch->SetBranchAddress("nMuons", &(br.nMuons));
   ch->SetBranchAddress("nMuPairs", &(br.nMuPairs));
   ch->SetBranchAddress("nEles", &(br.nEles));
+  ch->SetBranchAddress("nPhots", &(br.nPhots));
   ch->SetBranchAddress("nJets", &(br.nJets));
   ch->SetBranchAddress("nJetPairs", &(br.nJetPairs));
   ch->SetBranchAddress("nJetsCent", &(br.nJetsCent));
@@ -134,7 +136,7 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
     else if (jet_sys == "JES_down") {
       if (isSlim) ch->SetBranchAddress("jets_JES_down", &(br.slimJets));
       ch->SetBranchAddress("jets_JES_down", &(br.jets));
-      ch->SetBranchAddress("jetPairs_JES_dowb", &(br.jetPairs));
+      ch->SetBranchAddress("jetPairs_JES_down", &(br.jetPairs));
       ch->SetBranchAddress("met_JES_down", &(br.met));
       ch->SetBranchAddress("mht_JES_down", &(br.mht));
       ch->SetBranchAddress("nJets_JES_down", &(br.nJets));

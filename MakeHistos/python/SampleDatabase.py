@@ -49,7 +49,8 @@ def GetSamples(location = 'CERN', year = '2017'):
             sys.exit
     elif (location == 'CERN_3l'):
         if   (year == '2016'):
-            in_dir = '/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR'
+            #in_dir = '/eos/cms/store/user/bortigno/h2mm/ntuples/2016/94X_v3/STR'
+	    in_dir = '/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2016/94X_v3/prod-v16.0.7.skim3l'
         elif (year == '2017'):
             in_dir = '/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2017/94X_v2/2019_01_15_LepMVA_3l_test_v1'
         elif (year == '2018'):

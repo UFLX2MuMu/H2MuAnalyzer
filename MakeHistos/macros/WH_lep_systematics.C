@@ -735,7 +735,7 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 		if      ( abs(jet.partonID) == 5 ) jet_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_B, jet.eta, jet.pt);
 		else if ( abs(jet.partonID) == 4 ) jet_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_C, jet.eta, jet.pt);
 		else				   jet_SF = readerM.eval_auto_bounds(B_sys, BTagEntry::FLAV_UDSG, jet.eta, jet.pt);
-	      } // if ( JetPass(obj_sel, jet, br, "BTagMedium") )
+	      } // end of if ( JetPass(obj_sel, jet, br, "BTagMedium") )
 	      else if ( JetPass(obj_sel, jet, br, "BTagLoose") ) {
 		float loose_SF  = 1.0;
 	        float medium_SF = 1.0;
