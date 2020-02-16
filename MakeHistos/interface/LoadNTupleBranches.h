@@ -54,7 +54,6 @@ struct NTupleBranches {
   int nEles = -99;
   int nPhots = -99;
   int nJets = -99;
-  int nPhots = -99;
   int nJetPairs = -99;
   int nJetsCent = -99;
   int nJetsFwd = -99;
