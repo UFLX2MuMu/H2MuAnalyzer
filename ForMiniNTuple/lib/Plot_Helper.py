@@ -149,7 +149,7 @@ def DrawOnCanv(canv, var_name, logY, stack, histos, scaled_sig, ratio_plot, lege
     cms_label.DrawLatexNDC(0.15, 0.85, '#scale[1.5]{CMS} #bf{#it{Preliminary}}')
     cms_label.Draw('same')
 #    lumi_label.DrawLatexNDC(0.90, 0.91, '%s fb^{-1} (13 TeV)' %plt_cfg.lumi)
-    lumi_label.DrawLatexNDC(0.90, 0.91, '#bf{137.1 fb^{-1} (13 TeV)}' )
+    lumi_label.DrawLatexNDC(0.90, 0.91, '#bf{35.9 fb^{-1} (13 TeV)}' )
     lumi_label.Draw('same')
 
     canv.cd()
