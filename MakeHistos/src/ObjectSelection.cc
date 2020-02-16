@@ -464,11 +464,17 @@ JetInfos SelectedJets ( const ObjectSelectionConfig & cfg, const NTupleBranches 
 PhotInfos SelectedPhots ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const bool verbose ) {
 
   PhotInfos selPhots;
-  for (const auto & phot : (*br.phots)) {
-    if ( PhotPass(cfg, phot, br) ) {
-      selPhots.push_back(phot);
+  for (const auto & phot1 : (*br.phots)) {
+    bool pass = true;
+    if (not PhotPass(cfg, phot1, br)) continue;
+    for (const auto & phot2 : (*br.phots)) {
+      if (phot1.pt == phot2.pt and phot1.eta == phot2.eta and phot1.phi == phot2.phi) continue; // if they refer to the same photon
+      if (phot1.mu_idx != phot2.mu_idx) continue; // if they are NOT associated with the same muon
+      if (PhotPass(cfg, phot2, br) and phot1.dROverEt2 > phot2.dROverEt2) pass = false; // if there is another photon with smaller dROverEt2
     }
+    if (pass) selPhots.push_back(phot1);
   }
+
   return selPhots;
 }
 

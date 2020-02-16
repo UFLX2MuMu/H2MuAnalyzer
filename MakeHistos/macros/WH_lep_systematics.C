@@ -419,6 +419,7 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 	    if ( FourVec(SelectedMuPairs(obj_sel, br).at((iPair+1) % 2), PTC).M()  > 110 &&
 		 FourVec(SelectedMuPairs(obj_sel, br).at((iPair+1) % 2), PTC).M()  < 160 &&
 		 FourVec(SelectedMuPairs(obj_sel, br).at((iPair+1) % 2), PTC).Pt() > H_pair_vec.Pt() ) continue;
+	    // This is in side a muPair loop. Just continue if this is not the pair we want
 	  }
 	}
 
