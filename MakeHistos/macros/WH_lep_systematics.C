@@ -403,22 +403,19 @@ void WH_lep_systematics( TString sample = "", TString in_dir = "", TString out_d
 
 	  // Choose a unique Higgs candidate pair
 	  H_pair     = SelectedMuPairs(obj_sel, br).at(iPair);
-	  H_pair_vec = FourVec(H_pair, PTC);
+	  H_pair_vec = FourVecFSRGeoFit(H_pair, PTC, std::stoi(YEAR), "FSRGeoFit", *br.muons, SelectedPhots(obj_sel, br));
 	  if ( !allMass ) {
 	    // Require selected Higgs candidate dimuon pair to fall inside mass window
+	    // In the next if block, this dimuon is required to have higher pt than the other dimuon
 	    if ( H_pair_vec.M() < 110 ||
-		 H_pair_vec.M() > 160 ) continue;
-	  } else if (MU) {
-	    // Pick the candidate closer to the Z mass as the "H_pair"
-	    int iZ = ( abs(FourVec( SelectedMuPairs(obj_sel, br).at(0), PTC ).M() - 91) <
-		       abs(FourVec( SelectedMuPairs(obj_sel, br).at(1), PTC ).M() - 91) ? 0 : 1 );
-	    if (iZ != iPair) continue;
+		 H_pair_vec.M() > 150 ) continue;
 	  }
 	  if ( MU && hiPt && !allMass ) {
+	    TLorentzVector other_pair_vec = FourVecFSRGeoFit( SelectedMuPairs(obj_sel, br).at((iPair+1) % 2), PTC, std::stoi(YEAR), "FSRGeoFit", *br.muons, SelectedPhots(obj_sel, br) );
 	    // Choose the Higgs candidate pair with the higher vector pT value
-	    if ( FourVec(SelectedMuPairs(obj_sel, br).at((iPair+1) % 2), PTC).M()  > 110 &&
-		 FourVec(SelectedMuPairs(obj_sel, br).at((iPair+1) % 2), PTC).M()  < 160 &&
-		 FourVec(SelectedMuPairs(obj_sel, br).at((iPair+1) % 2), PTC).Pt() > H_pair_vec.Pt() ) continue;
+	    if ( FourVec(other_pair_vec.M()  > 110 &&
+		 FourVec(other_pair_vec.M()  < 150 &&
+		 FourVec(other_pair_vec.Pt() > H_pair_vec.Pt() ) continue;
 	    // This is in side a muPair loop. Just continue if this is not the pair we want
 	  }
 	}
