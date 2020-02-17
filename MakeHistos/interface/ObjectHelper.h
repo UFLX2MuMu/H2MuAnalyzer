@@ -37,6 +37,8 @@ float JetCSV ( const JetInfo & jet, const std::string opt = "deepCSV" ); // Retu
 
 JetPairInfo MakeJetPair( TLorentzVector jet1_vec, TLorentzVector jet2_vec );
 
+TLorentzVector FourVecFSRGeoFit( const MuonInfo & muon, const int idx, const std::string pt_corr, const int year, const std::string fg = "", const PhotInfos & phots = {}, const std::string opt = "" );
+TLorentzVector FourVecFSRGeoFit( const MuPairInfo & muPair, const std::string pt_corr, const int year, const std::string fg = "", const MuonInfos & muons = {}, const PhotInfos & phots = {}, const std::string opt = "" );
 TLorentzVector FourVec( const MuonInfo & muon, const std::string pt_corr, const std::string opt = "" );
 TLorentzVector FourVec( const MuPairInfo & muPair, const std::string pt_corr, const std::string opt = "", const MuonInfos & muons = {} );
 TLorentzVector FourVec( const EleInfo & ele, const std::string opt = "" );

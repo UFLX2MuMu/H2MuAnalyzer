@@ -1,5 +1,5 @@
 #include "H2MuAnalyzer/MakeHistos/interface/ObjectHelper.h"
-
+#include "H2MuAnalyzer/GeoFit/GeoFitCorr.C"
 
 ////////////////////////
 ///  Muon functions  ///
@@ -382,6 +382,28 @@ JetPairInfo MakeJetPair( TLorentzVector jet1_vec, TLorentzVector jet2_vec ) {
 ///////////////////////////////
 ///  Four-vector functions  ///
 ///////////////////////////////
+TLorentzVector FourVecFSRGeoFit( const MuonInfo & muon, const int idx, const std::string pt_corr, const int year, const std::string fg, const PhotInfos & phots, const std::string opt ) {
+  TLorentzVector vec = FourVec(muon, pt_corr);
+  bool DidFSR = false;
+  if (fg.find("FSR") != std::string::npos) {
+    for (const auto & phot: phots) {
+      if (phot.mu_idx == idx) {
+	vec += FourVec(phot);
+	DidFSR = true;
+      }
+    }
+  }
+  if (fg.find("GeoFit") != std::string::npos and not DidFSR) vec.SetPtEtaPhiM( GeoFit::PtCorrGeoFit(muon.d0_BS * muon.charge, muon.pt_Roch, muon.eta, year), muon.eta, muon.phi, 0.105658367 );
+  if (opt == "T") vec.SetPtEtaPhiM( vec.Pt(), 0, vec.Phi(), 0.105658367);
+  return vec;  
+}
+TLorentzVector FourVecFSRGeoFit( const MuPairInfo & muPair, const std::string pt_corr, const int year, const std::string fg, const MuonInfos & muons, const PhotInfos & phots, const std::string opt ) {
+  TLorentzVector vec;
+  TLorentzVector mu1_vec = FourVecFSRGeoFit(muons.at(muPair.iMu1), muPair.iMu1, pt_corr, year, fg, phots, opt);
+  TLorentzVector mu2_vec = FourVecFSRGeoFit(muons.at(muPair.iMu2), muPair.iMu2, pt_corr, year, fg, phots, opt);
+  vec = mu1_vec + mu2_vec;
+  return vec;
+}
 
 TLorentzVector FourVec( const MuonInfo & muon, const std::string pt_corr, const std::string opt ) {
   TLorentzVector vec;
