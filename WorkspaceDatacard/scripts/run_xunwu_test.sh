@@ -16,11 +16,88 @@ declare -a DCARDS=(
 
 ############################################
 
+#    "out_files/ZH_Run2_lep_06_02_altZHcat0_constant/datacard/ZHCat0_BWZ_constant.txt"
+
+#    "out_files/ZH_Run2_lep_07_20_extra_lepMVA_uncert/datacard/ZH2cats_0720.txt"
+#    "out_files/WH_Run2_3lep_07_20_extra_lepMVA_uncert/datacard/WH3cats_0720.txt"
+#    "out_files/WH_Run2_3lep_07_20_extra_lepMVA_uncert/datacard/VHcats_0720.txt"
+#    "out_files/WH_Run2_3lep_07_20_extra_lepMVA_uncert/datacard/WHCat0_BWZGamma.txt"
+#    "out_files/WH_Run2_3lep_07_20_extra_lepMVA_uncert/datacard/WHCat1_BWZ.txt"
+#    "out_files/WH_Run2_3lep_07_20_extra_lepMVA_uncert/datacard/WHCat2_BWZ.txt"
+#    "out_files/ZH_Run2_lep_07_20_extra_lepMVA_uncert/datacard/ZHCat0_BWZ.txt"
+#    "out_files/ZH_Run2_lep_07_20_extra_lepMVA_uncert/datacard/ZHCat1_BWZ.txt"
+
+
+    "out_files/ZH_Run2_lep_06_02_sys_addRoch/datacard/ZH2cats_0603.txt"
+    "out_files/WH_Run2_3lep_06_02_sys_addRoch/datacard/WH3cats_0603.txt"
+    "out_files/WH_Run2_3lep_06_02_sys_addRoch/datacard/VHcats_0603.txt"
+    "out_files/WH_Run2_3lep_06_02_sys_addRoch/datacard/WHCat0_BWZGamma.txt"
+    "out_files/WH_Run2_3lep_06_02_sys_addRoch/datacard/WHCat1_BWZ.txt"
+    "out_files/WH_Run2_3lep_06_02_sys_addRoch/datacard/WHCat2_BWZ.txt"
+    "out_files/ZH_Run2_lep_06_02_sys_addRoch/datacard/ZHCat0_BWZ.txt"
+    "out_files/ZH_Run2_lep_06_02_sys_addRoch/datacard/ZHCat1_BWZ.txt"
+
+#    "out_files/WH_Run2_3lep_05_21_temp/datacard/WHCat0_BWZGamma.txt"
+#    "out_files/WH_Run2_3lep_05_21_temp/datacard/WHCat1_BWZ.txt"
+#    "out_files/WH_Run2_3lep_05_21_temp/datacard/WHCat2_BWZ.txt"
+#    "out_files/WH_Run2_3lep_05_21_temp/datacard/WH3cats_0522.txt"
+#    "out_files/ZH_Run2_lep_05_21_temp/datacard/ZH2cats_0521.txt"
+#    "out_files/WH_Run2_3lep_05_21_temp/datacard/VHcats_0521.txt"
+
+#    "out_files/ZH_Run2_lep_05_18_Fullsys/datacard/ZH2cats_0518.txt"
+#    "out_files/ZH_Run2_lep_05_18_Fullsys/datacard/ZHCat0_BWZ.txt"
+#    "out_files/ZH_Run2_lep_05_18_Fullsys/datacard/ZHCat1_BWZ.txt"
+#
+#    "out_files/WH_Run2_3lep_05_18_FullSys/datacard/WHCat0_BWZGamma.txt"
+#    "out_files/WH_Run2_3lep_05_18_FullSys/datacard/WHCat1_BWZ.txt"
+#    "out_files/WH_Run2_3lep_05_18_FullSys/datacard/WHCat2_BWZ.txt"
+#    "out_files/WH_Run2_3lep_05_18_FullSys/datacard/WH3cats_0518.txt"
+#    "out_files/WH_Run2_3lep_05_18_FullSys/datacard/VHcats_0518.txt"
+
+#    "out_files/ZH_Run2_lep_05_15_Fullsys/datacard/ZH2cats_0515.txt"
+#    "out_files/ZH_Run2_lep_05_15_Fullsys/datacard/ZHCat0_BWZ.txt"
+#    "out_files/ZH_Run2_lep_05_15_Fullsys/datacard/ZHCat1_BWZ.txt"
+
+#    "out_files/WH_Run2_3lep_05_15_FullSys/datacard/WH3cats_0515.txt"
+#    "out_files/WH_Run2_3lep_05_15_FullSys/datacard/VHcats_0515.txt"
+#    "out_files/WH_Run2_3lep_05_15_FullSys/datacard/WHCat0_BWZGamma.txt"
+#    "out_files/WH_Run2_3lep_05_15_FullSys/datacard/WHCat1_BWZ.txt"
+#    "out_files/WH_Run2_3lep_05_15_FullSys/datacard/WHCat2_BWZ.txt"
+
+#     "out_files/ZH_Run2_lep_05_04_FullSys/datacard/ZH2cats_0505.txt"
+#     "out_files/ZH_Run2_lep_05_04_FullSys/datacard/ZHCat0_BWZ.txt"
+#     "out_files/ZH_Run2_lep_05_04_FullSys/datacard/ZHCat1_BWZ.txt"
+
+#     "out_files/WH_Run2_3lep_05_04_FullSys/datacard/VHcat_0505.txt" 
+#     "out_files/WH_Run2_3lep_05_04_FullSys/datacard/WH3cats_0505.txt"
+#     "out_files/WH_Run2_3lep_05_04_FullSys/datacard/WHCat0_BWZGamma.txt"
+#     "out_files/WH_Run2_3lep_05_04_FullSys/datacard/WHCat1_BWZ.txt"
+#     "out_files/WH_Run2_3lep_05_04_FullSys/datacard/WHCat2_BWZ.txt"
+
+#     "out_files/ZH_Run2_lep_04_22_noSys/datacard/ZH2cats_0423.txt"
+#     "out_files/ZH_Run2_lep_04_22_noSys/datacard/ZHCat0_BWZ.txt"
+#     "out_files/ZH_Run2_lep_04_22_noSys/datacard/ZHCat1_BWZ.txt"
+#    
+#     "out_files/WH_Run2_3lep_04_22_noSys/datacard/WHCat0_BWZGamma.txt"
+#     "out_files/WH_Run2_3lep_04_22_noSys/datacard/WHCat1_BWZ.txt"
+#     "out_files/WH_Run2_3lep_04_22_noSys/datacard/WHCat2_BWZ.txt"
+#     "out_files/WH_Run2_3lep_04_22_noSys/datacard/WH3cats_0423.txt"
+#     "out_files/WH_Run2_3lep_04_22_noSys/datacard/VHcats_0423.txt"
+
+#     "out_files/ZH_Run2_lep_04_02_newcats_noSys/datacard/ZH_2cats_0422.txt"
+#     "out_files/ZH_Run2_lep_04_02_newcats_noSys/datacard/ZHCat0_BWZ.txt"
+#     "out_files/ZH_Run2_lep_04_02_newcats_noSys/datacard/ZHCat1_BWZ.txt" 
+
+#     "out_files/WH_Run2_3lep_04_02_newcats_noSys/datacard/WH_3cats_0422.txt" 
+#     "out_files/WH_Run2_3lep_04_02_newcats_noSys/datacard/WHCat0_BWZGamma.txt"
+#     "out_files/WH_Run2_3lep_04_02_newcats_noSys/datacard/WHCat1_BWZ.txt"
+#     "out_files/WH_Run2_3lep_04_02_newcats_noSys/datacard/WHCat2_BWZ.txt"
+
 #    "out_files/ZH_Run2_lep_02_07_newcat_sys/datacard/ZH_4l_dimu_mass_DSCB1_frzCoefs_frzparam_sys_BWZ1_shape_MC.txt"
 #    "out_files/ZH_Run2_lep_02_07_newcat_sys/datacard/ZH_4l_dimu_mass_BDT_n10_n01_DSCB1_frzCoefs_frzparam_sys_BWZ1_shape_MC.txt"
 #    "out_files/ZH_Run2_lep_02_07_newcat_sys/datacard/ZH_4l_dimu_mass_BDT_n01_p10_DSCB1_frzCoefs_frzparam_sys_BWZ1_shape_MC.txt"
 #    "out_files/ZH_Run2_lep_02_07_newcat_sys/datacard/ZH_2newcats_BWZ_MC_02_07_sys.txt"
-    "out_files/ZH_Run2_lep_02_07_newcat_sys/datacard/VH_6_2_BWZ_02_07.txt"
+#    "out_files/ZH_Run2_lep_02_07_newcat_sys/datacard/VH_6_2_BWZ_02_07.txt"
 
 #    "out_files/ZH_Run2_lep_02_07_newcat/datacard/ZH_2newcats_BWZ_MC_02_07.txt"
 #    "out_files/ZH_Run2_lep_02_07_newcat/datacard/ZH_4l_dimu_mass_BDT_n10_n01_DSCB1_frzCoefs_frzparam_sys_BWZ1_shape_MC.txt"
@@ -439,7 +516,8 @@ FIXBERN_TOYS="--toysFile higgsCombine_Bern3_inc_fixShapeMC_T2500.FitDiagnostics.
 FREEBERN_TOYS="--toysFile higgsCombine_Bern_inc_freeShapeMC_T800.FitDiagnostics.mH120.123456.root"
 ## Generate toys with unconstrained systematics (""), no systematics,
 ##   or systematics constrained from fit to data ("toysFrequentist")
-FREQ="--toysNoSystematics"  ## "", "--toysNoSystematics", or "--toysFrequentist"
+#FREQ="--toysNoSystematics"  ## "", "--toysNoSystematics", or "--toysFrequentist"
+FREQ="--toysFrequentist"
 ## Save output
 ##   * "--saveShapes" and "--plots" only save info from the last toy
 ##   * "--saveShapes" and "--saveWithUncertainties" can't be run simultaneously
@@ -459,14 +537,35 @@ do
     echo "-------------------------------- $DCARD --------------------------------"
     echo "---------------------------------------------------------------------------------------------------"
 
-    echo "Running combine -M AsymptoticLimits $DCARD --run blind $MUSIG $SYST $FREQ $LABEL"
-    combine -M AsymptoticLimits $DCARD --run blind $MUSIG $SYST $FREQ $LABEL
+    ## make labels to save results for each category
+    dcard="${DCARD%.*}"
+    echo $dcard
+    label="${dcard##*/}"
+
+    ## observed limit
+    echo "Running combine -M AsymptoticLimits -m 125 $DCARD -n $label"
+    combine -M AsymptoticLimits -m 125 $DCARD -n $label
     echo "---------------------------------------------"
 
-    echo "---------------------------------------------"
-    echo "Running combine -M Significance --uncapped=true $DCARD -t -1  $MUSIG $SYST $FREQ $LABEL"
-    combine -M Significance --uncapped=true $DCARD -t -1  $MUSIG $SYST $FREQ $LABEL
-    echo "---------------------------------------------"
+    ## observed significance
+#    echo "---------------------------------------------"
+#    echo "Running combine -M Significance --uncapped=true $DCARD  $SYST $LABEL"
+#    combine -M Significance --uncapped=true $DCARD $SYST $LABEL
+#    echo "---------------------------------------------"
+
+    ## expected limit (expect)
+#    echo "Running combine -M AsymptoticLimits $DCARD --run blind $SYST $FREQ $LABEL"
+#    combine -M AsymptoticLimits $DCARD --run blind $SYST $FREQ $LABEL
+#    echo "---------------------------------------------"
+
+    ## expected significance (expect)
+#    echo "---------------------------------------------"
+#    echo "Running combine -M Significance --uncapped=true $DCARD -t -1  $MUSIG $SYST $FREQ $LABEL"
+#    combine -M Significance --uncapped=true $DCARD -t -1  $MUSIG $SYST $FREQ $LABEL
+#    echo "---------------------------------------------"
+
+
+
 
 
 #    echo "---------------------------------------------"

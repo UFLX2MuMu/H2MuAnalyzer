@@ -164,11 +164,11 @@ class DataLoader:
 
             print '  * Loading %s_Net_Data, %s_Net_Sig, and %s_Net_Bkg' % (self.dist, self.dist, self.dist)
 	    if not self.in_file.GetListOfKeys().Contains( self.dist+'_Net_Data' ):
-		self.data_hist = self.in_file.Get(self.dist+'_Net_Bkg').Clone('Net_Data')
+		self.data_hist = self.in_file.Get(self.dist+'_Net_Bkg').Clone('Net_Data').Rebin(10)
 	    else:
-                self.data_hist = self.in_file.Get(self.dist+'_Net_Data').Clone('Net_Data')
+                self.data_hist = self.in_file.Get(self.dist+'_Net_Data').Clone('Net_Data').Rebin(10)
             #self.sig_hists.append(self.in_file.Get(self.dist+'_Net_Sig').Clone('Net_Sig'))
-            self.bkg_hists.append(self.in_file.Get(self.dist+'_Net_Bkg').Clone('Net_Bkg'))
+            self.bkg_hists.append(self.in_file.Get(self.dist+'_Net_Bkg').Clone('Net_Bkg') .Rebin(10) )
 
 	    sys_shifts = []
 	    sys_shifts.append('noSys')
@@ -183,9 +183,9 @@ class DataLoader:
 		for sys_shift in sys_shifts:
 		    hstr = signal + '_' + sys_shift + '_' + self.dist
 	    	    if sys_file.GetListOfKeys().Contains(hstr):
-			hist = sys_file.Get(hstr).Clone()
+			hist = sys_file.Get(hstr).Clone().Rebin(10)
 		    else:
-			hist = R.TH1D(hstr, hstr, 100, 110, 160)
+			hist = R.TH1D(hstr, hstr, 80, 110, 150)
 		    hist.SetDirectory(0)
 		    if sys_shift == 'noSys':
 			self.sig_hists.append(  hist.Clone(signal)  )

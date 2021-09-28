@@ -1,0 +1,129 @@
+
+<root>
+
+  <source> Sys_test </source>
+  <in_dir> /afs/cern.ch/work/x/xzuo/public/H2Mu/Run2/Histograms/WH_lep_preApp_final_SR_CR_missHit_2020_05_09 </in_dir>
+  <in_file> StackPlots.root </in_file>
+  <sys_dir> /afs/cern.ch/work/x/xzuo/public/H2Mu/Run2/Histograms/WH_lep_fullsys_add_prefire_2020_05_26_Rochsys </sys_dir>
+  <sys_file> Systematics_Run2_merged.root</sys_file>
+  
+  <signals> [WH, qqZH, ggZH, ttH, THQ, THW] </signals>
+  <sys_names> [PU_wgt_2016, PU_wgt_2017, PU_wgt_2018, prefiring_2016, prefiring_2017, Roch, IsoMu_SF, LepMVA_SF_mu, LepMVA_SF_ele, B_SF, Absolute,   BBEC1,   EC2,   FlavorQCD,   HF,   RelativeBal, Absolute_2016,   BBEC1_2016,   EC2_2016,   HF_2016,   RelativeSample_2016, Absolute_2017,   BBEC1_2017,   EC2_2017,   HF_2017,   RelativeSample_2017, Absolute_2018,   BBEC1_2018,   EC2_2018,   HF_2018,   RelativeSample_2018] </sys_names>  
+
+  <categories>
+    <cat name="WH" loc="3lep_lep20_MissHits1_medLepMVA_SR_Bveto_noSys"/>
+  </categories>
+
+
+  <discriminants>
+    
+    <!-- Template and shape-based discrimination for di-muon mass with 1 GeV bins -->
+    <mass>
+      <dist>     H_pair_mass_zoomH  </dist>
+      <min_max>  [110, 150] </min_max>
+      <blind>    [] </blind>
+      <rebin>    False </rebin>
+      <models>   [shape] </models>
+
+      <sig_fits>
+        <fit>
+          <shape>  DSCB </shape>
+          <order>  1 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+      </sig_fits>
+
+      <bkg_fits>
+
+	<fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+      </bkg_fits>
+    </mass>
+
+
+
+
+    <mass>
+      <dist>     H_pair_mass_BDT_final_n10_n01_zoomH  </dist>
+      <min_max>  [110, 150] </min_max>
+      <blind>    [] </blind>
+      <rebin>    False </rebin>
+      <models>   [shape] </models>
+
+      <sig_fits>
+        <fit>
+          <shape>  DSCB </shape>
+          <order>  1 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+      </sig_fits>
+
+      <bkg_fits>
+        <fit>
+          <shape>  BWZGamma </shape>
+          <order>  1 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+      </bkg_fits>
+    </mass>
+
+    <mass>
+      <dist>     H_pair_mass_BDT_final_n01_p03_zoomH  </dist>
+      <min_max>  [110, 150] </min_max>
+      <blind>    [] </blind>
+      <rebin>    False </rebin>
+      <models>   [shape] </models>
+
+      <sig_fits>
+        <fit>
+          <shape>  DSCB </shape>
+          <order>  1 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+      </sig_fits>
+
+      <bkg_fits>
+        <fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+      </bkg_fits>
+    </mass>
+   
+   
+    <mass>
+      <dist>     H_pair_mass_BDT_final_p03_p10_zoomH  </dist>
+      <min_max>  [110, 150] </min_max>
+      <blind>    [] </blind>
+      <rebin>    False </rebin>
+      <models>   [shape] </models>
+
+      <sig_fits>
+        <fit>
+          <shape>  DSCB </shape>
+          <order>  1 </order>
+          <freeze> [Coefs, Params] </freeze>
+        </fit>
+      </sig_fits>
+
+      <bkg_fits>
+        <fit>
+          <shape>  BWZ </shape>
+          <order>  1 </order>
+          <freeze> [] </freeze>
+        </fit>
+
+      </bkg_fits>
+    </mass>
+
+
+  </discriminants>
+
+</root>

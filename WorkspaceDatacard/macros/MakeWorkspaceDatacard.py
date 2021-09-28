@@ -53,26 +53,34 @@ if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 # CONFIGS = ['WH_lep_AWB_2019_05_20_v1_shape']
 
 #====== XWZ CONGIF
-#CONFIGS = ['WH_2018_3lep_AWB_mass_06_19_med']
-#CONFIGS = ['WH_2018_3lep_AWB_BDT_06_19_med']
-#CONFIGS = ['WH_1718_3lep_AWB_mass_06_25']
-#CONFIGS = ['WH_1718_3lep_AWB_BDT_06_25_med']
-#CONFIGS = ['WH_1718_3lep_AWB_Bernstein_mass_07_03', 'WH_1718_3lep_AWB_template_mass_07_03']
-#CONFIGS = ['ZH_lep_XWZ_mass_05_23_MVAp04_v1']
-# CONFIGS = ['WH_lep_XWZ_2019_05_14_TMVA_out_v1']
-#CONFIGS = ['ttH_1718_3lep_AWB_mass_07_04']
-#CONFIGS = ['ttH_1718_3lep_AWB_mass_med_07_08']
-#CONFIGS = ['WH_Run2_3lep_AWB_mass_07_10']
-#CONFIGS = ['ttH_Run2_3lep_AWB_mass_07_10']
-
 #CONFIGS = ['WH_Run2_3lep_07_31']
 #CONFIGS = ['ZH_Run2_lep_08_26']
 #CONFIGS = ['ZH_Run2_lep_BDT_08_26']
 
-
 #CONFIGS = ['WH_Run2_3lep_10_20_DSCB_sig_sys']
-CONFIGS = ['ZH_Run2_lep_02_07_newcat_sys']
+#CONFIGS = ['ZH_Run2_lep_02_07_newcat_sys']
+#CONFIGS = ['WH_Run2_3lep_02_18_temp']
+#CONFIGS = ['ZH_Run2_lep_02_18_temp']
 
+#CONFIGS = ['WH_Run2_3lep_04_02_newcats_noSys']
+#CONFIGS = ['ZH_Run2_lep_04_02_newcats_noSys']
+
+#CONFIGS = ['WH_Run2_3lep_04_22_noSys']
+#CONFIGS = ['ZH_Run2_lep_04_22_noSys']
+
+#CONFIGS = ['WH_Run2_3lep_05_04_FullSys']
+#CONFIGS = ['ZH_Run2_lep_05_04_FullSys']
+
+#CONFIGS = ['WH_Run2_3lep_05_18_FullSys']
+#CONFIGS = ['ZH_Run2_lep_05_18_Fullsys']
+
+#CONFIGS = ['WH_Run2_3lep_06_02_sys_addRoch']
+#CONFIGS = ['ZH_Run2_lep_06_02_sys_addRoch']
+#CONFIGS = ['ZH_Run2_lep_06_02_altZHcat0_constraint']
+#CONFIGS = ['ZH_Run2_lep_06_02_altZHcat0_constant']
+
+CONFIGS = ['WH_Run2_3lep_07_20_extra_lepMVA_uncert']
+#CONFIGS = ['ZH_Run2_lep_07_20_extra_lepMVA_uncert']
 #============================================
 # Main code
 #============================================
@@ -86,6 +94,7 @@ class WorkspaceAndDatacardMaker:
         self.out_dir = _out_dir ## Output directory for datacards, workspaces, plots, etc.
         self.cat     = _cat     ## Category name for this workspace
         self.dist    = _dist    ## Distribution for signal extraction
+        self.catname = 'CatAll'
         self.blind   = _blind   ## Range to blind in data
         self.rebin   = _rebin   ## Rebin input distribution for optimal S^2/
         self.models  = _models  ## Set of analytic or template models to use
@@ -98,7 +107,14 @@ class WorkspaceAndDatacardMaker:
         self.h_data_fit = None  ## Histogram of analytic best-fit to data shape
         # self.nuisances = []     ## List of nuisance parameters (not yet implemented - AWB 13.05.19)
 
-	self.sys_cfg = SH.SystematicsConfig(_sys_names, self.in_data.hists_sys)
+	self.sys_cfg = SH.SystematicsConfig(_signals, _sys_names, self.in_data.hists_sys)
+
+        if   _dist == 'dimu_mass_BDT_n10_n01': self.catname = 'ZHCat0'
+        elif _dist == 'dimu_mass_BDT_n01_p10': self.catname = 'ZHCat1'
+        elif _dist == 'H_pair_mass_BDT_final_n10_n01_zoomH': self.catname = 'WHCat0'
+        elif _dist == 'H_pair_mass_BDT_final_n01_p03_zoomH': self.catname = 'WHCat1'
+        elif _dist == 'H_pair_mass_BDT_final_p03_p10_zoomH': self.catname = 'WHCat2'
+
 
     def Clear(self):
         if not self.in_data    is None: self.in_data.Clear()
@@ -186,13 +202,16 @@ class WorkspaceAndDatacardMaker:
         ## Don't print plots to screen while running (faster)
 	R.gROOT.SetBatch(R.kTRUE)
 
+        mean_sys  = R.RooRealVar('CMS_hmm_%s_peak'  %(self.catname),  'peak_sys',        0.0, 0.0, 0.0)
+        sigma_sys = R.RooRealVar('CMS_hmm_%s_sigma' %(self.catname),  'sigma_sys',       0.0, 0.0, 0.0)
+
 	sig_fits = []
 	for sig_hist in self.in_data.sig_hists:
 	    sig_name = sig_hist.GetName() 
 	    print 'Adding signal %s ---------------------------' %sig_name
-            sig_fits.append( FF.FitFunction( sig_name+'_fit_%s'  % self.cat, sig_hist, sig_mod, sig_ord, self.in_data.min_max, [],         'dimu_mass')  )
-        bkg_fit  = FF.FitFunction('bkg_fit_%s'  % self.cat, self.in_data.bkg_hists[0], bkg_mod, bkg_ord, self.in_data.min_max, [],         'dimu_mass')
-        data_fit = FF.FitFunction('data_fit_%s' % self.cat, self.in_data.data_hist,    bkg_mod, bkg_ord, self.in_data.min_max, self.blind, 'dimu_mass')
+            sig_fits.append( FF.FitFunction( sig_name+'_%s'  % self.catname, sig_hist, sig_mod, sig_ord, self.in_data.min_max, [],         'mh_'+self.cat, mean_sys, sigma_sys)  )
+        bkg_fit  = FF.FitFunction('bkg_%s'  % self.catname, self.in_data.bkg_hists[0], bkg_mod, bkg_ord, self.in_data.min_max, [],         'mh_'+self.cat)
+        data_fit = FF.FitFunction('data_%s' % self.catname, self.in_data.data_hist,    bkg_mod, bkg_ord, self.in_data.min_max, self.blind, 'mh_'+self.cat)
 
 	self.h_sig_fits = []
 	for sig_fit in sig_fits:
@@ -221,31 +240,46 @@ class WorkspaceAndDatacardMaker:
         if len(sig_frz_str) > 0: sig_frz_str = '_frz'+sig_frz_str
         bkg_frz_str = '_frz'.join(f for f in bkg_frz)
         if len(bkg_frz_str) > 0: bkg_frz_str = '_frz'+bkg_frz_str
-        shape_str = sig_mod+str(sig_ord)+sig_frz_str+'_'+bkg_mod+str(bkg_ord)+bkg_frz_str+'_shape'
+#        shape_str = sig_mod+str(sig_ord)+sig_frz_str+'_'+bkg_mod+str(bkg_ord)+bkg_frz_str+'_shape'  ## this is original convention set up by AWB in May2019
+        shape_str = bkg_mod  ## convention for final DCs, since choices for sig/bkg models are set
 
         ## Create a new workspace for this category
-        WS_data = R.RooWorkspace(self.cat+'_'+self.dist+'_'+shape_str+'_data')  ## Using data for background
-        WS_MC   = R.RooWorkspace(self.cat+'_'+self.dist+'_'+shape_str+'_MC')    ## Using MC for background
+        WS_data = R.RooWorkspace(self.catname+'_'+shape_str.replace('_constraint','').replace('_constant',''))  ## Using data for background
+        WS_MC   = R.RooWorkspace(self.catname+'_'+shape_str.replace('_constraint','').replace('_constant','')+'_MC')    ## Using MC for background
         ## "Data" input to workspace must have name "data_obs"
         ## Rename signal and background models for simplicity
-        data_fit.dat  .SetName('data_obs')
-        bkg_fit .dat  .SetName('data_obs')
-        data_fit.model.SetName('data_fit')
-        bkg_fit .model.SetName('bkg_fit')
+        data_fit.dat  .SetName('data_obs_' + self.catname)
+        bkg_fit .dat  .SetName('data_obs_' + self.catname)
+        data_fit.model.SetName('bkg_' + self.catname + '_pdf')
+        bkg_fit .model.SetName('BKG_' + self.catname + '_pdf')
+        data_bkg_norm  = R.RooRealVar('bkg_'+self.catname+'_pdf'+'_norm', 'bkg_'+self.catname+'_pdf'+'_norm', data_fit.fit_hist.Integral(), 0.0, 10000.0)
+        MC_bkg_norm    = R.RooRealVar('BKG_'+self.catname+'_pdf'+'_norm', 'BKG_'+self.catname+'_pdf'+'_norm',  bkg_fit.fit_hist.Integral(), 0.0, 10000.0)  ## use capital for MC so they have different names
+        data_bkg_norm.setConstant(False)
+        MC_bkg_norm.setConstant(False)
+        sig_norms = {}
 	for sig_fit in sig_fits:        
-	    sig_name = sig_fit.name.replace(('_%s' %self.cat), '').replace('_fit', '')
+	    sig_name = sig_fit.name + '_pdf'
 	    sig_fit.model.SetName( sig_name )
-		
+	    sig_norms[sig_name] = R.RooRealVar(sig_name+'_norm', sig_name+'_norm', sig_fit.fit_hist.Integral(), 0, 10000.0)	
+            sig_norms[sig_name].setConstant(True)
+
         ## "import" is a keyword so workspace.import() doesn't work in python
         ##   Have to do this instead:
         getattr(WS_data, 'import')(data_fit.dat,   R.RooCmdArg())
         getattr(WS_data, 'import')(data_fit.model, R.RooCmdArg())
+        getattr(WS_data, 'import')(data_bkg_norm,  R.RooCmdArg())
         getattr(WS_MC,   'import')(bkg_fit.dat,    R.RooCmdArg())
         getattr(WS_MC,   'import')(bkg_fit.model,  R.RooCmdArg())
+        getattr(WS_MC,   'import')(MC_bkg_norm,    R.RooCmdArg())
+
+        getattr(WS_data, 'import')(mean_sys,       R.RooCmdArg())   ## common signal shape uncertainty to all signal modes
+        getattr(WS_MC,   'import')(sigma_sys,      R.RooCmdArg())   ## common signal shape uncertainty to all signal modes
 	for sig_fit in sig_fits:
 	  print '\n\n\n Adding sig_fit.model %s to workspace **************************\n\n\n' %sig_fit.model.GetName()
           getattr(WS_data, 'import')(sig_fit.model,  R.RooCmdArg())
           getattr(WS_MC,   'import')(sig_fit.model,  R.RooCmdArg())
+          getattr(WS_data, 'import')(sig_norms[sig_fit.name+'_pdf'],  R.RooCmdArg())
+          getattr(WS_MC,   'import')(sig_norms[sig_fit.name+'_pdf'],  R.RooCmdArg())
 
 	# Save workspaces to root file
         WS_data.SaveAs(self.out_dir+'/workspace/'+WS_data.GetName()+'.root')
@@ -269,15 +303,16 @@ class WorkspaceAndDatacardMaker:
         if len(sig_frz_str) > 0: sig_frz_str = '_frz'+sig_frz_str
         bkg_frz_str = '_frz'.join(f for f in bkg_frz)
         if len(bkg_frz_str) > 0: bkg_frz_str = '_frz'+bkg_frz_str
-        shape_str = sig_mod+str(sig_ord)+sig_frz_str+'_'+bkg_mod+str(bkg_ord)+bkg_frz_str+'_shape'
+#        shape_str = sig_mod+str(sig_ord)+sig_frz_str+'_'+bkg_mod+str(bkg_ord)+bkg_frz_str+'_shape'  ## orignal convention set by AWB MAy2019
+        shape_str = bkg_mod  ## convention for final DCs
 
-        card_data = open(self.out_dir+'/datacard/'+self.cat+'_'+self.dist+'_'+shape_str+'_data.txt', 'w')
-        DH.WriteHeader        (card_data, self.cat, self.out_dir, self.cat+'_'+self.dist+'_'+shape_str+'_data')
-        DH.WriteSigBkgBody    (card_data, self.cat, self.dist, 'shape_data', width, self.h_sig_fits, self.h_data_fit.Integral(), self.signals, self.sys_cfg)
+        card_data = open(self.out_dir+'/datacard/'+self.catname+'_'+shape_str+'.txt', 'w')
+        DH.WriteHeader        (card_data, self.catname, self.out_dir, width, self.h_sig_fits, self.catname+'_'+shape_str)
+        DH.WriteSigBkgBody    (card_data, self.catname, self.dist, 'shape_data', width, self.h_sig_fits, self.h_data_fit.Integral(), self.signals, self.sys_cfg)
 
-        card_MC = open(self.out_dir+'/datacard/'+self.cat+'_'+self.dist+'_'+shape_str+'_MC.txt', 'w') 
-        DH.WriteHeader        (card_MC, self.cat, self.out_dir, self.cat+'_'+self.dist+'_'+shape_str+'_MC')
-        DH.WriteSigBkgBody    (card_MC, self.cat, self.dist, 'shape_MC', width, self.h_sig_fits, self.h_bkg_fit.Integral(), self.signals, self.sys_cfg)
+        card_MC = open(self.out_dir+'/datacard/'+self.catname+'_'+shape_str+'_MC.txt', 'w') 
+        DH.WriteHeader        (card_MC, self.catname, self.out_dir, width, self.h_sig_fits, self.catname+'_'+shape_str+'_MC')
+        DH.WriteSigBkgBody    (card_MC, self.catname, self.dist, 'shape_MC', width, self.h_sig_fits, self.h_bkg_fit.Integral(), self.signals, self.sys_cfg)
 
     ## End function: def makeShapeDatacards(self, sig_mod, sig_ord, sig_frz, bkg_mod, bkg_ord, bkg_frz):
 
