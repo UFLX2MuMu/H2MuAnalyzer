@@ -22,9 +22,10 @@ def GetHistInfo(hist):
     reso_err = 0.0
     return mean_val, mean_err, reso_val, reso_err    
 
-def FitVoigtian(hist, exp = False):
+def FitVoigtian(hist, IsGen = False, exp = False):
+#    if hist.GetEntries() < 5000.0:
     if hist.Integral() < 2000.0:
-	return 91.0, 91.0, 10.0, 10.0
+	return 9.9, 3.3, 9.9, 3.3 #unlikely values for inproper fits 
 
     minM     = round(hist.GetMean() - min(hist.GetRMS()*2, 3.5), 2)
     maxM     = round(hist.GetMean() + min(hist.GetRMS()*2, 3.5), 2)
@@ -37,6 +38,7 @@ def FitVoigtian(hist, exp = False):
     F_voigt.SetParLimits(1, minM, maxM			    )  ## Mean  range
 #    F_voigt.SetParLimits(3, 2.0, 3.0) ## test floating Z width
     F_voigt.FixParameter(3, 2.5)  ## fix Z natural width
+    if IsGen: F_voigt.FixParameter(2, 0) ## fix sigma for gen
 
     if exp:
 	F_voigt.SetParLimits(4, 0, hist.GetMaximum()) ## norm_exp range
@@ -67,6 +69,8 @@ def FitVoigtian(hist, exp = False):
     print "mean  = %f +- %f, " %( F_voigt.GetParameter(1), F_voigt.GetParError(1) )
     print "sigma = %f +- %f, " %( F_voigt.GetParameter(2), F_voigt.GetParError(2) )
     print "gamma = %f +- %f, " %( F_voigt.GetParameter(3), F_voigt.GetParError(3) )
+
+#    if mean_err > 2: mean_err = 0.02
 
     return mean_val, mean_err, reso_val, reso_err
 
@@ -148,7 +152,7 @@ def FitCrystalBall(hist):
 
 
 def FitDSCB(hist):
-    if hist.Integral() < 1000.0:
+    if hist.GetEntries() < 1000.0:
         return (None, 125.0, 125.0, 10.0, 10.0)
 
 #    minM     = round(hist.GetXaxis().GetXmin(), 2) + 1.0
@@ -173,7 +177,7 @@ def FitDSCB(hist):
 
     dat_hist = RooDataHist('dat_' + hist.GetName(), 'dat_'+hist.GetName(), RooArgList(RooArgSet(x_var)), hist)
 
-    func_DSCB = ( RooDoubleCB('DSCB', 'DSCB', x_var, params[0], params[1], params[2], params[3], params[4], params[5]) )
+    func_DSCB = ( RooDoubleCB('DSCB_'+hist.GetName(), 'DSCB_'+hist.GetName(), x_var, params[0], params[1], params[2], params[3], params[4], params[5]) )
     arg_sets  = RooArgSet(func_DSCB) 
 
 
@@ -211,7 +215,7 @@ def FitDSCB(hist):
     print "a2    = %f +- %f, " %( params[4].getValV(), params[4].getError() )
     print "n2    = %f +- %f, " %( params[5].getValV(), params[5].getError() )
 
-    return (frame_plot, mean_val, mean_err, reso_val, reso_err)
+    return (frame_plot, mean_val, mean_err, reso_val, reso_err, dat_hist, func_DSCB)
 
 
 
@@ -219,13 +223,15 @@ def FitDSCB(hist):
 
 def GetColor(sample, pt_cal):
     if sample == "ZJets_MG_1" or sample == "ZJets_AMC":
+      if pt_cal == "gen" or pt_cal == "genBS":
+        return kGray+1
       if pt_cal == "PF" or pt_cal == "Kin_vs_d0kin_BB" or pt_cal == "Kin_vs_d0kin_d0PV_N50_N15":
         return kRed
       if pt_cal == "Roch" or pt_cal == "good_Kinfit" or pt_cal == "Kin_vs_d0kin_BE" or pt_cal == "Kin_vs_d0kin_d0PV_N15_N05":
         return kAzure
       if pt_cal == "Kinfit" or pt_cal == "Kin_vs_d0kin_EE" or pt_cal == "Kin_vs_d0kin_d0PV_P05_P15":
 	return kSpring
-      if pt_cal == "KinRoch" or pt_cal == "Kin_vs_d0kin" or pt_cal == "Kin_vs_d0kin_d0PV_P15_P50":
+      if pt_cal == "GeoBSRoch" or pt_cal == "KinRoch" or pt_cal == "Kin_vs_d0kin" or pt_cal == "Kin_vs_d0kin_d0PV_P15_P50":
 	return kOrange
 
     if sample == "data":
@@ -235,13 +241,25 @@ def GetColor(sample, pt_cal):
         return kBlue + 2
       if pt_cal == "Kinfit" or pt_cal == "Kin_vs_d0kin_EE" or pt_cal == "Kin_vs_d0kin_d0PV_P05_P15":
 	return kGreen + 2
-      if pt_cal == "KinRoch" or pt_cal == "Kin_vs_d0kin" or pt_cal == "Kin_vs_d0kin_d0PV_P15_P50":
+      if pt_cal == "GeoBSRoch" or pt_cal == "KinRoch" or pt_cal == "Kin_vs_d0kin" or pt_cal == "Kin_vs_d0kin_d0PV_P15_P50":
 	return kOrange - 6
     else:
         return kBlack
 
 
-
+def LatexVarName(nameX):
+    if   nameX == 'dimu_pt':  return 'p_{T}(\mu\mu) (GeV)'
+    elif nameX == 'dimu_eta': return '\eta(\mu\mu)'
+    elif nameX == 'muP_pt':  return 'p_{T}(\mu^{+}) (GeV)'
+    elif nameX == 'muP_eta':  return '\eta(\mu^{+})'
+    elif nameX == 'muP_phi':  return '\phi(\mu^{+})'
+    elif nameX == 'muN_phi':  return '\phi(\mu^{-})'
+    elif nameX == 'muP_d0': return 'd0(\mu^{+}, BS) (\mu^{}m)'
+    elif nameX == 'muN_d0': return 'd0(\mu^{-}, BS) (\mu^{}m)'
+    elif nameX == 'muP_d0_rebin': return 'd0(\mu^{+}, BS) (\mu^{}m)'
+    elif nameX == 'muN_d0_rebin': return 'd0(\mu^{-}, BS) (\mu^{}m)'
+    
+    else: return nameX
 
 def WriteOverlay(graphs, term, samples, pt_cals):
     for sample in samples:
@@ -252,8 +270,10 @@ def WriteOverlay(graphs, term, samples, pt_cals):
       canv.cd()
 
       for pt_cal in pt_cals:
+        if pt_cal == 'gen' and sample == 'data': continue
         graphs[sample+pt_cal].Draw()  ## the first plot cannot have option "SAME", otherwise it is empty
       for pt_cal in pt_cals:
+        if pt_cal == 'gen' and sample == 'data' :continue
 	graphs[sample+pt_cal].Draw("SAME")
 	legend.AddEntry(graphs[sample+pt_cal], pt_cal.replace('KinRoch','Kinfit+Roch'), "LPE")
       legend.Draw()
@@ -267,8 +287,10 @@ def WriteOverlay(graphs, term, samples, pt_cals):
       legend = TLegend(0.7,0.7,1,1)
       canv.cd()
       for sample in samples:
+        if pt_cal == 'gen' and sample == 'data' :continue
         graphs[sample+pt_cal].Draw()  ## the first plot cannot have option "SAME", otherwise it is empty
       for sample in samples:
+        if pt_cal == 'gen' and sample == 'data' :continue
 	graphs[sample+pt_cal].Draw("SAME")
         legend.AddEntry(graphs[sample+pt_cal], sample, "LPE")
       legend.Draw()
@@ -278,45 +300,79 @@ def WriteOverlay(graphs, term, samples, pt_cals):
 
 
 
-def WriteSummary(graphs, term, nameX, samples, pt_cals, plot_dir):
+def WriteSummary(graphs, term, nameX, year, samples, pt_cals, plot_dir):
+    gStyle.SetLegendBorderSize(0)
+    gStyle.SetLegendFont(42)
+    gStyle.SetLegendTextSize(0.045)
+    gStyle.SetErrorX(0.0)
+
     canv = TCanvas("summary_" + term, "summary_" + term, 600,600)
     
     ## upper pad
     upper_pad = TPad("UP_"+term, "UP_"+term, 0,0.3, 1,1)
-    upper_pad.SetBottomMargin(0.05);
-    upper_pad.SetGridx()
-    upper_pad.SetGridy()
+    upper_pad.SetBottomMargin(0.02);
+#    upper_pad.SetGridx()
+#    upper_pad.SetGridy()
     upper_pad.Draw()
     upper_pad.cd()
-    legend_U = TLegend(0.7,0.7,1,1)
-    legend_U.SetHeader("mass_" + term + "_vs_" + nameX, "C")
+    legend_U = TLegend(0.55,0.56,0.85,0.86)
+#    legend_U.SetHeader("mass_" + term + "_vs_" + nameX, "C")
     for pt_cal in pt_cals:
       for sample in samples:
+        if pt_cal == 'gen' and sample == 'data' :continue
+        if pt_cal == 'gen' and term == 'reso': continue
+        graphs[sample+pt_cal].SetMarkerColor( GetColor(sample, pt_cal) )
+        graphs[sample+pt_cal].SetMarkerStyle(8)
+        graphs[sample+pt_cal].SetMarkerSize(0.8)
+        graphs[sample+pt_cal].GetXaxis().SetLabelSize(0)
+        if term == 'mean': graphs[sample+pt_cal].GetYaxis().SetTitle("m_{\mu\mu} (GeV)")
+        else:              graphs[sample+pt_cal].GetYaxis().SetTitle("\sigma(m_{\mu\mu}) (GeV)")
+        graphs[sample+pt_cal].GetYaxis().SetTitleOffset(0.95)
+        graphs[sample+pt_cal].GetYaxis().SetTitleSize(0.06)
 	if term == "mean":
-          graphs[sample+pt_cal].SetMaximum(92.5)
-          graphs[sample+pt_cal].SetMinimum(90.0)
+          if "d0" in nameX:
+            graphs[sample+pt_cal].SetMaximum(95)
+            graphs[sample+pt_cal].SetMinimum(89)
+          else:
+            graphs[sample+pt_cal].SetMaximum(93)
+            graphs[sample+pt_cal].SetMinimum(90)
         else:
-          graphs[sample+pt_cal].SetMaximum(2.8)
-          graphs[sample+pt_cal].SetMinimum(0.8)
-	graphs[sample+pt_cal].Draw()
+          graphs[sample+pt_cal].SetMaximum(3.2)
+          graphs[sample+pt_cal].SetMinimum(0.6)
+	graphs[sample+pt_cal].Draw('APZ')
     for pt_cal in pt_cals:
       for sample in samples:
-        graphs[sample+pt_cal].Draw("SAME")
-	legend_U.AddEntry(graphs[sample+pt_cal], pt_cal.replace('KinRoch','Kinfit+Roch') + "_" + sample, "LPE")
+        if pt_cal == 'gen' and sample == 'data' :continue
+        if pt_cal == 'gen' and term == 'reso': continue
+        graphs[sample+pt_cal].Draw("PZSAME")
+	legend_U.AddEntry(graphs[sample+pt_cal], pt_cal.replace('KinRoch','Kinfit+Roch').replace("GeoBSRoch", "Roch+GeoFit") + " " + sample.replace("ZJets_AMC", "MC").replace("ZJets_MG_1", "MC"), "LPE")
     legend_U.Draw()
-   
+  
+    cms_latex = TLatex()
+    cms_latex.SetTextAlign(11)
+    cms_latex.SetTextSize(0.03)
+    cms_latex.DrawLatexNDC(0.16, 0.82, '#scale[2.0]{CMS #bf{#it{Preliminary}}}')
+    lumi = '137'
+    if   year == '2016': lumi = '35.9'
+    elif year == '2017': lumi = '41.5'
+    elif year == '2018': lumi = '59.7' #ABC 28.0, D 31.9
+
+    cms_latex.DrawLatexNDC(0.71, 0.94,'#font[42]{#scale[1.7]{%s fb^{-1} (13 TeV)}}'%lumi) #35.9 41.5 59.7
+ 
     ## lower pad 
     canv.cd()
     lower_pad = TPad("LP_"+term, "LP_"+term, 0,0.05, 1,0.3)
     lower_pad.SetTopMargin(0.05)
-    lower_pad.SetGridx()
+    lower_pad.SetBottomMargin(0.35)
+#    lower_pad.SetGridx()
     lower_pad.SetGridy()
     lower_pad.Draw()
     lower_pad.cd()
     ratios = {}
-    legend_L = TLegend(0.8,0.6,1,1)
-    legend_L.SetHeader("data/MC", "C")
+    legend_L = TLegend(0.7,0.6,0.9,0.9)
+#    legend_L.SetHeader("data/MC", "C")
     for pt_cal in pt_cals:
+      if pt_cal == 'gen' :continue
       ratios[pt_cal] = TGraphErrors()
       ratios[pt_cal].SetName("ratio_" + term + pt_cal)
       x_MC =   double(0.0)
@@ -335,29 +391,44 @@ def WriteSummary(graphs, term, nameX, samples, pt_cals, plot_dir):
 	y_err_data = graphs["data"+pt_cal].GetErrorY(i)
 
 	ratios[pt_cal].SetPoint(i, x_data, y_data/y_MC)
+        if y_data == 9.9 or y_MC == 9.9: ratios[pt_cal].SetPoint(i, x_data, 0) #if one of them is not a good fit
         ratios[pt_cal].SetPointError(i, x_err, y_data/y_MC * math.sqrt( (y_err_MC/y_MC) ** 2.0 + (y_err_data/y_data) ** 2.0 ) )
 
       ratios[pt_cal].SetLineColor( GetColor(MC_sample, pt_cal) )
       ratios[pt_cal].SetLineWidth(2)
+      ratios[pt_cal].SetMarkerColor( GetColor(MC_sample, pt_cal) )
+      ratios[pt_cal].SetMarkerStyle(8)
+      ratios[pt_cal].SetMarkerSize(0.8)
+      ratios[pt_cal].GetXaxis().SetTitle(LatexVarName(nameX))
+      ratios[pt_cal].GetXaxis().SetTitleSize(0.14)
+      ratios[pt_cal].GetXaxis().SetTitleOffset(0.9)
+      ratios[pt_cal].GetYaxis().SetTitle('Data / Pred.')
+      ratios[pt_cal].GetYaxis().SetTitleSize(0.14)
+      ratios[pt_cal].GetYaxis().SetTitleOffset(0.43)
+      ratios[pt_cal].GetYaxis().CenterTitle(1)
+      ratios[pt_cal].GetYaxis().SetNdivisions(402)
+      ratios[pt_cal].GetXaxis().SetTickLength(0.06)
+      ratios[pt_cal].GetYaxis().SetTickLength(0.04)
       ratios[pt_cal].GetXaxis().SetLabelSize(0.12)
       ratios[pt_cal].GetYaxis().SetLabelSize(0.12)
       if term == "mean":
-        ratios[pt_cal].SetMaximum(1.003)
-        ratios[pt_cal].SetMinimum(0.997)
+        ratios[pt_cal].SetMaximum(1.005)
+        ratios[pt_cal].SetMinimum(0.995)
       else:
-	ratios[pt_cal].SetMaximum(1.10)
-        ratios[pt_cal].SetMinimum(0.90)
-      ratios[pt_cal].Draw()
+	ratios[pt_cal].SetMaximum(1.2)
+        ratios[pt_cal].SetMinimum(0.8)
+      ratios[pt_cal].Draw("APZ")
 
     for pt_cal in pt_cals:
-      ratios[pt_cal].Draw("SAME")
+      if pt_cal == 'gen' :continue
+      ratios[pt_cal].Draw("PZSAME")
       legend_L.AddEntry(ratios[pt_cal], pt_cal.replace('KinRoch','Kinfit+Roch'), "LPE")
-    legend_L.Draw()
+#    legend_L.Draw()
 
     canv.Update()
     canv.Write()
     canv.SaveAs( plot_dir + "/" + nameX + "_summary_" + term + ".png")
-
+    canv.SaveAs( plot_dir + "/" + nameX + "_summary_" + term + ".pdf")
 
 
 

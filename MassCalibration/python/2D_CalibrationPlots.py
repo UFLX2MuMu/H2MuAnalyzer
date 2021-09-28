@@ -111,7 +111,7 @@ def main():
 		  sum_plots[sample+pt_cal+sum_name].Add( mass_hist )
 
 
-	    if   PEAK == "Z":       mean_val, mean_err, reso_val, reso_err = FitVoigtian(mass_hist, exp = True)
+	    if   PEAK == "Z":       mean_val, mean_err, reso_val, reso_err = FitVoigtian(mass_hist, IsGen = (pt_cal == 'gen'), exp = True)
 	    elif PEAK == "H":       #mean_val, mean_err, reso_val, reso_err = FitCrystalBall(mass_hist)
 		temp_tuple = FitDSCB(mass_hist)
 		mean_val = temp_tuple[1]
@@ -119,7 +119,7 @@ def main():
 		reso_val = temp_tuple[3]
 		reso_err = temp_tuple[4]
 	    elif PEAK == "off_set": mean_val, mean_err, reso_val, reso_err = FitCrystalBall(mass_hist)
-	    if reso_err == 10:  # if not a good fit
+	    if reso_err == 3.3:  # if not a good fit
 		mean_plots[sample+pt_cal].SetBinContent(i+1,j+1, 0.0)
 		mean_plots[sample+pt_cal].SetBinError  (i+1,j+1, mean_err)
 	 	reso_plots[sample+pt_cal].SetBinContent(i+1,j+1, 0.0)
@@ -239,9 +239,6 @@ def main():
 #    WriteOverlay(mean_plots, "mean", samples, pt_cals)
 #    WriteOverlay(reso_plots, "reso", samples, pt_cals)
 #
-#    sum_dir.cd()
-#    WriteSummary(mean_plots, "mean", nameX, samples, pt_cals, file_dir)
-#    WriteSummary(reso_plots, "reso", nameX, samples, pt_cals, file_dir)
 #
 
 
