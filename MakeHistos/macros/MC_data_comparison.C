@@ -147,7 +147,15 @@ void MC_data_comparison( TString sample = "", TString in_dir = "", TString out_d
     if (verbose) std::cout << "Before running GetEntry, event = " << br.event;
     
     in_chain->GetEntry(iEvt);
-    
+   
+     // process muon collection and load new ones with Roch pt with systematic shifts 
+    MuonInfos muons_tmp;
+    if ( not sample.Contains("SingleMu") and SYS.find("Roch_") != std::string::npos ) {
+      muons_tmp = ReloadMuonRoch(Roch_Cor, *br.muons_orig, *br.genMuons, SYS);
+      br.muons = &muons_tmp;
+    }
+    else br.muons = br.muons_orig;
+ 
     if (verbose) std::cout << "... after, event = " << br.event << std::endl;
 
     // For 2016 NTuples, convert "SlimJets" collection into regular jets

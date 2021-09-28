@@ -44,8 +44,8 @@ const bool verbose = false; // Print extra information
 
 //const TString IN_DIR   = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2018/102X/prod-v18-pre-tag/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/ZJets_MG_1/190521_174140/0000";
 //const TString SAMPLE   = "ZJets_MG_1";
-const TString IN_DIR   = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2016/94X_v3/prod-v16.0.7/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/ZJets_AMC/190714_182527/0000/";
-const TString SAMPLE   = "ZJets_AMC";
+//const TString IN_DIR   = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2016/94X_v3/prod-v16.0.7/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/ZJets_AMC/190714_182527/0000/";
+//const TString SAMPLE   = "ZJets_AMC";
 
 //const TString IN_DIR   = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/2016/94X_v3/prod-v16.0.7/DYJetsToLL_M-105To160_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/ZJets_hiM_MG/190714_181926/0000/";
 //const TString SAMPLE   = "ZJets_hiM_MG";
@@ -64,6 +64,8 @@ const TString SAMPLE   = "ZJets_AMC";
 //const TString IN_DIR    = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/data_2017_and_mc_fall17/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/ZJets_AMC/181019_172147/0000";
 //const TString SAMPLE    = "ZJets_AMC";
 
+const TString IN_DIR = "/eos/cms/store/group/phys_higgs/HiggsExo/H2Mu/UF/ntuples/data_2017_and_mc_fall17/WPlusH_HToMuMu_M125_13TeV_powheg_pythia8/H2Mu_WH_pos/180802_164326/0000";
+const TString SAMPLE = "H2Mu_WH_pos";
 
 const std::string YEAR  = "2018";
 const std::string SLIM  = "notSlim";  // "Slim" or "notSlim" - original 2016 NTuples were in "Slim" format, some 2017 NTuples are "Slim"
@@ -71,10 +73,13 @@ const std::string SLIM  = "notSlim";  // "Slim" or "notSlim" - original 2016 NTu
 const TString OUT_DIR   = "plots";
 const TString HIST_TREE = "HistTree"; // "Hist", "Tree", or "HistTree" to output histograms, trees, or both
 
+std::string GEN_INT = "GENint";
+
 const std::vector<std::string> SEL_CUTS = {"PreselRun2"}; // Cuts which every event must pass
 const std::vector<std::string> OPT_CUTS = {"NONE"}; // Multiple selection cuts, applied independently in parallel
 //const std::vector<std::string> CAT_CUTS = {"NONE", "inclusive_01jet", "inclusive_2jets", "BB", "BE", "EE", "nonBB"}; // Event selection categories, also applied in parallel
-const std::vector<std::string> CAT_CUTS = {"NONE", "BB", "nonBB", "XX", "EE", "posBarrel", "posOverlap", "posEndcap"};
+//const std::vector<std::string> CAT_CUTS = {"NONE", "BB", "nonBB", "XX", "EE", "posBarrel", "posOverlap", "posEndcap"};
+const std::vector<std::string> CAT_CUTS = {"NONE"};
 
 // Command-line options for running in batch.  Running "root -b -l -q macros/ReadNTupleChain.C" will use hard-coded options above.
 void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir = "",
@@ -133,7 +138,7 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
     if (sample.Contains("SingleMu"))
       SetBranchAddresses(*in_chain, br, {YEAR, SLIM}, "noSys", false); // Options in {} include "JES", "Flags", and "SFs"
     else
-      SetBranchAddresses(*in_chain, br, {YEAR, SLIM, "GEN", "Wgts"}, "noSys", false); // Options in {} include "JES", "Flags", and "SFs"
+      SetBranchAddresses(*in_chain, br, {YEAR, SLIM, GEN_INT, "GEN", "Wgts"}, "noSys", false); // Options in {} include "JES", "Flags", and "SFs"
   }
 
   // Initialize empty map of histogram names to output histograms
@@ -164,8 +169,9 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
   /////////////////////////////////////////
   MassCalConfig 	mc_cfg;
 //  ConfigureMassCal( mc_cfg, "Z", "muN_d0");
-  ConfigureMassCal( mc_cfg, "Z", "muP_d0_rebin", "muP_phi");
-//  ConfigureMassCal( mc_cfg, "Z", "muP_d0_rebin", "muN_d0_rebin");
+//  ConfigureMassCal( mc_cfg, "Z", "muP_d0_rebin", "muP_phi");
+//  ConfigureMassCal( mc_cfg, "H", "muP_d0_rebin", "muN_d0_rebin");
+  ConfigureMassCal( mc_cfg, "Z", "muP_phi", "muN_phi");
 
   std::map<TString, MassCalPlots*> mc_map_gen;
   std::map<TString, MassCalPlots*> mc_map_genBS;
@@ -178,7 +184,7 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
 //  std::map<TString, MassCalPlots*> mc_map_KaMu;
 //  std::map<TString, MassCalPlots*> mc_map_KinKaMu;
 
-  std::map<TString, MassCalPlots*> mc_map_GeoRoch;
+//  std::map<TString, MassCalPlots*> mc_map_GeoRoch;
   std::map<TString, MassCalPlots*> mc_map_GeoBSRoch;
 
 //  std::map<TString, MassCalPlots*> mc_map_PtWPF;
@@ -226,7 +232,7 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
 //        mc_map_KaMu   [ optCatStr ]   = new MassCalPlots( (sample.Contains("SingleMu") ? "data" :  sample) + "_" + optCatStr + "_KaMu", mc_cfg );
 //	mc_map_KinKaMu[ optCatStr ]   = new MassCalPlots( (sample.Contains("SingleMu") ? "data" :  sample) + "_" + optCatStr + "_KinKaMu", mc_cfg );
 
-        mc_map_GeoRoch[ optCatStr ]     = new MassCalPlots( (sample.Contains("SingleMu") ? "data" :  sample) + "_" + optCatStr + "_GeoRoch", mc_cfg );
+//        mc_map_GeoRoch[ optCatStr ]     = new MassCalPlots( (sample.Contains("SingleMu") ? "data" :  sample) + "_" + optCatStr + "_GeoRoch", mc_cfg );
 	mc_map_GeoBSRoch[ optCatStr ]   = new MassCalPlots( (sample.Contains("SingleMu") ? "data" :  sample) + "_" + optCatStr + "_GeoBSRoch", mc_cfg );
 
 //    	mc_map_PtWPF  [ optCatStr ]   = new MassCalPlots( (sample.Contains("SingleMu") ? "data" :  sample) + "_" + optCatStr + "_PtWPF", mc_cfg );
@@ -276,7 +282,18 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
     if (verbose) std::cout << "Before running GetEntry, event = " << br.event;
     
     in_chain->GetEntry(iEvt);
-    
+    // check if GEN_wgt is float or int, if the float value is 0 (not properly read), reload the int one
+    if (GEN_INT == "GENint") br.GEN_wgt = (float) br.GEN_wgt_int;  
+ 
+     // process muon collection and load new ones with Roch pt with systematic shifts 
+//    MuonInfos muons_tmp;
+//    if ( not sample.Contains("SingleMu") and SYS.find("Roch_") != std::string::npos ) {
+//      muons_tmp = ReloadMuonRoch(Roch_Cor, *br.muons_orig, *br.genMuons, SYS);
+//      br.muons = &muons_tmp;
+//    }
+//  no need to Roch sys in this macro
+    br.muons = br.muons_orig;
+ 
     if (verbose) std::cout << "... after, event = " << br.event << std::endl;
 
     // For original 2016 and some 2017 NTuples, convert "SlimJets" collection into regular jets
@@ -304,13 +321,14 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
       /////////////////////////////////////////////////////////////////////////////////////////
       ///  Loop through alternate, optional selection cuts defined in src/SelectionCuts.cc  ///
       /////////////////////////////////////////////////////////////////////////////////////////
+//    std::cout<<"at line 318" <<std::endl; //debugging
 
     for (int iOpt = 0; iOpt < OPT_CUTS.size(); iOpt++) {
       std::string OPT_CUT = OPT_CUTS.at(iOpt);
       
       for (int iCat = 0; iCat < CAT_CUTS.size(); iCat++) {
 	TString optCatStr = OPT_CUTS.at(iOpt)+"_"+CAT_CUTS.at(iCat);
-	if ( not InCategory(obj_sel, br, CAT_CUTS.at(iCat), verbose) ) continue;
+	if ( not InCategory(obj_sel, br, "noSys", CAT_CUTS.at(iCat), verbose) ) continue;
 
 	MuPairInfo    dimu;
 	if ( mc_cfg.peak == "Z" or sample.Contains("gg") or sample.Contains("VBF") ) {
@@ -344,6 +362,7 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
 	TLorentzVector mu_vec1 = FourVec( mu1, "PF" );
 	TLorentzVector mu_vec2 = FourVec( mu2, "PF" );
 
+//        std::cout<<"at line 359"<<std::endl; //debugging
 	// for MC samples, find gen match
 	GenParentInfo    gen_dimu;
 	if (not isData) {
@@ -362,9 +381,16 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
 	if ( mc_cfg.peak != "off_set" and gen_dimu.mass == -999 and not isData ) continue;
 	// gen match found
 
-	GenMuonInfo gen_muP;
-	if (gen_dimu.mass != -999 and not isData and (br.genMuons->at(gen_dimu.daughter_1_idx)).charge == 1) gen_muP = br.genMuons->at(gen_dimu.daughter_1_idx);
-	else if (gen_dimu.mass != -999 and not isData)	gen_muP = br.genMuons->at(gen_dimu.daughter_2_idx);
+//        std::cout<<"gen_dimu_mass="<<gen_dimu.mass<<std::endl; //debugging
+	GenMuonInfo gen_muP, gen_muN;
+	if (gen_dimu.mass != -999 and not isData and (br.genMuons->at(gen_dimu.daughter_1_idx)).charge == 1) {
+          gen_muP = br.genMuons->at(gen_dimu.daughter_1_idx);
+          gen_muN = br.genMuons->at(gen_dimu.daughter_2_idx);
+        }
+	else if (gen_dimu.mass != -999 and not isData) {	
+          gen_muP = br.genMuons->at(gen_dimu.daughter_2_idx);
+          gen_muN = br.genMuons->at(gen_dimu.daughter_1_idx);
+        }     
 
 	// getting offset for "off_set" option
 	float off_set = 0.0;
@@ -385,6 +411,7 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
 	  off_set = gendimu_vec.M();
 	}
 
+//        std::cout<<"dimu_mass_Roch="<<dimu.mass_Roch<<std::endl; //debugging
 	if (mu1.charge == 1)  muP = mu1, muN = mu2;
         else muP = mu2, muN = mu1;
 	float dimu_mass_KinRoch = dimu.mass_kinfit * dimu.mass_Roch / dimu.mass;
@@ -410,16 +437,21 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
 
 	TLorentzVector muP_vec, muN_vec, sum_vec;
 
-	muP_vec.SetPtEtaPhiM( PtGeoCor::PtGeoFit_mod(muP.d0_PV * muP.charge, muP.pt_Roch, muP.eta, std::stoi(YEAR)), muP.eta, muP.phi, 0.105658367 );
-	muN_vec.SetPtEtaPhiM( PtGeoCor::PtGeoFit_mod(muN.d0_PV * muN.charge, muN.pt_Roch, muN.eta, std::stoi(YEAR)), muN.eta, muN.phi, 0.105658367 );
-	sum_vec = muP_vec + muN_vec;
-	float dimu_mass_GeoRoch = sum_vec.M();
+//	muP_vec.SetPtEtaPhiM( PtGeoCor::PtGeoFit_mod(muP.d0_PV * muP.charge, muP.pt_Roch, muP.eta, std::stoi(YEAR)), muP.eta, muP.phi, 0.105658367 );
+//	muN_vec.SetPtEtaPhiM( PtGeoCor::PtGeoFit_mod(muN.d0_PV * muN.charge, muN.pt_Roch, muN.eta, std::stoi(YEAR)), muN.eta, muN.phi, 0.105658367 );
+//	sum_vec = muP_vec + muN_vec;
+//	float dimu_mass_GeoRoch = sum_vec.M();
+//        float dimu_pt_GeoRoch = sum_vec.Pt();
+//        float dimu_eta_GeoRoch = sum_vec.Eta();
 
 	muP_vec.SetPtEtaPhiM( PtGeoCor_UF::PtGeo_BS_Roch(muP.d0_BS * muP.charge, muP.pt_Roch, muP.eta, std::stoi(YEAR)), muP.eta, muP.phi, 0.105658367 );
         muN_vec.SetPtEtaPhiM( PtGeoCor_UF::PtGeo_BS_Roch(muN.d0_BS * muN.charge, muN.pt_Roch, muN.eta, std::stoi(YEAR)), muN.eta, muN.phi, 0.105658367 );
         sum_vec = muP_vec + muN_vec;
         float dimu_mass_GeoBSRoch = sum_vec.M();
+        float dimu_pt_GeoBSRoch = sum_vec.Pt();
+        float dimu_eta_GeoBSRoch = sum_vec.Eta();
 
+//        std::cout<<"dimu_mass_GeoBSRoch="<<dimu_mass_GeoBSRoch<<std::endl; //debugging
 
 //	muP_vec.SetPtEtaPhiM(muP.pt - PtGeoCor::PtGeo_Wide_PF(muP.d0_PV * muP.charge, muP.pt, muP.eta, std::stoi(YEAR)), muP.eta, muP.phi, 0.105658367);
 //	muN_vec.SetPtEtaPhiM(muN.pt - PtGeoCor::PtGeo_Wide_PF(muN.d0_PV * muN.charge, muN.pt, muN.eta, std::stoi(YEAR)), muN.eta, muN.phi, 0.105658367);
@@ -512,20 +544,24 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
 	if ( CAT_CUTS.at(iCat) == "posOverlap" and  ( abs(muN.eta) < 0.9 or abs(muN.eta) > 1.7 ) ) continue;
 	if ( CAT_CUTS.at(iCat) == "posEndcap"  and  abs(muN.eta) < 1.7 ) continue;
 
+//        std::cout<<"offset = " << off_set << "muP.d0_BS = " << muP.d0_BS << "muN.d0_BS = " << muN.d0_BS << std::endl; //debugging
+//        std::cout<<"event_wgt = " << event_wgt << std::endl; //debugging
+//        std::cout<<"pref_wgt = " <<br.l1pref_wgt << "GEN_wgt = " << br.GEN_wgt<<std::endl; //debugging
 
-	mc_map_gen    [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_gen",     gen_dimu.mass - off_set,     muP.d0_PV, muP.phi, event_wgt, false);
-	mc_map_genBS  [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_genBS",   gen_dimu.mass - off_set,     muP.d0_BS, muP.phi, event_wgt, false);
-	mc_map_PF     [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_PF",      dimu.mass - off_set, 	   muP.d0_PV, muP.phi, event_wgt, false);
-	mc_map_Roch   [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_Roch",    dimu.mass_Roch - off_set,    muP.d0_PV, muP.phi, event_wgt, false);
-	mc_map_RochBS [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_RochBS",  dimu.mass_Roch - off_set,    muP.d0_BS, muP.phi, event_wgt, false);
-  	mc_map_Kinfit [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_Kinfit",  dimu.mass_kinfit - off_set,  muP.d0_PV, muP.phi, event_wgt, false);
-	mc_map_KinRoch[optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_KinRoch", dimu_mass_KinRoch - off_set, muP.d0_PV, muP.phi, event_wgt, false);
+	mc_map_gen    [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_gen",     gen_dimu.mass - off_set,     gen_muP.phi, gen_muN.phi, event_wgt, false);
+	mc_map_genBS  [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_genBS",   gen_dimu.mass - off_set,     gen_muP.phi, gen_muN.phi, event_wgt, false);
+	mc_map_PF     [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_PF",      dimu.mass - off_set, 	   muP.phi,     muN.phi, event_wgt, false);
+	mc_map_Roch   [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_Roch",    dimu.mass_Roch - off_set,    muP.phi, muN.phi, event_wgt, false);
+	mc_map_RochBS [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_RochBS",  dimu.mass_Roch - off_set,    muP.phi, muN.phi, event_wgt, false);
+  	mc_map_Kinfit [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_Kinfit",  dimu.mass_kinfit - off_set,  muP.phi, muN.phi, event_wgt, false);
+	mc_map_KinRoch[optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_KinRoch", dimu_mass_KinRoch - off_set, muP.phi, muN.phi, event_wgt, false);
 //	mc_map_KaMu   [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_KaMu",    dimu.mass_KaMu - off_set,    muP.d0_PV, muP.phi, event_wgt, false);
 //	mc_map_KinKaMu[optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_KinKaMu", dimu_mass_KinKaMu - off_set, muP.d0_PV, muP.phi, event_wgt, false);
 
-	mc_map_GeoRoch  [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_GeoRoch",   dimu_mass_GeoRoch - off_set,   muP.d0_PV, muP.phi, event_wgt, false);
-	mc_map_GeoBSRoch[optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_GeoBSRoch", dimu_mass_GeoBSRoch - off_set, muP.d0_BS, muP.phi, event_wgt, false);
+//	mc_map_GeoRoch  [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_GeoRoch",   dimu_mass_GeoRoch - off_set,   muP.d0_PV, muN.d0_PV, event_wgt, false);
+	mc_map_GeoBSRoch[optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_GeoBSRoch", dimu_mass_GeoBSRoch - off_set, muP_vec.Phi(), muN.phi, event_wgt, false);
 
+//        std::cout<<"at line 543"<<std::endl; //debugging
 //	mc_map_PtWPF  [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_PtWPF",   dimu_mass_PtWPF   - off_set, muP.d0_PV, muN.d0_PV, event_wgt, false);
 //	mc_map_PtWKaMu[optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_PtWKaMu", dimu_mass_PtWKaMu - off_set, muP.d0_PV, muN.d0_PV, event_wgt, false);
 // 	mc_map_PtNPF  [optCatStr]->FillEvent( (sample.Contains("SingleMu") ? "data" : sample) + "_" + optCatStr + "_PtNPF",   dimu_mass_PtNPF   - off_set, muP.d0_PV, muN.d0_PV, event_wgt, false);
@@ -596,7 +632,7 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
 //      TDirectory* KaMu_dir = out_file->mkdir("KaMu");
 //      TDirectory* KinKaMu_dir = out_file->mkdir("KinKaMu");
 
-      TDirectory* GeoRoch_dir = out_file->mkdir("GeoRoch");
+//      TDirectory* GeoRoch_dir = out_file->mkdir("GeoRoch");
       TDirectory* GeoBSRoch_dir = out_file->mkdir("GeoBSRoch");
 
 //      TDirectory* PtWPF_dir   = out_file->mkdir("PtWPF");
@@ -640,7 +676,7 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
 //      MassCalPlots* mc_KaMu      = mc_map_KaMu[optCatStr];
 //      MassCalPlots* mc_KinKaMu   = mc_map_KinKaMu[optCatStr];
 
-      MassCalPlots* mc_GeoRoch     = mc_map_GeoRoch[optCatStr];
+//      MassCalPlots* mc_GeoRoch     = mc_map_GeoRoch[optCatStr];
       MassCalPlots* mc_GeoBSRoch   = mc_map_GeoBSRoch[optCatStr];
 
 
@@ -765,15 +801,15 @@ void MassCalibration( TString sample = "", TString in_dir = "", TString out_dir 
 //        it->second->Write();
 //      }
 
-      GeoRoch_dir->cd();
-      mc_GeoRoch->summary_plot_2D->Write();
-      for (std::map<TString, TH1*>::iterator it = mc_GeoRoch->mass_plots.begin(); it != mc_GeoRoch->mass_plots.end(); ++it) {
-        std::string h_name = it->second->GetName();
-        h_name.erase( h_name.find(optCatStr+"_"), optCatStr.Length() + 1 );
-        it->second->SetName(h_name.c_str());
-        it->second->SetTitle(h_name.c_str());
-        it->second->Write();
-      }
+//      GeoRoch_dir->cd();
+//      mc_GeoRoch->summary_plot_2D->Write();
+//      for (std::map<TString, TH1*>::iterator it = mc_GeoRoch->mass_plots.begin(); it != mc_GeoRoch->mass_plots.end(); ++it) {
+//        std::string h_name = it->second->GetName();
+//        h_name.erase( h_name.find(optCatStr+"_"), optCatStr.Length() + 1 );
+//        it->second->SetName(h_name.c_str());
+//        it->second->SetTitle(h_name.c_str());
+//        it->second->Write();
+//      }
 
       GeoBSRoch_dir->cd();
       mc_GeoBSRoch->summary_plot_2D->Write();
