@@ -127,15 +127,15 @@ void ZH_4l_miniNTuple( TString myMethodList = "",
   
   // Here the preparation phase begins
   TString out_file_name;
-  out_file_name.Form( "%s/temp_for_tank_2017_ZH_lep_against_inclu_with_mass.root", out_dir.Data() );
+  out_file_name.Form( "%s/Run2_ZH_lep_against_inclu_no_mass_setxsec_trimMHT_20200311_right_RESwgt.root", out_dir.Data() );
   TFile * out_file = TFile::Open( out_file_name, "RECREATE" );
 
   ///////////////////////////////////////////////////////
   ///  Input samples: MC signal, MC background, data  ///
   ///////////////////////////////////////////////////////
   std::map<TString, TString> MN_name; // <short_name, full path to miniNtuple>
-  MN_name["signal"] 	= "/afs/cern.ch/work/x/xzuo/public/H2Mu/2017/Histograms/VH_selection_2019april/pt10_iso04/ZH_ele_BDT/sum_e_m_training.root";
-  MN_name["bkg"]	= "/afs/cern.ch/work/x/xzuo/public/H2Mu/2017/Histograms/VH_selection_2019april/pt10_iso04/ZH_ele_BDT/sum_e_m_training.root";
+  MN_name["signal"] 	= "/afs/cern.ch/work/x/xzuo/public/H2Mu/Run2/Histograms/ZH_lep_final_ntuple_ele_loose_FSRGeo_2020_02_17/all_with_120130_sig_for_training.root";
+  MN_name["bkg"]	= "/afs/cern.ch/work/x/xzuo/public/H2Mu/Run2/Histograms/ZH_lep_final_ntuple_ele_loose_FSRGeo_2020_02_17/all_with_120130_sig_for_training.root";
  
   //////////////////////////////////////////////////////////////////
   ///  Factories: Use different sets of variables, weights, etc. ///
@@ -184,22 +184,42 @@ void ZH_4l_miniNTuple( TString myMethodList = "",
 //                                        0x0fe0, 0xfff0, 0xfffe, 0x0fff, 0x0000, 0x0000, "all", "all", "ge0j") );
 //  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_trim_without_mass", var_names, var_vals,
 //                                        0x0d60, 0xfd70, 0xffc8, 0x00d1, 0x0000, 0x0000, "all", "all", "ge0j") );
-//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_sel_angle_without_mass", var_names, var_vals,
-//                                        0x0360, 0xf370, 0x00d8, 0x00d1, 0x0000, 0x0000, "all", "all", "ge0j") );
-//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_skim_without_mass", var_names, var_vals,
-//                                        0x0360, 0xf370, 0x0058, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
-//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_min_without_mass", var_names, var_vals,
+  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_sel_angle_without_mass", var_names, var_vals,
+                                        0x0360, 0xf370, 0x00d8, 0x00d1, 0x0000, 0x0000, "all", "all", "ge0j") );
+  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim_without_mass", var_names, var_vals,
+                                        0x0360, 0xf370, 0x0058, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
+  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim101_without_mass", var_names, var_vals,
+                                        0x0160, 0xf270, 0x0058, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim102_without_mass", var_names, var_vals,
+//                                        0x0160, 0xf260, 0x0058, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
+  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim103_without_mass", var_names, var_vals,
+                                        0x0160, 0xf270, 0x0048, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
+  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim104_without_mass", var_names, var_vals,
+                                        0x0160, 0xf270, 0x0048, 0x0000, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim2_without_mass", var_names, var_vals,
+//                                        0x0360, 0xf360, 0x0048, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim3_without_mass", var_names, var_vals,
+//                                        0x0260, 0xf360, 0x0048, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim4_without_mass", var_names, var_vals,
+//                                        0x0060, 0xf360, 0x0048, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim5_without_mass", var_names, var_vals,
+//                                        0x0040, 0xf340, 0x0048, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim6_without_mass", var_names, var_vals,
+//                                        0x0040, 0xf340, 0x0048, 0x0000, 0x0000, 0x0000, "all", "all", "ge0j") );
+  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_skim7_without_mass", var_names, var_vals,
+                                        0x0040, 0xf240, 0x0048, 0x0000, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_Run2_lep_against_inclu_min_without_mass", var_names, var_vals,
 //                                        0x0220, 0xf330, 0x0048, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
 
 
-  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_sel_angle_with_mass", var_names, var_vals,
-                                        0x0370, 0xf370, 0x00d8, 0x00d1, 0x0000, 0x0000, "all", "all", "ge0j") );
-  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_skim_with_mass", var_names, var_vals,
-                                        0x0370, 0xf370, 0x0058, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
-  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_min_with_mass", var_names, var_vals,
-                                        0x0230, 0xf330, 0x0048, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
-  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_BDTv3_and_mass", var_names, var_vals,
-                                        0x1010, 0x1000, 0x0000, 0x0000, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_sel_angle_with_mass", var_names, var_vals,
+//                                        0x0370, 0xf370, 0x00d8, 0x00d1, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_skim_with_mass", var_names, var_vals,
+//                                        0x0370, 0xf370, 0x0058, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_min_with_mass", var_names, var_vals,
+//                                        0x0230, 0xf330, 0x0048, 0x0010, 0x0000, 0x0000, "all", "all", "ge0j") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "ZH_2017_lep_against_inclu_BDTv3_and_mass", var_names, var_vals,
+//                                        0x1010, 0x1000, 0x0000, 0x0000, 0x0000, 0x0000, "all", "all", "ge0j") );
 
   // Initialize factories and dataloaders
   for (int iFact = 0; iFact < factories.size(); iFact++) {
@@ -334,6 +354,7 @@ void ZH_4l_miniNTuple( TString myMethodList = "",
 //  spec_vars.push_back( TMVA_var( "res_wgt",   "Resolution weight",    "", 'F', -77 ) );
 //  spec_vars.push_back( TMVA_var( "LHE_HT",    "Sample weight",     "GeV", 'F', -77 ) );
   spec_vars.push_back( TMVA_var( "dimu_mass", "mass(#mu#mu)",      "GeV", 'F', -77 ) );
+  spec_vars.push_back( TMVA_var( "all_lepMVA_SF", "lepMVA SF",          "", 'F', -77 ) );
 
   // Fill each factory with the correct set of variables
   for (int iFact = 0; iFact < factories.size(); iFact++) {
@@ -567,6 +588,7 @@ void ZH_4l_miniNTuple( TString myMethodList = "",
 
     float	  event_wgt;
     float 	  xsec_norm;
+    float 	  all_lepMVA_SF;
     int           lep_ID; 
     int           Sample_ID;
 
@@ -657,6 +679,7 @@ void ZH_4l_miniNTuple( TString myMethodList = "",
 
     in_chain->SetBranchAddress("event_wgt",     & event_wgt     );
     in_chain->SetBranchAddress("xsec_norm",     & xsec_norm     );
+    in_chain->SetBranchAddress("all_lepMVA_SF", & all_lepMVA_SF );
     in_chain->SetBranchAddress("lep_ID", 	& lep_ID 	);
     in_chain->SetBranchAddress("Sample_ID",	& Sample_ID	);
 
@@ -753,8 +776,12 @@ void ZH_4l_miniNTuple( TString myMethodList = "",
 	    var_vals.at(iVar) = Sample_ID;
 	  else if ( vName == "event_wgt")
 	    var_vals.at(iVar) = event_wgt;
-	  else if ( vName == "xsec_norm")
+	  else if ( vName == "all_lepMVA_SF")
+	    var_vals.at(iVar) = all_lepMVA_SF;
+	  else if ( vName == "xsec_norm") {
+	    if (Sample_ID == -2323) xsec_norm = 0.0008264; // low stats in 2018 ZZ_4l, so reassign norm
 	    var_vals.at(iVar) = xsec_norm;
+	  }
 	  else if ( vName == "lep_ID" )
 	    var_vals.at(iVar) = lep_ID;
 //	  else if ( vName == "dimu_mass" )
@@ -909,26 +936,29 @@ void ZH_4l_miniNTuple( TString myMethodList = "",
 	double MVA_cut = 0.4;
 //	if (mu1_lepMVA < MVA_cut or mu2_lepMVA < MVA_cut or lep1_lepMVA < MVA_cut or lep2_lepMVA < MVA_cut) continue;
 
-	
+
+	double reso_wgt = 1.0;
+	if (Sample_ID > 0) reso_wgt = (1.2/125.0) / (dimu_mass_err / dimu_mass);
+	double total_wgt = event_wgt * all_lepMVA_SF * xsec_norm * reso_wgt;
 	// Load values into event
 	if ( MN.first == "signal" and (Sample_ID == 2325 or Sample_ID == 1202325 or Sample_ID == 1302325) ) { // Signal MC    Sample_ID > 0 , 2325 is ZH
 	  if ( abs(dilep_mass-91)>10 or dimu_gen_ID!=25 ) continue;  // Z-cand mass range, dimu from H
-	  if ( (iEvt % (2*presc)) != 1 ) {   // only iEvt % 2 == 1 is used for BDT (the other half for limits), now limited by stats.   -- XWZ 02.12.2018
+	  if ( (iEvt % (3*presc)) != 1 ) {  // use 2/3 for training      // only iEvt % 2 == 1 is used for BDT (the other half for limits), now limited by stats.   -- XWZ 02.12.2018
 	    if (!MULTICLASS) {
-	      std::get<1>(factories.at(iFact))->AddSignalTrainingEvent( var_vals, event_wgt * xsec_norm ); // signal and bkg are automatically reweighted by TMVA
+	      std::get<1>(factories.at(iFact))->AddSignalTrainingEvent( var_vals, total_wgt ); // signal and bkg are automatically reweighted by TMVA
 	      nTrain_sig.at(iFact) += 1;
 	    } else {
-	      std::get<1>(factories.at(iFact))->AddTrainingEvent( multi_str, var_vals, event_wgt * xsec_norm );
+	      std::get<1>(factories.at(iFact))->AddTrainingEvent( multi_str, var_vals, total_wgt );
 	      if (multi_str == "nonVH") nTrain_nonVH.at(iFact) += 1;
 	      if (multi_str == "ZH")    nTrain_ZH.at(iFact)    += 1;
 	      if (multi_str == "WH")    nTrain_WH.at(iFact)    += 1;
 	    }
 	  } else {
 	    if (!MULTICLASS) {
-	      std::get<1>(factories.at(iFact))->AddSignalTestEvent( var_vals, event_wgt * xsec_norm );
+	      std::get<1>(factories.at(iFact))->AddSignalTestEvent( var_vals, total_wgt );
 	      nTest_sig.at(iFact) += 1;
 	    } else {
-	      std::get<1>(factories.at(iFact))->AddTestEvent( multi_str, var_vals, event_wgt * xsec_norm );
+	      std::get<1>(factories.at(iFact))->AddTestEvent( multi_str, var_vals, total_wgt );
 	      if (multi_str == "nonVH") nTest_nonVH.at(iFact) += 1;
 	      if (multi_str == "ZH")    nTest_ZH.at(iFact)    += 1;
 	      if (multi_str == "WH")    nTest_WH.at(iFact)    += 1;
@@ -937,22 +967,22 @@ void ZH_4l_miniNTuple( TString myMethodList = "",
 	}
 	if ( MN.first == "bkg" and Sample_ID < 0 and Sample_ID != -999 ) { // Background MC       Sample_ID < 0
 	  if ( abs(dilep_mass-91)>10 ) continue; // Z-cand mass range, dimu from Z
-	  if ( (iEvt % (2*presc)) != 0 ) {
+	  if ( (iEvt % (3*presc)) != 1 ) {
 	    if (!MULTICLASS) {
-	      std::get<1>(factories.at(iFact))->AddBackgroundTrainingEvent( var_vals, event_wgt * xsec_norm );
+	      std::get<1>(factories.at(iFact))->AddBackgroundTrainingEvent( var_vals, total_wgt );
 	      nTrain_bkg.at(iFact) += 1;
 	    } else {
-	      std::get<1>(factories.at(iFact))->AddTrainingEvent( multi_str, var_vals, event_wgt * xsec_norm );
+	      std::get<1>(factories.at(iFact))->AddTrainingEvent( multi_str, var_vals, total_wgt );
 	      if (multi_str == "WZ")  nTrain_WZ.at(iFact)  += 1;
 	      if (multi_str == "ZZ")  nTrain_ZZ.at(iFact)  += 1;
 	      if (multi_str == "ttX") nTrain_ttX.at(iFact) += 1;
 	    }
 	  } else {
 	    if (!MULTICLASS) {
-	      std::get<1>(factories.at(iFact))->AddBackgroundTestEvent( var_vals, event_wgt * xsec_norm );
+	      std::get<1>(factories.at(iFact))->AddBackgroundTestEvent( var_vals, total_wgt );
 	      nTest_bkg.at(iFact) += 1;
 	    } else {
-	      std::get<1>(factories.at(iFact))->AddTestEvent( multi_str, var_vals, event_wgt * xsec_norm );
+	      std::get<1>(factories.at(iFact))->AddTestEvent( multi_str, var_vals, total_wgt );
 	      if (multi_str == "WZ")  nTest_WZ.at(iFact)  += 1;
 	      if (multi_str == "ZZ")  nTest_ZZ.at(iFact)  += 1;
 	      if (multi_str == "ttX") nTest_ttX.at(iFact) += 1;
@@ -1144,18 +1174,18 @@ void ZH_4l_miniNTuple( TString myMethodList = "",
     
     if (Use["BDTG_UF_v1"]) // Optimized settings - AWB 04.04.2017
       factX->BookMethod( loadX, TMVA::Types::kBDT, "BDTG_UF_v1", (std::string)
-			 "!H:!V:NTrees=100::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
+			 "!H:!V:NTrees=200::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
 			 "BaggedSampleFraction=0.5:nCuts=10:MaxDepth=3" );
     
     if (Use["BDTG_UF_v2"]) // Test settings - AWB 29.10.2018
       factX->BookMethod( loadX, TMVA::Types::kBDT, "BDTG_UF_v2", (std::string)
-			 "!H:!V:NTrees=200::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
+			 "!H:!V:NTrees=400::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
 			 "BaggedSampleFraction=0.5:nCuts=10:MaxDepth=3" );
 
     if (Use["BDTG_UF_v3"]) // Test settings - AWB 29.10.2018
       factX->BookMethod( loadX, TMVA::Types::kBDT, "BDTG_UF_v3", (std::string)
                          "!H:!V:NTrees=400::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
-                         "BaggedSampleFraction=0.5:nCuts=10:MaxDepth=5" );   
+                         "BaggedSampleFraction=0.5:nCuts=20:MaxDepth=4" );   
  
     if (Use["BDTG_AWB"]) // Optimized settings from EMTF pT assignment
       factX->BookMethod( loadX, TMVA::Types::kBDT, "BDTG_AWB", (std::string)

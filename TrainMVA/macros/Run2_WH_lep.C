@@ -24,10 +24,12 @@ const int PRT_EVT =  10000;  // Print every N events
 
 const bool verbose = false; // Print extra information
 
-const std::vector<TString> IN_DIRS  = {"/afs/cern.ch/work/a/abrinke1/public/H2Mu/2017/Histograms/WH_lep_AWB_2019_06_25_v1/files/",
-				       "/afs/cern.ch/work/a/abrinke1/public/H2Mu/2018/Histograms/WH_lep_AWB_2019_06_25_v1/files/"};
-// const TString OUT_DIR = "output";
-const TString OUT_DIR = "/afs/cern.ch/work/a/abrinke1/public/H2Mu/Run2/TrainMVA/output";
+//const std::vector<TString> IN_DIRS  = {"/afs/cern.ch/work/a/abrinke1/public/H2Mu/2017/Histograms/WH_lep_AWB_2019_06_25_v1/files/",
+//				       "/afs/cern.ch/work/a/abrinke1/public/H2Mu/2018/Histograms/WH_lep_AWB_2019_06_25_v1/files/"}; // Andrew's training
+const std::vector<TString> IN_DIRS  = {"/afs/cern.ch/work/x/xzuo/public/H2Mu/Run2/Histograms/WH_lep_SR_for_training_standard_ID_jet25_2020_03_09/files/",
+                                       "/afs/cern.ch/work/x/xzuo/public/H2Mu/Run2/Histograms/WH_lep_SR_for_training_standard_ID_jet25_2020_03_09/files/"};
+ const TString OUT_DIR = "output";
+//const TString OUT_DIR = "/afs/cern.ch/work/a/abrinke1/public/H2Mu/Run2/TrainMVA/output"; // Andrew's training
 
 // Prescales for data and MC: select 1/Xth of the events in each sample
 const int SIG_PRESC  = 1;
@@ -40,8 +42,8 @@ const double PI = 3.14159265359;
 const double BIT = 0.000001; // Tiny value or offset
 
 // Events must fall into one of the allowed categories
-const std::vector<TString> CATS = {"OPT_3lep_CAT_looseLepMVA_noZ5_noBtag"};
-
+//const std::vector<TString> CATS = {"OPT_3lep_CAT_looseLepMVA_noZ5_noBtag"}; // Andrew's training
+const std::vector<TString> CATS = {"OPT_3lep_CAT_lep20_looseLepMVA_SR_Bveto"};
 
 using namespace TMVA;
 
@@ -80,11 +82,12 @@ void Run2_WH_lep( TString myMethodList = "", std::vector<TString> in_dirs = {},
   Use["BDT"]            = 0;
   Use["BDTG_default"]   = 0;
   Use["BDTG_UF_v1"]     = 1;
-  Use["BDTG_UF_v1a"]    = 0;
-  Use["BDTG_UF_v1b"]    = 0;
-  Use["BDTG_UF_v1c"]    = 0;
-  Use["BDTG_UF_v2"]     = 1;
-  Use["BDTG_UF_v3"]     = 1;
+  Use["BDTG_UF_v1a"]    = 1;
+  Use["BDTG_UF_v1b"]    = 1;
+  Use["BDTG_UF_v1c"]    = 1;
+  Use["BDTG_UF_v1d"]    = 1;
+  Use["BDTG_UF_v2"]     = 0;
+  Use["BDTG_UF_v3"]     = 0;
   Use["BDTG_AWB"]       = 0;
   Use["BDTG_AWB_lite"]  = 0;
   Use["BDTG_Carnes"]    = 0;
@@ -114,7 +117,7 @@ void Run2_WH_lep( TString myMethodList = "", std::vector<TString> in_dirs = {},
   
   // Here the preparation phase begins
   TString out_file_name;
-  out_file_name.Form( "%s/Run2_WH_lep_all_vs_all_2019_06_26_v1.root", out_dir.Data() );
+  out_file_name.Form( "%s/Run2_WH_lep_all_vs_all_2020_03_23_v2.root", out_dir.Data() );
   TFile * out_file = TFile::Open( out_file_name, "RECREATE" );
 
   ///////////////////////////////////////////////////////
@@ -247,19 +250,19 @@ void Run2_WH_lep( TString myMethodList = "", std::vector<TString> in_dirs = {},
   // // factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_withMass_v2", var_names, var_vals,
   // // 					0xffff, 0xffff, 0x1, "all", "all", "ge0j") );
 
-  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_withMass_v3", var_names, var_vals,
-  					0xffff, 0xffff, 0x1, "all", "all", "") );
-  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3", var_names, var_vals,
-  					0xfffe, 0xffff, 0x1, "all", "all", "") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_withMass_v3", var_names, var_vals,
+//  					0xffff, 0xffff, 0x1, "all", "all", "") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3", var_names, var_vals,
+//  					0xfffe, 0xffff, 0x1, "all", "all", "") );
   factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt", var_names, var_vals,
   					0xfffe, 0xffff, 0x7, "all", "all", "resWgt") );
 
-  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_WH_vs_WZ_trueZ", var_names, var_vals,
-  					0xfffe, 0xffff, 0x1, "WH", "WZ_trueZ", "") );
-  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_WH_vs_WZ_nonZ", var_names, var_vals,
-  					0xfffe, 0xffff, 0x0, "WH", "WZ_nonZ", "") );
-  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_WH_vs_ZJets", var_names, var_vals,
-  					0xfffe, 0xffff, 0x1, "WH", "ZJets", "") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_WH_vs_WZ_trueZ", var_names, var_vals,
+//  					0xfffe, 0xffff, 0x1, "WH", "WZ_trueZ", "") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_WH_vs_WZ_nonZ", var_names, var_vals,
+//  					0xfffe, 0xffff, 0x0, "WH", "WZ_nonZ", "") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_WH_vs_ZJets", var_names, var_vals,
+//  					0xfffe, 0xffff, 0x1, "WH", "ZJets", "") );
 
   // factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v2_WH_vs_WZ_trueZ", var_names, var_vals,
   // 					0xfffe, 0xffff, 0x0, "WH_e2mu", "WZ_e2mu_trueZ", "ge0j") );
@@ -275,6 +278,61 @@ void Run2_WH_lep( TString myMethodList = "", std::vector<TString> in_dirs = {},
   // factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v2_WH_vs_ZJets", var_names, var_vals,
   // 					0xfffe, 0xffff, 0x0, "WH_3mu", "ZJets_3mu", "ge0j") );
 
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET", var_names, var_vals,
+//                                        0xc7fe, 0xb9df, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMHT", var_names, var_vals,
+//                                        0x3ffe, 0x87ff, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairM", var_names, var_vals,
+//                                        0xc7fe, 0xb9de, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairM_pt", var_names, var_vals,
+//                                        0xc7fe, 0xb9dc, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairM_pt_dR", var_names, var_vals,
+//                                        0xc7fe, 0xb9cc, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OS_pt_dR_dEta", var_names, var_vals,
+//                                        0xc7fe, 0xb9c5, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairM_pt_dR_dEta", var_names, var_vals,
+//                                        0xc7fe, 0xb9c4, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_muSSMhtDphi", var_names, var_vals,
+//                                        0xc7fe, 0x99c4, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_muSSMhtDphi_MHT", var_names, var_vals,
+//                                        0x87fe, 0x99c4, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_muSSMhtDphi_MHT_muSSpt", var_names, var_vals,
+//                                        0x87fe, 0x99c0, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_lepMuSSdR", var_names, var_vals,
+//                                        0x86fe, 0x99c0, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_var2", var_names, var_vals,
+//                                        0x86fe, 0x9980, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_lepMuSSdR_lepMuOScos", var_names, var_vals,
+//                                        0x86be, 0x99c0, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_lMuSSdR_lMuOScos_lMuOSdR", var_names, var_vals,
+//                                        0x82be, 0x99c0, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_lMuSSdR_lMuOScos_lMuOSdR_muSSOScos", var_names, var_vals,
+//                                        0x82be, 0x9980, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_lMuSSdR_lMuOScos_lMuOSdR_muSSOScos_lMuOSdEta", var_names, var_vals,
+//                                        0x80be, 0x9980, 0x7, "all", "all", "resWgt") );
+
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_var2_lmuOScos", var_names, var_vals,
+//                                        0x86be, 0x9980, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_var2_lmuOSdR", var_names, var_vals,
+//                                        0x82fe, 0x9980, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_var2_lmuOSdEta", var_names, var_vals,
+//                                        0x84fe, 0x9980, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_var2_lmuSSdEta", var_names, var_vals,
+//                                        0x867e, 0x9980, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_var2_muSSOSdEta", var_names, var_vals,
+//                                        0x86fe, 0x9900, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_var2_lHdEta", var_names, var_vals,
+//                                        0x86f6, 0x9980, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_var2_lepCharge", var_names, var_vals,
+//                                        0x86fe, 0x1980, 0x7, "all", "all", "resWgt") );
+
+
+  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_var2_muSSOSdEta_lepCharge", var_names, var_vals,
+                                        0x86fe, 0x1900, 0x7, "all", "all", "resWgt") );
+  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAllbutM_var1_var2_muSSOSdEta_lepCharge", var_names, var_vals,
+                                        0x86fe, 0x1901, 0x7, "all", "all", "resWgt") );
+//  factories.push_back( std::make_tuple( nullF, nullL, "f_Opt_AWB_noMass_v3_resWgt_trimMET_OSpairAll_var1_var2_muSSOSdEta_lepCharge_lmuOSdEta_lHdEta", var_names, var_vals,
+//                                        0x84f6, 0x1900, 0x7, "all", "all", "resWgt") );
 
   // Initialize factories and dataloaders
   for (int iFact = 0; iFact < factories.size(); iFact++) {
@@ -602,7 +660,7 @@ void Run2_WH_lep( TString myMethodList = "", std::vector<TString> in_dirs = {},
 
     // For signal, only use the "true" di-muon pair from the Higgs
     if (samp_ID < 0 && br_flt.at("H_pair_mass") != br_flt.at("H_mass_true")) continue;
-      
+//    if (samp_ID < 0 && abs(br_flt.at("H_pair_mass") - br_flt.at("H_mass_true"))>5 ) continue;    // temp since wrong H_mass_true
 
     //////////////////////////////////////////////////////////////////////////////////
     ///  Weight signal events by cross section and inclusive H2Mu mass resolution  ///
@@ -660,6 +718,8 @@ void Run2_WH_lep( TString myMethodList = "", std::vector<TString> in_dirs = {},
       // Select only events with Higgs candidate matched to true Z (or not matched to true Z)
       if (bkg_name.Contains("trueZ") && samp_ID > 0 && br_flt.at("H_pair_mass") != br_flt.at("Z_mass_true")) continue;
       if (bkg_name.Contains("nonZ")  && samp_ID > 0 && br_flt.at("H_pair_mass") == br_flt.at("Z_mass_true")) continue;
+      //if (bkg_name.Contains("trueZ") && samp_ID > 0 && abs(br_flt.at("H_pair_mass") - br_flt.at("Z_mass_true"))>5) continue; //temp since wrong Z_mass_true
+      //if (bkg_name.Contains("nonZ")  && samp_ID > 0 && abs(br_flt.at("H_pair_mass") - br_flt.at("Z_mass_true"))<5) continue;
       // If a 3-muon event, mask events within 5 GeV of the Z boson mass
       if (br_int.at("nEles") == 0 && abs(br_flt.at("OS_pair_mass") - 91) < 5) continue;
       
@@ -755,7 +815,8 @@ void Run2_WH_lep( TString myMethodList = "", std::vector<TString> in_dirs = {},
       // Load values into event
       if (samp_ID < 0) { // Signal MC
 	if ( (event % (2*presc)) == (2*presc - 1) ) {  // Use odd event numbers for training
-	// if ( (iEvt % (2*every_N)) == 0 ) {
+	//if ( (event % (3*presc)) < (3*presc - 1) ) {  // use 2/3 for training
+	//if ( (iEvt % (2*every_N)) == 0 ) {
     	  if (!MULTICLASS) {
     	    std::get<1>(factories.at(iFact))->AddSignalTrainingEvent( var_vals, sig_evt_weight );
     	    nTrain_sig.at(iFact) += 1;
@@ -779,7 +840,8 @@ void Run2_WH_lep( TString myMethodList = "", std::vector<TString> in_dirs = {},
       }
       if (samp_ID > 0) { // Background MC
 	if ( (event % (2*presc)) == (2*presc - 1) ) {  // Use odd event numbers for training
-        // if ( (iEvt % (2*every_N)) == 0 ) {
+	//if ( (event % (3*presc)) < (3*presc - 1) ) {  // use 2/3 for training
+        //if ( (iEvt % (2*every_N)) == 0 ) {
     	  if (!MULTICLASS) {
     	    std::get<1>(factories.at(iFact))->AddBackgroundTrainingEvent( var_vals, bkg_evt_weight );
     	    nTrain_bkg.at(iFact) += 1;
@@ -982,19 +1044,24 @@ void Run2_WH_lep( TString myMethodList = "", std::vector<TString> in_dirs = {},
     
     if (Use["BDTG_UF_v1a"]) // Exploratory settings - AWB 15.05.2018
       factX->BookMethod( loadX, TMVA::Types::kBDT, "BDTG_UF_v1a", (std::string)
-			 "!H:!V:NTrees=200::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
-			 "BaggedSampleFraction=0.5:nCuts=20:MaxDepth=5" );
+			 "!H:!V:NTrees=500::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
+			 "BaggedSampleFraction=0.5:nCuts=20:MaxDepth=4" );
     
     if (Use["BDTG_UF_v1b"]) // Exploratory settings - AWB 15.05.2018
       factX->BookMethod( loadX, TMVA::Types::kBDT, "BDTG_UF_v1b", (std::string)
-			 "!H:!V:NTrees=500::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
-			 "BaggedSampleFraction=0.5:nCuts=10:MaxDepth=5" );
+			 "!H:!V:NTrees=1000::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
+			 "BaggedSampleFraction=0.5:nCuts=30:MaxDepth=4" );
     
     if (Use["BDTG_UF_v1c"]) // Exploratory settings - AWB 15.05.2018
       factX->BookMethod( loadX, TMVA::Types::kBDT, "BDTG_UF_v1c", (std::string)
-			 "!H:!V:NTrees=500::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
-			 "BaggedSampleFraction=0.5:nCuts=20:MaxDepth=3" );
-    
+			 "!H:!V:NTrees=1000::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
+			 "BaggedSampleFraction=0.5:nCuts=30:MaxDepth=5" );
+  
+    if (Use["BDTG_UF_v1d"]) // Exploratory settings - AWB 15.05.2018
+      factX->BookMethod( loadX, TMVA::Types::kBDT, "BDTG_UF_v1d", (std::string)
+                         "!H:!V:NTrees=500::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
+                         "BaggedSampleFraction=0.5:nCuts=20:MaxDepth=3" );   
+ 
     if (Use["BDTG_UF_v2"]) // Optimized settings - XWZ 15.05.2018
       factX->BookMethod( loadX, TMVA::Types::kBDT, "BDTG_UF_v2", (std::string)
 			 "!H:!V:NTrees=200::BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:"+
