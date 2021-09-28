@@ -82,6 +82,10 @@ def Sample_Name(Sample_ID):
       elif Sample_ID == 2425: 	return "WH"
       elif Sample_ID == 2325: 	return "ZH"
       elif Sample_ID == 60625: 	return "ttH"
+      elif Sample_ID == 23250000:   return "ggZH"
+      elif Sample_ID == 50525:      return "bbH"
+      elif Sample_ID == 62500:      return "THQ"
+      elif Sample_ID == 62524:      return "THW"
       else: 	return "unknown_sig"
 
     elif Sample_ID < 0:
@@ -124,8 +128,8 @@ def FillHistTerm(histos, term, cfg, value, Sample_ID, event_wgt):
     if samp == "unknown_sig" or samp == "unknown_bkg": return
 
     #blind
-    if samp == "Data" and term == "dimu_mass" and value > 120 and value < 130:
-        return
+#    if samp == "Data" and (term == "dimu_mass" or "dimu_mass_BDT" in term) and value > 120 and value < 130:
+#        return
     if samp == "Data" and ("BDT_mass" in term) and value > 0.4:
 	return
 

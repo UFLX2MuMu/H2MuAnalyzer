@@ -64,9 +64,13 @@ def ScaleSignal(sig_scale, stack_sig, var_name):
 
 
 def MakeRatioPlot(h_data, h_MC, var_name):
-    ratio_plot = TGraphAsymmErrors()
-    ratio_plot.Divide(h_data, h_MC, "pois")
+#    ratio_plot = TGraphAsymmErrors()  #If use this method, need to set points with y=0 by hand, otherwise the x range is messed up
+#    ratio_plot.Divide(h_data, h_MC, "pois")
+    h_temp = h_data.Clone('ratiohist')
+    h_temp.Divide(h_MC)
+    ratio_plot = TGraphAsymmErrors(h_temp) 
     ratio_plot.SetName("ratiograph_" + var_name)
+    ratio_plot.SetTitle('')
     ratio_plot.SetMinimum(0.2)
     ratio_plot.SetMaximum(2.0)
     ratio_plot.SetMarkerStyle(20)
@@ -77,6 +81,10 @@ def MakeRatioPlot(h_data, h_MC, var_name):
 	ratio_plot.GetXaxis().SetTitle('M(#mu#mu) (GeV)')
     elif var_name == 'dimu_pt':
 	ratio_plot.GetXaxis().SetTitle('p_{T}(#mu#mu) (GeV)')
+    elif var_name == 'dimu_abs_eta':
+        ratio_plot.GetXaxis().SetTitle('|#eta(#mu#mu)|')
+    elif var_name == 'dimu_abs_dPhi':
+        ratio_plot.GetXaxis().SetTitle('|#Delta#phi(#mu#mu)|')
     elif var_name == 'mu1_pt':
         ratio_plot.GetXaxis().SetTitle('p_{T}(#mu_{leading}) (GeV)')
     elif var_name == 'mu1_abs_eta':
@@ -85,10 +93,18 @@ def MakeRatioPlot(h_data, h_MC, var_name):
         ratio_plot.GetXaxis().SetTitle('M(dilep) (GeV)')
     elif var_name == 'dilep_pt':
         ratio_plot.GetXaxis().SetTitle('p_{T}(dilep) (GeV)')
+    elif var_name == 'dilep_abs_eta':
+        ratio_plot.GetXaxis().SetTitle('|#eta(dilep)|')
+    elif var_name == 'dilep_abs_dR':
+        ratio_plot.GetXaxis().SetTitle('#Delta R(dilep)')
     elif var_name == 'lep1_pt':
-        ratio_plot.GetXaxis().SetTitle('p_{T}(#lep_{leading}) (GeV)')
+        ratio_plot.GetXaxis().SetTitle('p_{T}(lep_{leading}) (GeV)')
     elif var_name == 'lep1_abs_eta':
-        ratio_plot.GetXaxis().SetTitle('|#eta(#lep_{leading})|')
+        ratio_plot.GetXaxis().SetTitle('|#eta(lep_{leading})|')
+    elif var_name == 'cts_dipair_H':
+        ratio_plot.GetXaxis().SetTitle('cos#theta*(#mu#mu,dilep)')
+    elif var_name == 'dipair_dEta_H':
+        ratio_plot.GetXaxis().SetTitle('#Delta#eta(#mu#mu,dilep)')
     elif 'BDT' in var_name:
         ratio_plot.GetXaxis().SetTitle('BDT output')
     else:
@@ -106,22 +122,25 @@ def MakeRatioPlot(h_data, h_MC, var_name):
 
 
 def MakeLegend(sig_names, bkg_names, histos, scaled_signal, sig_scale):
-    legend = TLegend(0.5,0.5,0.9,0.9)
-    legend.SetNColumns(2)
+    legend = TLegend(0.6,0.6,0.9,0.9)
+#    legend.SetNColumns(2)
 
     legend.AddEntry(histos["Data"], "data")
 #    for sample in plt_cfg.ana_cfg.sig_names:
+
     for sample in sig_names:
-	legend.AddEntry(histos[sample], sample )
+        histos[sample].Scale(sig_scale)
+	legend.AddEntry(histos[sample], "%s X%d"%(sample, sig_scale) )
 #    legend.AddEntry(scaled_signal, "signal X%d" %plt_cfg.sig_scale)
-    legend.AddEntry(scaled_signal, "signal X%d" %sig_scale)
+    legend.AddEntry(scaled_signal, "sum signal X%d" %sig_scale)
 #    for sample in plt_cfg.ana_cfg.bkg_names:
     for sample in bkg_names:
-        legend.AddEntry(histos[sample], sample )
+        if sample == 'others':   legend.AddEntry(histos[sample], 'other bkg.' )
+        else:                    legend.AddEntry(histos[sample], sample )
     return legend
 
 
-def DrawOnCanv(canv, var_name, logY, stack, histos, scaled_sig, ratio_plot, legend, lumi_label, cms_label):
+def DrawOnCanv(canv, var_name, logY, stack, histos, sig_names, scaled_sig, ratio_plot, legend, lumi_label, cms_label, lumi):
     canv.cd()
     upper_pad = TPad("upperpad_"+var_name, "upperpad_"+var_name, 0,0.25, 1,1)
     upper_pad.SetBottomMargin(0.04)
@@ -143,13 +162,15 @@ def DrawOnCanv(canv, var_name, logY, stack, histos, scaled_sig, ratio_plot, lege
     stack.GetYaxis().SetTitleOffset(1.0)
     histos['Data'].SetMarkerStyle(20)
     histos['Data'].Draw('SAMEPE')
+    for sample in sig_names:
+      histos[sample].Draw('HISTSAME')
     scaled_sig.Draw('HISTSAME')
 
     legend.Draw()
     cms_label.DrawLatexNDC(0.15, 0.85, '#scale[1.5]{CMS} #bf{#it{Preliminary}}')
     cms_label.Draw('same')
 #    lumi_label.DrawLatexNDC(0.90, 0.91, '%s fb^{-1} (13 TeV)' %plt_cfg.lumi)
-    lumi_label.DrawLatexNDC(0.90, 0.91, '#bf{35.9 fb^{-1} (13 TeV)}' )
+    lumi_label.DrawLatexNDC(0.90, 0.91, '#bf{%s fb^{-1} (13 TeV)}' %lumi)
     lumi_label.Draw('same')
 
     canv.cd()
@@ -165,7 +186,7 @@ def DrawOnCanv(canv, var_name, logY, stack, histos, scaled_sig, ratio_plot, lege
 def SaveCanvPic(canv, save_dir, save_name):
     canv.cd()
     canv.SaveAs(save_dir + '/' + save_name + '.pdf')
-    #canv.SaveAs(save_dir + '/' + save_name + '.png')
+    canv.SaveAs(save_dir + '/' + save_name + '.png')
 
 
 

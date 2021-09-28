@@ -27,19 +27,23 @@ if USER == 'xzuo':     PLOT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/Run2/His
 #LABEL = 'WH_ele_loose_ID_loose_iso_loose_mu_iso_v1'
 #LABEL = 'WH_mu_med_ID_loose_iso_v1'
 
-LABEL = 'ZH_lep_2019_08_25_medLep_veto12'
+LABEL = 'ZH_lep_SR_CR_kfactor_2020_05_07'
+#LABEL = 'ZH_lep_SR_CR_final_BDT_2020_03_11'
+#LABEL = 'ZH_lep_2019_08_25_medLep_veto12'
 #LABEL = 'VH_selection_2019april/pt10_iso04/ZH_ele_massBDT'
 #LABEL = 'leftover_of_ttH_and_ZH_2019_09_08'
 #LEP = 'ele'
 
 def InitHists(histos, terms, signals, bkgs):
     for sample in signals + bkgs:
-	histos["dimu_mass"][sample] 		    = TH1F("dimu_mass" + "_Net_" + sample, "dimu_mass" + "_Net_" + sample, 			50,110,160)
-	histos["dimu_mass_BDT_n10_n01"][sample]     = TH1F("dimu_mass_BDT_n10_n01" + "_Net_" + sample, "dimu_mass_BDT_n10_n01" + "_Net_" + sample,                  50,110,160)
-	histos["dimu_mass_BDT_n01_p10"][sample]     = TH1F("dimu_mass_BDT_n01_p10" + "_Net_" + sample, "dimu_mass_BDT_n01_p10" + "_Net_" + sample,                  50,110,160)
-    histos["dimu_mass"]["Data"]     		= TH1F("dimu_mass" + "_Net_" + "Data", "dimu_mass" + "_Net_" + "Data",                  50,110,160)
-    histos["dimu_mass_BDT_n10_n01"]["Data"]     = TH1F("dimu_mass_BDT_n10_n01" + "_Net_" + "Data", "dimu_mass_BDT_n10_n01" + "_Net_" + "Data",                  50,110,160)
-    histos["dimu_mass_BDT_n01_p10"]["Data"]     = TH1F("dimu_mass_BDT_n01_p10" + "_Net_" + "Data", "dimu_mass_BDT_n01_p10" + "_Net_" + "Data",                  50,110,160)
+	histos["dimu_mass"][sample] 		    = TH1F("dimu_mass" + "_Net_" + sample, "dimu_mass" + "_Net_" + sample, 			800,110,150)
+	histos["dimu_mass_BDT_n10_n01"][sample]     = TH1F("dimu_mass_BDT_n10_n01" + "_Net_" + sample, "dimu_mass_BDT_n10_n01" + "_Net_" + sample,                  800,110,150)
+	histos["dimu_mass_BDT_n01_p10"][sample]     = TH1F("dimu_mass_BDT_n01_p10" + "_Net_" + sample, "dimu_mass_BDT_n01_p10" + "_Net_" + sample,                  800,110,150)
+        histos["BDT_final"][sample]                 = TH1F("BDT_final"     + "_Net_" + sample, "BDT_final"   + "_Net_" + sample,            60,-1,1)
+    histos["dimu_mass"]["Data"]     		= TH1F("dimu_mass" + "_Net_" + "Data", "dimu_mass" + "_Net_" + "Data",                  800,110,150)
+    histos["dimu_mass_BDT_n10_n01"]["Data"]     = TH1F("dimu_mass_BDT_n10_n01" + "_Net_" + "Data", "dimu_mass_BDT_n10_n01" + "_Net_" + "Data",                  800,110,150)
+    histos["dimu_mass_BDT_n01_p10"]["Data"]     = TH1F("dimu_mass_BDT_n01_p10" + "_Net_" + "Data", "dimu_mass_BDT_n01_p10" + "_Net_" + "Data",                  800,110,150)
+    histos["BDT_final"]["Data"]                 = TH1F("BDT_final"     + "_Net_" + "Data", "BDT_final"   + "_Net_" + "Data",            60,-1,1)
 
 def main():
     out_name = "mass_hists_lepMVAp04.root"
@@ -49,7 +53,7 @@ def main():
     file_chain = TChain("tree","chain");
     file_chain.Add(file_dir + "all_samples.root")
 
-    terms = ["dimu_mass", "dimu_mass_BDT_n10_n01", "dimu_mass_BDT_n01_p10"]
+    terms = ["dimu_mass", "dimu_mass_BDT_n10_n01", "dimu_mass_BDT_n01_p10", "BDT_final"]
 
     cfg = PC.Plot_Config("ZH_4l")
 
@@ -77,11 +81,15 @@ def main():
 	if iEvt % 10000 == 0:
 	    print "looking at event %d" %iEvt
 
-	if file_chain.dilep_mass < 70 or file_chain.dilep_mass > 110: continue
+        if file_chain.in_SR == 0: continue
+	if file_chain.dilep_mass < 81 or file_chain.dilep_mass > 101: continue
 
 	MVA_cut = 0.4
 	if file_chain.mu1_lepMVA < MVA_cut or file_chain.mu2_lepMVA < MVA_cut or file_chain.lep1_lepMVA < MVA_cut or file_chain.lep2_lepMVA < MVA_cut:
 	    continue
+
+        MaxMissHits = 1
+        if ( file_chain.lep1_missHit > MaxMissHits or file_chain.lep2_missHit > MaxMissHits ):  continue
 
 #	mu1_SF = GetSF("muon", file_chain.mu1_pt,  file_chain.mu1_abs_eta, MVA_cut)
 #	mu2_SF = GetSF("muon", file_chain.mu2_pt,  file_chain.mu2_abs_eta, MVA_cut)
@@ -92,11 +100,12 @@ def main():
 #	MVA_SF = 1.0
 	MVA_SF = file_chain.all_lepMVA_SF
 
-	FillHistTerm(histos, "dimu_mass"   	, cfg, file_chain.dimu_mass   	, file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
-	if file_chain.BDT_noMass_v3 < -0.1:
-	  FillHistTerm(histos, "dimu_mass_BDT_n10_n01"        , cfg, file_chain.dimu_mass     , file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
+	FillHistTerm(histos, "dimu_mass"   	, cfg, file_chain.dimu_mass   	, file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF * file_chain.Btag_wgt)
+	if file_chain.BDT_final < -0.1:
+	  FillHistTerm(histos, "dimu_mass_BDT_n10_n01"        , cfg, file_chain.dimu_mass     , file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF * file_chain.Btag_wgt)
 	else:
-	  FillHistTerm(histos, "dimu_mass_BDT_n01_p10"        , cfg, file_chain.dimu_mass     , file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF)
+	  FillHistTerm(histos, "dimu_mass_BDT_n01_p10"        , cfg, file_chain.dimu_mass     , file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF * file_chain.Btag_wgt)
+        FillHistTerm(histos, "BDT_final",                       cfg, file_chain.BDT_final     , file_chain.Sample_ID  , file_chain.xsec_norm * file_chain.event_wgt * MVA_SF * file_chain.Btag_wgt)
 
     out_file.cd()
     scaled_signal = {}
@@ -109,7 +118,7 @@ def main():
 	histos[term]["signal"] = stack_sig[term].GetStack().Last()
 	histos[term]["signal"].SetNameTitle(term + "_Net_Sig", term + "_Net_Sig")
 
-        stack_all[term].Add(histos[term]["signal"])
+#        stack_all[term].Add(histos[term]["signal"])
         histos[term]["signal"].SetFillColor( kGray )
         histos[term]["signal"].SetLineWidth(0)
         for sample in cfg.bkgs:
