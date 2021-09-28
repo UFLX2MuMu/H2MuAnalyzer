@@ -25,8 +25,9 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
   bool loadGEN   = false;
   bool loadJES   = false;
   bool loadFlags = false;
-  bool loadEffs   = false;
+  bool loadEffs  = false;
   bool loadWgts  = false;
+  bool isGENint  = false;
 
   for (uint i = 0; i < opts.size(); i++) {
     if (verbose) std::cout << "  * Using option " << opts.at(i) << std::endl;
@@ -41,6 +42,7 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
     if (opts.at(i) == "Flags")   loadFlags = true;
     if (opts.at(i) == "Effs")    loadEffs  = true;
     if (opts.at(i) == "Wgts")    loadWgts  = true;
+    if (opts.at(i) == "GENint")  isGENint  = true;
   }
 
   assert(isLeg2016 || is2016 || is2017 || is2018);
@@ -54,10 +56,10 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
   ch->SetBranchAddress("event", &(br.event));
   ch->SetBranchAddress("vertices", &(br.vertices));
 
-  ch->SetBranchAddress("muons", &(br.muons));
+  ch->SetBranchAddress("muons", &(br.muons_orig));
   ch->SetBranchAddress("muPairs", &(br.muPairs));
   ch->SetBranchAddress("eles", &(br.eles));
-  ch->SetBranchAddress("phots", &(br.phots));
+//  ch->SetBranchAddress("phots", &(br.phots));
   if ( isSlim) ch->SetBranchAddress("jets", &(br.slimJets));
   if (!isSlim) ch->SetBranchAddress("jets", &(br.jets));
   ch->SetBranchAddress("jetPairs", &(br.jetPairs));
@@ -68,7 +70,7 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
   ch->SetBranchAddress("nMuons", &(br.nMuons));
   ch->SetBranchAddress("nMuPairs", &(br.nMuPairs));
   ch->SetBranchAddress("nEles", &(br.nEles));
-  ch->SetBranchAddress("nPhots", &(br.nPhots));
+//  ch->SetBranchAddress("nPhots", &(br.nPhots));
   ch->SetBranchAddress("nJets", &(br.nJets));
   ch->SetBranchAddress("nJetPairs", &(br.nJetPairs));
   ch->SetBranchAddress("nJetsCent", &(br.nJetsCent));
@@ -197,7 +199,10 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
     ch->SetBranchAddress("PU_wgt", &(br.PU_wgt));
     ch->SetBranchAddress("PU_wgt_up", &(br.PU_wgt_up));
     ch->SetBranchAddress("PU_wgt_down", &(br.PU_wgt_down));
-    ch->SetBranchAddress("GEN_wgt", &(br.GEN_wgt));
+    if (! isGENint) ch->SetBranchAddress("GEN_wgt", &(br.GEN_wgt));     // in new ntuples GEN_wgt are float. But it does not read old ntuples properly  -- XWZ 2020.05.27
+    else            ch->SetBranchAddress("GEN_wgt", &(br.GEN_wgt_int)); // in old ntuples GEN_wgt are integer. One should check in macros which one to use.
+
+//    ch->SetBranchAddress("MG_wgt", &(br.MG_wgt)); //MG_wgt only for TH samples 
  
     ch->SetBranchAddress("IsoMu_SF_3", &(br.IsoMu_SF_3));
     ch->SetBranchAddress("IsoMu_SF_3_up", &(br.IsoMu_SF_3_up));
@@ -208,6 +213,12 @@ void SetBranchAddresses(TChain & ch_, NTupleBranches & br, std::vector<std::stri
     ch->SetBranchAddress("MuIso_SF_3", &(br.MuIso_SF_3));
     ch->SetBranchAddress("MuIso_SF_3_up", &(br.MuIso_SF_3_up));
     ch->SetBranchAddress("MuIso_SF_3_down", &(br.MuIso_SF_3_down));
+
+    if (is2016 || is2017) {
+//      ch->SetBranchAddress("l1pref_wgt", &(br.l1pref_wgt));
+//      ch->SetBranchAddress("l1pref_wgt_up", &(br.l1pref_wgt_up));
+//      ch->SetBranchAddress("l1pref_wgt_down", &(br.l1pref_wgt_down));
+    }
 
     if (isLeg2016 || is2016) {
       ch->SetBranchAddress("IsoMu_SF_4", &(br.IsoMu_SF_4));
@@ -257,3 +268,5 @@ JetInfos ConvertSlimJets(SlimJetInfos & _slimJets) {
 
   return _jets;
 } // End function: JetInfos ConvertSlimJets()
+
+

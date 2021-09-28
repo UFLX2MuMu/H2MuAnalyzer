@@ -7,14 +7,15 @@
 
 #include "TChain.h"
 
-#include "Ntupliser/DiMuons/interface/NTupleBranches.h"
+#include "Ntupliser/DiMuons/interface/NTupleBranches.h"  // include object struct definitions muon, electron, jets etc.
 
 void ASSERT(bool condition, std::string message);
 
 struct NTupleBranches {
   EventInfo * event = 0;
   VertexInfos * vertices = 0;
-  
+
+  MuonInfos * muons_orig = 0; // separate pointer that reads the muons from the ntuple, in order to apply post-ntuple Roch correction and uncertainty  
   MuonInfos * muons = 0;
   MuPairInfos * muPairs = 0;
   
@@ -145,7 +146,14 @@ struct NTupleBranches {
   float PU_wgt_up = -99;
   float PU_wgt_down = -99;
 
-  int GEN_wgt = -99;
+  float l1pref_wgt = 1.0;
+  float l1pref_wgt_up = -99;
+  float l1pref_wgt_down = -99;
+
+  float MG_wgt = -99; //MG_wgt only for TH samples
+
+  float GEN_wgt = -99; // now MG_wgt included in GEN_wgt
+  int   GEN_wgt_int = -99; // to read the old integer GEN_wgt
 };
 
 

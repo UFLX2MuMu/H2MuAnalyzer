@@ -27,6 +27,11 @@ int getSampleID(TString name, const bool verbose) {
     else if ( name.Contains("H2Mu_WH") ) 	return 2425;
     else if ( name.Contains("H2Mu_ZH") ) 	return 2325;
     else if ( name.Contains("H2Mu_ttH") ) 	return 60625;
+
+    else if ( name.Contains("H2Mu_ggZH_125") )  return 23250000;
+    else if ( name.Contains("H2Mu_bbH_125") )   return 50525;
+    else if ( name.Contains("H2Mu_THQ_125") )   return 62500;
+    else if ( name.Contains("H2Mu_THW_125") )   return 62524;
     // negative value for bkg
     else if ( name.Contains("ZJets") ) 		return -23; // can add more entries if need to distinguish between AMC/MG, 0j/1j/2j samples
     else if ( name.Contains("tt_ll") or name == "tt" ) 	return -606;

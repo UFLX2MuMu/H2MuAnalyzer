@@ -4,7 +4,7 @@
 
 
 bool InCategory( const ObjectSelectionConfig & cfg, const NTupleBranches & br,
-		 const std::string sel, const bool verbose) {
+		 const std::string SYS, const std::string sel, const bool verbose) {
   
   if (verbose) std::cout << "\nInside InCategory, checking if event passes " << sel << std::endl;
   
@@ -117,7 +117,7 @@ bool InCategory( const ObjectSelectionConfig & cfg, const NTupleBranches & br,
 
     // Require MET > 30, no medium b-tags, exactly 2 selected opposite-charge muon pairs, and 1 pair close to the Higgs mass
     if (br.met->pt < 30) return false;
-    if (SelectedJets(cfg, br, "BTagMedium").size() > 0) return false;
+    if (SelectedJets(cfg, br, SYS, "BTagMedium").size() > 0) return false;
 
     // EleInfos eles = SelectedEles(cfg, br);
     MuPairInfos muPairs = SelectedMuPairs(cfg, br);
@@ -141,7 +141,7 @@ bool InCategory( const ObjectSelectionConfig & cfg, const NTupleBranches & br,
 
     // Require MET > 40, no medium b-tags, exactly 2 selected opposite-charge muon pairs, and 1 pair close to the Z mass
     if (br.met->pt < 40) return false;
-    if (SelectedJets(cfg, br, "BTagMedium").size() > 0) return false;
+    if (SelectedJets(cfg, br, SYS, "BTagMedium").size() > 0) return false;
 
     // EleInfos eles = SelectedEles(cfg, br);
     MuPairInfos muPairs = SelectedMuPairs(cfg, br);
@@ -164,9 +164,9 @@ bool InCategory( const ObjectSelectionConfig & cfg, const NTupleBranches & br,
 
     // Require MET > 40, >= 3 jets, >= 1 medium or >= 1 tight b-tags, exactly 2 selected opposite-charge muon pairs, and 1 pair close to the Z mass
     if (br.met->pt < 40) return false;
-    if (SelectedJets(cfg, br).size() < 3) return false;
-    if (SelectedJets(cfg, br, "BTagMedium").size() < 2 &&
-	SelectedJets(cfg, br, "BTagTight").size() < 1) return false;
+    if (SelectedJets(cfg, br, SYS).size() < 3) return false;
+    if (SelectedJets(cfg, br, SYS, "BTagMedium").size() < 2 &&
+	SelectedJets(cfg, br, SYS, "BTagTight").size() < 1) return false;
 
     // EleInfos eles = SelectedEles(cfg, br);
     MuPairInfos muPairs = SelectedMuPairs(cfg, br);
@@ -189,9 +189,9 @@ bool InCategory( const ObjectSelectionConfig & cfg, const NTupleBranches & br,
 
     // Require MET > 50, >= 3 jets, >= 1 medium or >= 1 tight b-tags, exactly 2 selected opposite-charge muon pairs, and 0 pairs close to the Z mass
     if (br.met->pt < 50) return false;
-    if (SelectedJets(cfg, br).size() < 3) return false;
-    if (SelectedJets(cfg, br, "BTagMedium").size() < 2 &&
-	SelectedJets(cfg, br, "BTagTight").size() < 1) return false;
+    if (SelectedJets(cfg, br, SYS).size() < 3) return false;
+    if (SelectedJets(cfg, br, SYS, "BTagMedium").size() < 2 &&
+	SelectedJets(cfg, br, SYS, "BTagTight").size() < 1) return false;
 
     // EleInfos eles = SelectedEles(cfg, br);
     MuPairInfos muPairs = SelectedMuPairs(cfg, br);
@@ -214,7 +214,7 @@ bool InCategory( const ObjectSelectionConfig & cfg, const NTupleBranches & br,
 
     // Require MET < 30, no medium b-tags, exactly 2 selected opposite-charge muon pairs, and 1 pair close to the Z mass
     if (br.met->pt > 30) return false;
-    if (SelectedJets(cfg, br, "BTagMedium").size() > 0) return false;
+    if (SelectedJets(cfg, br, SYS, "BTagMedium").size() > 0) return false;
 
     // EleInfos eles = SelectedEles(cfg, br);
     MuPairInfos muPairs = SelectedMuPairs(cfg, br);
@@ -237,7 +237,7 @@ bool InCategory( const ObjectSelectionConfig & cfg, const NTupleBranches & br,
 
     // Require MET > 40, exactly 1 medium b-tag, exactly 2 selected opposite-charge muon pairs, and 0 pairs close to the Z mass
     if (br.met->pt < 40) return false;
-    if (SelectedJets(cfg, br, "BTagMedium").size() != 1) return false;
+    if (SelectedJets(cfg, br, SYS, "BTagMedium").size() != 1) return false;
 
     // EleInfos eles = SelectedEles(cfg, br);
     MuPairInfos muPairs = SelectedMuPairs(cfg, br);
@@ -258,14 +258,14 @@ bool InCategory( const ObjectSelectionConfig & cfg, const NTupleBranches & br,
   else if (sel == "inclusive_01jet") {
     if (verbose) std::cout << "  * Applying inclusive_01jet cuts" << std::endl;
     
-    if (SelectedJets(cfg, br).size() >= 2) return false;
+    if (SelectedJets(cfg, br, SYS).size() >= 2) return false;
     PASS = true;
   } // End if (sel == "inclusive_01jet") 
   
   else if (sel == "inclusive_2jets") {
     if (verbose) std::cout << "  * Applying inclusive_2jets cuts" << std::endl;
     
-    if (SelectedJets(cfg, br).size() < 2) return false;
+    if (SelectedJets(cfg, br, SYS).size() < 2) return false;
     PASS = true;
   } // End if (sel == "inclusive_2jets")
 

@@ -14,18 +14,19 @@ struct EventWeightConfig {  // Default values taken from 2016
   std::string year = "NONE";
 
   // Weights to apply
-  bool PU         = false; // PU_wgt   (Pileup reweighting SF)
-  bool muon_ID    = false; // MuID_SF  (RECO muon ID SF)
-  bool muon_Iso   = false; // MuIso_SF (RECO muon isolation SF)
-  bool trig_IsoMu = false; // IsoMu_SF (HLT IsoMu trigger SF)
-  bool GEN        = false; // GEN_wgt  (NLO MC GEN weight, ±1)
+  bool PU         = false; // PU_wgt     (Pileup reweighting SF)
+  bool prefire    = false; // l1pref_wgt (prefiring weight)
+  bool muon_ID    = false; // MuID_SF    (RECO muon ID SF)
+  bool muon_Iso   = false; // MuIso_SF   (RECO muon isolation SF)
+  bool trig_IsoMu = false; // IsoMu_SF   (HLT IsoMu trigger SF)
+  bool GEN        = false; // GEN_wgt    (NLO MC GEN weight, ±1)
 
   // Systematics to use
   std::string SYS = "noSys"; 
 
   void Print() {
     std::cout << "\n*** EventWeightConfig for year = " << year << " ***" << std::endl;
-    std::cout << "Weights to use: PU = " << PU << ", muon_ID = " << muon_ID << ", muon_Iso = " << muon_Iso
+    std::cout << "Weights to use: PU = " << PU << ", prefiring = " << prefire << ", muon_ID = " << muon_ID << ", muon_Iso = " << muon_Iso
 	      << ", trig_IsoMu = " << trig_IsoMu << ", GEN = " << GEN << std::endl;
     std::cout << "Systematics to use: " << SYS << std::endl;
   } // End function: void Print()

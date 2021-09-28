@@ -40,7 +40,7 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
     cfg.mu_pt_min   = 20.0;     // Minimum muon pT
     cfg.mu_eta_max  =  2.4;     // Maximum muon |eta|
     cfg.mu_ID_cut   = "medium"; // Muon ID: "loose", "medium", or "tight"
-    cfg.mu_mIso_max =  0.4;     // Maximum muon relative miniIsolation
+//    cfg.mu_mIso_max =  0.4;     // Maximum muon relative miniIsolation
     cfg.mu_iso_max  =  0.25;    // Maximum muon relative isolation
     cfg.mu_d0_max   =  0.05;    // Maximum muon |dXY| from vertex
     cfg.mu_dZ_max   =  0.1;     // Maximum muon |dZ| from vertex
@@ -48,23 +48,28 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
     cfg.mu_seg_min  =  -99;     // Minimum muon segment compatibility
     cfg.mu_MVA_min  =  -99;     // Minimum prompt muon lepton MVA (lepMVA) BDT score
     cfg.mu_CSV_max  = "NONE";   // Veto muons with pT < 20 GeV with matching jet passing b-tag threshold
+    if (_year == "2016") cfg.mu_jet_CSV = 0.8958;  // cut on jet_deepCSV saved in object.
+    else		 cfg.mu_jet_CSV = 0.8001;  // complementary to mu_CSV_max
 
     // Electron selection
     cfg.ele_pt_min      = 20.0;     // Minimum electron pT
     cfg.ele_eta_max     =  2.5;     // Maximum electron |eta|
     cfg.ele_eta_gap_min = 1.444;    // Minimum electron gap eta
     cfg.ele_eta_gap_max = 1.566;    // Maximum electron gap eta
-    cfg.ele_ID_cut      = "tZq";    // Electron ID: "veto", loose", "medium", "tight", or "tZq"
+    cfg.ele_ID_cut      = "NONE";    // Electron ID: "veto", loose", "medium", "tight", or "tZq"
     cfg.ele_MVA_ID_cut  = "MvaWp90ID";  // Electron MVA ID: "MvaWp90ID" or "MvaWpLooseID"
-    cfg.ele_mIso_max    =  0.4;    // Maximum electron relative miniIsolation
+//    cfg.ele_mIso_max    =  0.4;    // Maximum electron relative miniIsolation
     cfg.ele_d0_max      =  0.05;   // Maximum electron |dXY| from vertex
     cfg.ele_dZ_max      =  0.1;    // Maximum electron |dZ| from vertex
     cfg.ele_SIP_max     =  8.0;    // Maximum electron impact parameter significance
+    cfg.ele_Conv_Veto   =  1.0;    // Do apply conversion veto
     cfg.ele_MVA_min     =  -99;    // Minimum prompt electron lepton MVA (lepMVA) BDT score
     cfg.ele_CSV_max     = "NONE";   // Veto electrons with pT < 20 GeV with matching jet passing b-tag threshold
+    if (_year == "2016") cfg.ele_jet_CSV = 0.8958;  // cut on jet_deepCSV saved in object.
+    else                 cfg.ele_jet_CSV = 0.8001;  // complementary to ele_CSV_max
 
     // Jet selection
-    cfg.jet_pt_min     = 30.0;    // Minimum jet pT
+    cfg.jet_pt_min     = 25.0;    // Minimum jet pT
     cfg.jet_eta_max    =  4.7;    // Maximum jet |eta|
     cfg.jet_mu_dR_min  =  0.4;    // Minimum dR(jet, muon)
     cfg.jet_ele_dR_min =  0.4;    // Minimum dR(jet, electron)
@@ -72,6 +77,9 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
     if (_year == "2016") cfg.jet_btag_cuts  = {0.2217, 0.6321, 0.8953}; // DeepCSV recommendation from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation2016Legacy
     if (_year == "2017") cfg.jet_btag_cuts  = {0.1522, 0.4941, 0.8001}; // DeepCSV recommendation from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
     if (_year == "2018") cfg.jet_btag_cuts  = {0.1241, 0.4184, 0.7527}; // DeepCSV recommendation from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
+    if (_year == "2016") cfg.JEC_file   = "/afs/cern.ch/work/x/xzuo/h2mm_944/src/H2MuAnalyzer/MakeHistos/data/JEC/Regrouped_Summer16_07Aug2017_V11_MC_UncertaintySources_AK4PFchs.txt"; // JEC txt file from https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC
+    if (_year == "2017") cfg.JEC_file   = "/afs/cern.ch/work/x/xzuo/h2mm_944/src/H2MuAnalyzer/MakeHistos/data/JEC/Regrouped_Fall17_17Nov2017_V32_MC_UncertaintySources_AK4PFchs.txt";   // JEC txt file from https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC
+    if (_year == "2018") cfg.JEC_file   = "/afs/cern.ch/work/x/xzuo/h2mm_944/src/H2MuAnalyzer/MakeHistos/data/JEC/Regrouped_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt";           // JEC txt file from https://twiki.cern.ch/twiki/bin/viewauth/CMS/JECDataMC
 
     // Photon selection
     cfg.phot_pt_min             =  2.0;   // Minimum photon pT
@@ -136,6 +144,8 @@ bool MuonPass ( const ObjectSelectionConfig & cfg, const MuonInfo & muon, const 
       if ( JetMuonClean(cfg, jet, muon, br) < 2 ) return false;
     }
   }
+  if ( cfg.mu_jet_CSV != -99 )
+    if ( muon.jet_deepCSV > cfg.mu_jet_CSV ) return false;
 
   return true;
 } // End function: bool MuonPass()
@@ -164,6 +174,8 @@ bool ElePass ( const ObjectSelectionConfig & cfg, const EleInfo & ele, const NTu
     if ( fabs(ele.dz_PV)             > cfg.ele_dZ_max   ) return false;
   if ( cfg.ele_SIP_max != -99 )
     if ( ele.SIP_3D                  > cfg.ele_SIP_max  ) return false;
+  if ( cfg.ele_Conv_Veto != -99 )
+    if ( !ele.passConversionVeto )                        return false;
   if ( cfg.ele_MVA_min  != -99 )
     if ( ele.lepMVA                  < cfg.ele_MVA_min  ) return false;
   if ( cfg.ele_POG_MVA  != -99 )
@@ -174,6 +186,8 @@ bool ElePass ( const ObjectSelectionConfig & cfg, const EleInfo & ele, const NTu
       if ( JetEleClean(cfg, jet, ele, br) < 2 ) return false;
     }
   }
+  if ( cfg.ele_jet_CSV != -99 )
+    if ( ele.jet_deepCSV > cfg.ele_jet_CSV ) return false;
 
   return true;
 } // End function: bool ElectronPass()
@@ -453,12 +467,26 @@ EleInfos SelectedEles ( const ObjectSelectionConfig & cfg, const NTupleBranches 
 
 
 // Return selected jets in event
-JetInfos SelectedJets ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const std::string sel, const bool verbose ) {
+JetInfos SelectedJets ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const std::string JEC_sys, const std::string sel, const bool verbose ) {
 
+  //  in JetPass(), the closestCSV for leptons are without JES shift
+  //  in rare cases, when the deepCSV is near the cut and affected by the JES,
+  //  the jet and lepton can be incorrectly cleaned. (does not matter for VH, since no b-jet allowed in events)
   JetInfos selJets;
-  for (const auto & jet : (*br.jets)) {
-    if ( JetPass(cfg, jet, br, sel) ) {
-      selJets.push_back(jet);
+  // use overall JES shift from ntuple
+  if (JEC_sys == "JES_up") {
+    for (const auto & jet : (*br.jets_JES_up)) {  if (JetPass(cfg, jet, br, sel)) selJets.push_back(jet); }
+  }
+  else if (JEC_sys == "JES_down") {
+    for (const auto & jet : (*br.jets_JES_down)) {  if (JetPass(cfg, jet, br, sel)) selJets.push_back(jet); }
+  }
+  // use specific JEC uncertainties sources
+  else {
+    for (const auto & jet_itr : (*br.jets)) {
+      JetInfo jet = ApplyJECuncert ( jet_itr, cfg.year, cfg.JEC_file, JEC_sys );
+      if ( JetPass(cfg, jet, br, sel) ) {
+        selJets.push_back(jet);
+      }
     }
   }
   return selJets;

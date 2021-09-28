@@ -25,6 +25,7 @@ void ConfigureEventWeight( EventWeightConfig & cfg, const std::string _year, con
     cfg.muon_Iso   = true; // MuIso_SF_3
     cfg.trig_IsoMu = true; // IsoMu_SF_3
     cfg.GEN        = true; // GEN_wgt
+    if (_year == "2016" || _year == "2017") cfg.prefire = true; //prefiring weight, only for 2016 and 2017
   } // End if (_year == "2016" || _year == "2017" || _year == "2018")
 
   else {
@@ -100,10 +101,17 @@ float EventWeight( const NTupleBranches & br, const EventWeightConfig & cfg, con
   if (cfg.SYS == "PU_wgt_up")   PU_wgt = br.PU_wgt_up;
   if (cfg.SYS == "PU_wgt_down") PU_wgt = br.PU_wgt_down;
 
-  // if (cfg.PU && br.PU_wgt <= 0) {
-  //   std::cout << "\n\nTruly bizzare case where PU_wgt = " << br.PU_wgt << "!!!" << std::endl;
-  //   std::cout << "Check computation!\n\n" << std::endl;
-  // }
+  float pref_wgt = 1.0;
+  if (cfg.year == "2016") {
+    pref_wgt = br.l1pref_wgt;
+    if (cfg.SYS == "prefiring_2016_up")   pref_wgt = br.l1pref_wgt_up;
+    if (cfg.SYS == "prefiring_2016_down") pref_wgt = br.l1pref_wgt_down;
+  }
+  if (cfg.year == "2017") {
+    pref_wgt = br.l1pref_wgt;
+    if (cfg.SYS == "prefiring_2017_up")   pref_wgt = br.l1pref_wgt_up;
+    if (cfg.SYS == "prefiring_2017_down") pref_wgt = br.l1pref_wgt_down;
+  }
 
   if (cfg.year == "2016" || cfg.year == "2017" || cfg.year == "2018") {
 
@@ -112,6 +120,12 @@ float EventWeight( const NTupleBranches & br, const EventWeightConfig & cfg, con
 	std::cout << "\n\nTruly bizzare case where PU_wgt = " << PU_wgt << "!!!" << std::endl;
 	std::cout << "Check computation! Setting to 1.\n\n" << std::endl;
       } else evt_weight *= PU_wgt;
+    }
+    if (cfg.prefire) {
+      if (pref_wgt < 0) {
+        std::cout << "\n\nTruly bizzare case where pref_wgt = " << pref_wgt << "!!!" << std::endl;
+        std::cout << "Check computation! Setting to 1.\n\n" << std::endl;
+      } else evt_weight *= pref_wgt;
     }
     if (cfg.GEN) evt_weight *= br.GEN_wgt;
 

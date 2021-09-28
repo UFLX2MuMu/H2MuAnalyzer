@@ -14,11 +14,19 @@
 #include "TH2.h"
 
 #include "H2MuAnalyzer/MakeHistos/interface/LoadNTupleBranches.h"
+#include "H2MuAnalyzer/MakeHistos/interface/RoccoR.h"
+#include "H2MuAnalyzer/MakeHistos/interface/JetCorrectorParameters_x.h"
+#include "H2MuAnalyzer/MakeHistos/interface/JetCorrectionUncertainty_x.h"
 
 bool  MuonID        ( const MuonInfo & muon, const std::string muon_ID );     // Return loose, medium, or tight muon ID
 bool  LepMVA        ( const MuonInfo & muon, const std::string year, const std::string cut ); // Return if muon passes lepton MVA cut
 bool  LepMVA        ( const EleInfo  & ele,  const std::string year, const std::string cut ); // Return if electron passes lepton MVA cut
 bool  MuonTrig      ( const MuonInfo & muon, const std::string year, const std::vector<std::string> trigNames ); // Return if muon fired HLT trigger
+
+float Roch_pt_shift ( const RoccoR rc, const MuonInfo & muon, float gen_pt, const std::string Roch_sys); // Return Rochester pt with systematic shifts 
+MuonInfos ReloadMuonRoch(const RoccoR rc, const MuonInfos & muons_orig, const GenMuonInfos & genMuons, const std::string Roch_sys);  // Return muon collection with shifted Roch pt
+MuonInfos ReloadMuonRoch_data(const RoccoR rc, const MuonInfos & muons_orig, const std::string Roch_sys); // return muon collection with shifted Roch pt, for data 
+
 float MuonPt        ( const MuonInfo & muon, const std::string pt_corr );     // Return PF, Rochester, or Kalman corrected muon pT
 float MuPairPt      ( const MuPairInfo & muPair, const std::string pt_corr ); // Return PF, Rochester, or Kalman corrected dimuon pT
 float MuPairMass    ( const MuPairInfo & muPair, const std::string pt_corr ); // Return PF, Rochester, or Kalman corrected dimuon invariant mass
@@ -34,6 +42,7 @@ float GetLepMVASF(const std::string lep_type, float pt, float eta, float lepMVA_
 
 bool JetPUID ( const JetInfo & jet, const std::string pu_ID, const std::string year ); // Return loose, medium, or tight jet PU ID from 2016 or 2017
 float JetCSV ( const JetInfo & jet, const std::string opt = "deepCSV" ); // Return CSVv2 or deepCSV, protect against NAN
+JetInfo ApplyJECuncert (const JetInfo & jet, const std::string year, const std::string JEC_file = "NONE", const std::string JEC_sys = "noSys" ); // Apply sys shift from JEC, return one jet after shift
 
 JetPairInfo MakeJetPair( TLorentzVector jet1_vec, TLorentzVector jet2_vec );
 
