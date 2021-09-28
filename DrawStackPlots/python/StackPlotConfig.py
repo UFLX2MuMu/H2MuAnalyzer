@@ -95,12 +95,17 @@ def ConfigStackPlot(known_config, year):
     ###  Configuration for validation of WH backgrounds (Z+jets, ttbar, ttW, ttZ)  ###
     ##################################################################################
 
-    if (known_config == 'WH_lep' or known_config == 'WH_lep_allMass' or
+    if (known_config == 'WH_lep' or known_config == 'WH_lep_allMass' or known_config == 'WH_lep_AN' or
         known_config == 'ttH_3l' or known_config == 'ttH_3l_allMass'):
 
         cfg.year       = year
-        cfg.ntuple_loc = 'CERN_3l'
+        cfg.ntuple_loc = 'CERN_3l_final'
         cfg.sig_mass   = '125'
+
+        ## ordered dict has to be declared before adding keys. All keys inserted before this declaration are fixed at a random order
+        cfg.groups['Data'] = OrderedDict(cfg.groups['Data'])
+        cfg.groups['Sig']  = OrderedDict(cfg.groups['Sig'])
+        cfg.groups['Bkg']  = OrderedDict(cfg.groups['Bkg'])
 
         if (year == '2016' or year == '2017' or year == '2018' or year == 'Run2'):
 
@@ -109,6 +114,7 @@ def ConfigStackPlot(known_config, year):
             cfg.excl_samps              = []  ## Samples to exclude from consideration
 
             ## Start by excluding component histograms merged in MakeHistos/scripts/MergeHists.py
+            cfg.excl_samps += ['H2Mu_gg', 'H2Mu_gg_125_NLO']  ## ignore contribution from ggH in WH channel
             cfg.excl_samps += ['H2Mu_VBF_120_NLO_1', 'H2Mu_VBF_120_NLO_2', 'H2Mu_VBF_120']  ## Merged into H2Mu_VBF_120
             cfg.excl_samps += ['H2Mu_VBF_125_NLO_1', 'H2Mu_VBF_125_NLO_2', 'H2Mu_VBF']  ## Merged into H2Mu_VBF, in 2017 the H2Mu_VBF is not in the SampleDatabase (NLO_1 and _2), ignore for now
             cfg.excl_samps += ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2', 'H2Mu_VBF_130']  ## Merged into H2Mu_VBF_130
@@ -121,17 +127,36 @@ def ConfigStackPlot(known_config, year):
             cfg.excl_samps += ['WWW_lep', 'ZZ_4l_amc']
 
 
+            cfg.groups['Sig']['WH']        = ['H2Mu_WH_pos_125', 'H2Mu_WH_neg_125']
+            cfg.groups['Sig']['qqZH+ggZH'] = ['H2Mu_ZH_125', 'H2Mu_ggZH_125']
+            cfg.groups['Sig']['ttH+tH']    = ['H2Mu_ttH_125', 'H2Mu_THQ_125', 'H2Mu_THW_125']
+#            cfg.groups['Sig']['ZH']  = ['H2Mu_ZH_125']
+#            cfg.groups['Sig']['ttH'] = ['H2Mu_ttH_125'] 
+#            cfg.groups['Sig']['bbH'] = ['H2Mu_bbH_125']
+#            cfg.groups['Sig']['ggZH'] = ['H2Mu_ggZH_125']
+#            cfg.groups['Sig']['THQ'] = ['H2Mu_THQ_125']
+#            cfg.groups['Sig']['THW'] = ['H2Mu_THW_125']
+
+
+            ## declare keys first so it is easy to check the order
+            cfg.groups['Bkg']['Other']   = []  ## Any background sample not of a specified type goes into 'Other'
+            cfg.groups['Bkg']['top']     = []
+            cfg.groups['Bkg']['ZJets']   = []
+            cfg.groups['Bkg']['ZZ+ggZZ'] = []
+
+
             cfg.groups['Bkg']['WZ'] = ['WZ_3l']
 
-            cfg.groups['Bkg']['ZZ'] = ['ZZ_4l']
+            cfg.groups['Bkg']['ZZ+ggZZ'] = ['ZZ_4l']
             if (year == '2017' or year == 'Run2'):
-                cfg.groups['Bkg']['ZZ'] += ['ZZ_4l_gg_4mu', 'ZZ_4l_gg_2e2mu']
+                cfg.groups['Bkg']['ZZ+ggZZ'] += ['ZZ_4l_gg_4mu', 'ZZ_4l_gg_2e2mu']
             if (year == '2016' or year == '2018' or year == 'Run2'):
-                cfg.groups['Bkg']['ZZ'] += ['ggZZ_4mu', 'ggZZ_4tau', 'ggZZ_2e2mu', 'ggZZ_2mu2tau']
+                cfg.groups['Bkg']['ZZ+ggZZ'] += ['ggZZ_4mu', 'ggZZ_4tau', 'ggZZ_2e2mu', 'ggZZ_2mu2tau']
 
-            cfg.groups['Bkg']['ttbar'] = ['tt_ll', 'tW_pos', 'tW_neg']
+            cfg.groups['Bkg']['top'] = ['tt_ll', 'tW_pos', 'tW_neg', 'tHq', 'tHW']
 
-	    cfg.groups['Bkg']['VVV'] = ['WWW', 'WWZ', 'WZZ', 'ZZZ']
+#            if known_config != 'WH_lep_AN':
+#	      cfg.groups['Bkg']['VVV'] = ['WWW', 'WWZ', 'WZZ', 'ZZZ']
 
             if ('allMass' in known_config):
                 ## Inclusive (mass > 50 GeV) Z+jets samples, to use for Z mass background validation plots
@@ -145,14 +170,12 @@ def ConfigStackPlot(known_config, year):
 
             else: print 'Config %s is not valid for year %s. Exiting.' % (known_config, year), sys.exit()
 
-            cfg.groups['Bkg']['Other'] = []  ## Any background sample not of a specified type goes into 'Other'
-
 
             ## Special modifications for WH or ttH plots
             if known_config == 'WH_lep' or known_config == 'WH_lep_allMass':
+                cfg.groups['Bkg']['top'] += ['ttZ', 'ttW', 'ttH', 'tZq', 'ttZ_lowM', 'ttWW']
 
-                cfg.groups['Bkg']['ttX'] = ['ttZ', 'ttW', 'ttH', 'tZq', 'tHq', 'tHW', 'ttZ_lowM', 'ttWW']
-
+            elif known_config == 'WH_lep_AN': print 'using config WH_lep_AN'
             elif known_config == 'ttH_3l' or known_config == 'ttH_3l_allMass':
                 cfg.groups['Bkg']['top+X'] = ['tZq', 'tHq', 'tHW', 'ttWW'] ## Missing tZW
                 cfg.groups['Bkg']['ttH']   = ['ttH']
@@ -162,9 +185,9 @@ def ConfigStackPlot(known_config, year):
             else: print 'Config %s is not valid for year %s. Exiting.' % (known_config, year), sys.exit()
 
             ## Preserve ordering of groups
-            cfg.groups['Data'] = OrderedDict(cfg.groups['Data'])
-            cfg.groups['Sig']  = OrderedDict(cfg.groups['Sig'])
-            cfg.groups['Bkg']  = OrderedDict(cfg.groups['Bkg'])
+#            cfg.groups['Data'] = OrderedDict(cfg.groups['Data'])
+#            cfg.groups['Sig']  = OrderedDict(cfg.groups['Sig'])
+#            cfg.groups['Bkg']  = OrderedDict(cfg.groups['Bkg'])
 
         else: print 'Year %s not valid for config %s. Exiting.' % (year, known_config), sys.exit()
 
@@ -209,12 +232,22 @@ def ConfigStackPlot(known_config, year):
         cfg.colors = {}
         cfg.colors['Signal']     = R.kRed
         cfg.colors['Data']       = R.kBlack
-	cfg.colors['VVV']	 = R.kOrange
-        cfg.colors['WZ']         = R.kViolet
-        cfg.colors['ZZ']         = R.kPink+7
-        cfg.colors['ZJets']      = R.kAzure
-        cfg.colors['ttbar']      = R.kOrange+2
-        cfg.colors['Other']      = R.kCyan
+	cfg.colors['VVV']	 = R.kViolet-9
+        cfg.colors['WZ']         = R.kGreen-9
+        cfg.colors['ZZ+ggZZ']    = R.kCyan-7
+        cfg.colors['ZJets']      = R.kOrange-3
+        cfg.colors['top']      = R.kGreen+2
+        cfg.colors['Other']      = R.kGray
+
+        cfg.colors['WH'] = R.kGreen+2
+        cfg.colors['qqZH+ggZH'] = R.kBlue+1
+        cfg.colors['ttH+tH']    = R.kViolet
+        cfg.colors['ZH'] = R.kBlue+1
+        cfg.colors['ttH'] = R.kRed 
+        cfg.colors['bbH'] = R.kViolet
+        cfg.colors['ggZH'] = R.kOrange
+        cfg.colors['THQ'] = R.kBlack
+        cfg.colors['THW'] = R.kBlack
 
         if known_config == 'WH_lep' or known_config == 'WH_lep_allMass':
             cfg.colors['ttX']        = R.kSpring
