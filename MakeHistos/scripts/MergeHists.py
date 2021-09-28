@@ -79,7 +79,7 @@ elif USER == 'eyigitba':
                   '3lep_hiPt_lep20_medLepMVA_onZ10_noBtag_noSys']
 
 elif USER == 'xzuo':
-    YEARS    = ['2018']  ## Dataset years (2016, 2017, 2018)
+    YEARS    = ['2016', '2017', '2018']  ## Dataset years (2016, 2017, 2018)
     PLOT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/YEAR/Histograms'
 
     SAMPLES = {}  ## Sets of samples to merge
@@ -91,9 +91,43 @@ elif USER == 'xzuo':
     SAMPLES['tt_ll']        = ['tt_ll_POW', 'tt_ll_MG', 'tt_ll_AMC']
     SAMPLES['ttZ']          = ['ttZ', 'ttZ_1', 'ttZ_2']
 
-    LABEL      = 'WH_lep_final_ntuple_old_selection_2020_02_05'
-    CATEGORIES = ['3lep_hiPt_lep20_medLepMVA_noZ10_noBtag_noSys', 
-		  '3lep_hiPt_lep20_medLepMVA_onZ10_noBtag_noSys']
+    LABEL      = 'WH_lep_add_MHT_JES_shift_for_ARC_2020_07_04'
+#    LABEL      = 'WH_lep_preApp_final_SR_CR_missHit_2020_05_09'
+
+    CATEGORIES = ['3lep_lep20_MissHits1_medLepMVA_SR_Bveto_noSys',
+                  '3mu_lep20_MissHits1_medLepMVA_SR_Bveto_noSys',
+                  'e2mu_lep20_MissHits1_medLepMVA_SR_Bveto_noSys']
+#    CATEGORIES = ['3lep_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  '3lep_lep20_medLepMVA_DYCR_Bveto_noSys',
+#                  '3lep_lep20_WZCR_SMPWZ_noSys',
+#                  '3lep_lep20_DYCR_SMPWZ_noSys',
+#                  '3mu_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  '3mu_lep20_medLepMVA_DYCR_Bveto_noSys',
+#                  '3mu_lep20_WZCR_SMPWZ_noSys',
+#                  '3mu_lep20_DYCR_SMPWZ_noSys',
+#                  'e2mu_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  'e2mu_lep20_medLepMVA_DYCR_Bveto_noSys',
+#                  'e2mu_lep20_WZCR_SMPWZ_noSys',
+#                  'e2mu_lep20_DYCR_SMPWZ_noSys']
+#    CATEGORIES = ['3lep_lep20_MissHits0_medLepMVA_WZCR_Bveto_noSys',
+#                  '3lep_lep20_MissHits0_medLepMVA_SR_Bveto_noSys',
+#                  '3lep_lep20_MissHits1_medLepMVA_WZCR_Bveto_noSys',
+#                  '3lep_lep20_MissHits1_medLepMVA_SR_Bveto_noSys',
+#                  '3lep_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  '3lep_lep20_medLepMVA_SR_Bveto_noSys',
+#                  '3mu_lep20_MissHits0_medLepMVA_WZCR_Bveto_noSys',
+#                  '3mu_lep20_MissHits0_medLepMVA_SR_Bveto_noSys',
+#                  '3mu_lep20_MissHits1_medLepMVA_WZCR_Bveto_noSys',
+#                  '3mu_lep20_MissHits1_medLepMVA_SR_Bveto_noSys',
+#                  '3mu_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  '3mu_lep20_medLepMVA_SR_Bveto_noSys',
+#                  'e2mu_lep20_MissHits0_medLepMVA_WZCR_Bveto_noSys',
+#                  'e2mu_lep20_MissHits0_medLepMVA_SR_Bveto_noSys',
+#                  'e2mu_lep20_MissHits1_medLepMVA_WZCR_Bveto_noSys',
+#                  'e2mu_lep20_MissHits1_medLepMVA_SR_Bveto_noSys',
+#                  'e2mu_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  'e2mu_lep20_medLepMVA_SR_Bveto_noSys']
+
 
 elif USER == 'bortigno':
     PLOT_DIR = 'NONE'
