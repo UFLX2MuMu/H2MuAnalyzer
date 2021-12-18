@@ -30,6 +30,7 @@ from StackPlotConfig import ConfigStackPlot
 ## Configure the script user
 if 'abrinke1' in os.getcwd(): USER = 'abrinke1'
 if 'bortigno' in os.getcwd(): USER = 'bortigno'
+if 'eyigitba' in os.getcwd(): USER = 'eyigitba'
 if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 
 ## Settings for this stack-drawing job
@@ -50,12 +51,63 @@ if USER == 'abrinke1':
     SCALE     = 'lin' ## 'log' or 'lin' scaling of y-axis
     RATIO_MIN = 0.0   ## Minimum value in ratio plot
     RATIO_MAX = 2.0   ## Maximum value in ratio plot
+
+elif USER == 'eyigitba':
+    YEAR = '2018'
+#    YEAR = 'Run2'
+    PLOT_DIR = '/afs/cern.ch/work/e/eyigitba/public/H2Mu/%s/Histograms' %YEAR
+
+#    CONFIG   = '2l'
+#    LABEL    = 'data_MC_2019_11_06_GeoFitBS'
+#    CATEGORY = 'NONE'
+
+    CONFIG   = 'WH_lep'
+    CONFIG   = 'WH_lep_allMass'
+    LABEL    = 'WH_lep_AWB_2019_10_20_BtagSF'
+    CATEGORY = '3lep_hiPt_lep20_medLepMVA_noZ10_noBtag_noSys'
+
+    IN_FILE  = 'histos_PreselRun2_%s_merged.root' % CATEGORY
+#    IN_FILE  = 'all_NONE_%s.root' %CATEGORY
+    SCALE    = 'lin' ## 'log' or 'lin' scaling of y-axis
+    RATIO_MIN = 0.0   ## Minimum value in ratio plot
+    RATIO_MAX = 2.0   ## Maximum value in ratio plot
+
+
 elif USER == 'xzuo':
-    PLOT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/2018/Histograms'
+    YEAR = '2016'
+#    YEAR = 'Run2'
+    PLOT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/%s/Histograms' %YEAR
+
+#    CONFIG   = '2l'
+#    LABEL    = 'data_MC_2019_11_06_GeoFitBS'
+#    CATEGORY = 'NONE'
+
+    CONFIG   = 'WH_lep'
+#    CONFIG   = 'WH_lep_allMass'
+#    LABEL    = 'WH_lep_final_BDT_cats_for_bias_2020_03_30'
+#    LABEL    = 'WH_lep_preApp_final_SR_CR_missHit_2020_05_09'
+    LABEL    = 'WH_lep_add_MHT_JES_shift_for_ARC_2020_07_04'
+#    CATEGORY = 'e2mu_lep20_ConVetoAll_medLepMVA_SR_Bveto_noSys'
+    CATEGORY = '3lep_lep20_MissHits1_medLepMVA_SR_Bveto_noSys'
+
+    IN_FILE  = 'histos_PreselRun2_%s_merged.root' % CATEGORY
+#    IN_FILE  = 'all_NONE_%s.root' %CATEGORY
+    SCALE    = 'lin' ## 'log' or 'lin' scaling of y-axis
+    RATIO_MIN = 0.0   ## Minimum value in ratio plot
+    RATIO_MAX = 2.0   ## Maximum value in ratio plot
+
 elif USER == 'bortigno':
     PLOT_DIR = 'NONE'
 else: print 'Invalid USER = %s' % USER
 
+APPLY_KFactor = True
+DRAW_JES_sys = False
+if LABEL == '': DRAW_JES_sys = True
+
+LUMI = 137.2
+if YEAR == '2016': LUMI = 35.9
+if YEAR == '2017': LUMI = 41.5
+if YEAR == '2018': LUMI = 59.7
 
 ## Configure year, category, label, and config from command line
 ## ./macros/StackPlots.py i j YEAR CATEGORY LABEL CONFIG
@@ -80,18 +132,125 @@ if len(sys.argv) > 6:
 
 
 
+def GetDistSysRatio(in_file, dist, groups, all_stack):
+
+  if dist == 'MHT': 
+    dist_up = 'MHT_JES_up'
+    dist_dn = 'MHT_JES_down'
+  elif dist == 'muSS_MHT_MT':
+    dist_up = 'muSS_MHT_JES_up_MT'
+    dist_dn = 'muSS_MHT_JES_down_MT'
+  elif dist == 'lep_MHT_MT':
+    dist_up = 'lep_MHT_JES_up_MT'
+    dist_dn = 'lep_MHT_JES_down_MT'
+
+  elif dist == 'MET':
+    dist_up = 'MET_JES_up'
+    dist_dn = 'MET_JES_down'
+  elif dist == 'muSS_MET_MT':
+    dist_up = 'muSS_MET_JES_up_MT'
+    dist_dn = 'muSS_MET_JES_down_MT'
+  elif dist == 'lep_MET_MT':
+    dist_up = 'lep_MET_JES_up_MT'
+    dist_dn = 'lep_MET_JES_down_MT'
+
+
+  cfg = ConfigStackPlot(CONFIG, YEAR)
+
+  stack_up = R.THStack('stack_up_'+dist, dist+'_up background')
+  stack_dn = R.THStack('stack_dn_'+dist, dist+'_dn background')
+
+  for group, samps in groups['Bkg'].items():
+    for samp in samps:
+        try:
+            hist_up = in_file.Get(samp+'_'+dist_up).Clone('tmp_up')
+            hist_dn = in_file.Get(samp+'_'+dist_dn).Clone('tmp_dn')
+
+## no need for empty bin uncertainty here
+#            ## Set uncertainty for empty bins to Integral/(nEffectuveEntries*sqrt(nEmptyBins))
+#            nEmptyBins = 0
+#            for iBin in range(1, hist.GetNbinsX()+1):
+#                if hist.GetBinContent(iBin) == 0: nEmptyBins += 1
+#            if nEmptyBins > 0:
+#                empty_uncert = abs(hist.Integral() / (hist.GetEffectiveEntries() * math.sqrt(nEmptyBins)))
+#                for jBin in range(1, hist.GetNbinsX()+1):
+#                    hist.SetBinError(jBin, max(abs(hist.GetBinError(jBin)), empty_uncert))
+
+            ## Scale samples for which there is more than on MC dataset
+            if samp in cfg.weight.keys():
+                print 'Scaling sample %s by %.2f' % (samp, cfg.weight[samp])
+                hist_up.Scale(cfg.weight[samp])
+                hist_dn.Scale(cfg.weight[samp])
+
+            ## apply k-factor to WZ_3l sample
+            if samp == 'WZ_3l' and APPLY_KFactor:
+                if CONFIG  == 'WH_lep_allMass': 
+                  hist_up.Scale(1.127)
+                  hist_dn.Scale(1.127)
+                else:                           
+                  hist_up.Scale(1.102)
+                  hist_dn.Scale(1.102)
+
+            stack_up.Add(hist_up.Clone('hist_'+dist_up+'_'+samp))
+            stack_dn.Add(hist_dn.Clone('hist_'+dist_dn+'_'+samp))
+
+            del hist_up
+            del hist_dn
+        except:
+            print '  - Getting sys hists. Could not find histogram '+samp+'_'+dist+'up/down'
+
+
+  ratio_up = stack_up.GetStack().Last()
+  ratio_dn = stack_dn.GetStack().Last()
+  ratio_up.SetNameTitle('ratio_'+dist_up, '')
+  ratio_dn.SetNameTitle('ratio_'+dist_dn, '')
+  ratio_up.Divide(all_stack.GetStack().Last())
+  ratio_dn.Divide(all_stack.GetStack().Last())
+
+  h_stat_err_band = all_stack.GetStack().Last().Clone('stat_err_band_'+dist)
+  h_stat_err_band.Divide(all_stack.GetStack().Last())
+  stat_err_band = R.TGraphAsymmErrors(h_stat_err_band)      ## might have problem if there are empty bins in the histo 
+  sys_err_band = stat_err_band.Clone('sys_err_band_'+dist)
+  jec_err_band = stat_err_band.Clone('jec_err_band_'+dist)
+#  stat_err_band.SetDirectory(0)
+#  sys_err_band.SetDirectory(0)
+
+  for ibin in range(1, h_stat_err_band.GetNbinsX()+1):
+    stat_err = h_stat_err_band.GetBinError(ibin)
+    sys_up   = max( ratio_up.GetBinContent(ibin) - 1, ratio_dn.GetBinContent(ibin) - 1, 0)
+    sys_dn   = max( 1 - ratio_up.GetBinContent(ibin), 1 - ratio_dn.GetBinContent(ibin), 0)
+
+    err_up = math.sqrt(stat_err**2.0 + sys_up**2.0)
+    err_dn = math.sqrt(stat_err**2.0 + sys_dn**2.0)
+
+    sys_err_band.SetPointEYhigh(ibin, err_up)
+    sys_err_band.SetPointEYlow (ibin, err_dn)
+
+    jec_err_band.SetPointEYhigh(ibin, sys_up)
+    jec_err_band.SetPointEYlow (ibin, sys_dn)
+
+  del stack_up, stack_dn
+
+  return stat_err_band, sys_err_band, jec_err_band
+  ## delete objects created by GetDistSysRatio()
+
+## End function GetDistSysRatio()
+
+
 ## Function to draw each stack plot and ratio plot on the same canvas
-def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):   # Do not use TRatioPlot! It is a devil! - XWZ 19.09.2018
+## Add in_file as input to enable MC sys band in ratio plot 
+def DrawOneStack( in_file, dist, sig_stack, all_stack, groups, group_hist, legend, out_file_name ):   # Do not use TRatioPlot! It is a devil! - XWZ 19.09.2018
+    h_data = group_hist['Dat']
 
     ## Create a new TCanvas
-    canv = R.TCanvas('can_'+dist, 'can_'+dist, 1)
+    canv = R.TCanvas('can_'+dist, 'can_'+dist, 600, 600)
     canv.Clear()
     canv.cd()
     
     ## Draw the upper pad, with the stack histogram
-    upper_pad = R.TPad('upperPad_'+dist, 'upperPad_'+dist, 0, 0.3, 1, 1)
-    upper_pad.SetBottomMargin(0.05);
-    upper_pad.SetRightMargin(0.20)
+    upper_pad = R.TPad('upperPad_'+dist, 'upperPad_'+dist, 0, 0.25, 1, 1)
+    upper_pad.SetBottomMargin(0.04);
+    #upper_pad.SetRightMargin(0.20)
     upper_pad.Draw()
     upper_pad.cd()
 
@@ -103,20 +262,28 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
         else:      all_stack.SetMaximum( 10.0*all_stack.GetMaximum() )
     elif SCALE == 'lin':
         all_stack.SetMinimum(0)
-        if h_data: all_stack.SetMaximum( 1.2*max(h_data.GetMaximum(), all_stack.GetMaximum()) )
-        else:      all_stack.SetMaximum( 1.2*all_stack.GetMaximum() )
+        if h_data: all_stack.SetMaximum( 1.5*max(h_data.GetMaximum(), all_stack.GetMaximum()) )
+        else:      all_stack.SetMaximum( 1.5*all_stack.GetMaximum() )
+#	if dist == 'H_pair_mass_zoomZ': all_stack.SetMaximum(250)
+#        if dist == 'lep_pt': all_stack.SetMaximum(100)
     else: print 'Invalid SCALE = %s. Exiting.' % SCALE, sys.exit()
         
     all_stack.Draw('HIST')
+    all_stack.SetTitle('')
+    all_stack.GetXaxis().SetLabelSize(0)
+    all_stack.GetYaxis().SetLabelSize(0.05)
+    all_stack.GetYaxis().SetTitle('Events / Bin')
+    all_stack.GetYaxis().SetTitleSize(0.05)
+    all_stack.GetYaxis().SetTitleOffset(1.0)
 
     ## Draw the data histogram
     if h_data:
         ## Blind 120 - 130 GeV range of mass plots
-        if 'H_pair_mass' in h_data.GetName():
-            for i in range(1, h_data.GetNbinsX()+1):
-                if h_data.GetXaxis().GetBinCenter(i) > 120 and h_data.GetXaxis().GetBinCenter(i) < 130:
-                    h_data.SetBinContent(i, 0)
-                    h_data.SetBinError(i, 0)
+#        if 'H_pair_mass_window' in h_data.GetName():
+#            for i in range(1, h_data.GetNbinsX()+1):
+#                if h_data.GetXaxis().GetBinCenter(i) > 120 and h_data.GetXaxis().GetBinCenter(i) < 130:
+#                    h_data.SetBinContent(i, 0)
+#                    h_data.SetBinError(i, 0)
         ## Blind high-score part of BDT with mass
         if 'BDT' in h_data.GetName() and ('withMass' in h_data.GetName() or 'retrain' in h_data.GetName() or 'combo' in h_data.GetName()):
             for i in range(1, h_data.GetNbinsX()+1):
@@ -127,25 +294,46 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
         h_data.Draw('SAME')
 
     ## Draw the signal histogram, normalized to total MC area
-    h_sig = sig_stack.GetStack().Last().Clone('tmp')
-    if h_sig.Integral() > 0: h_sig.Scale( all_stack.GetStack().Last().Integral() / h_sig.Integral() )
-    h_sig.Draw('HISTSAME')
+    h_sig = False
+    if sig_stack.GetNhists() != 0:
+        h_sig = sig_stack.GetStack().Last().Clone('tmp')
+        h_sig.SetLineColor(R.kRed)
+#        if h_sig.Integral() > 0: h_sig.Scale( all_stack.GetStack().Last().Integral() / h_sig.Integral() )
+	if h_sig.Integral() > 0: h_sig.Scale(50)
+        h_sig.Draw('HISTSAME')
+
+    for group in groups['Sig'].keys():
+        group_hist[group].Scale(50)
+        group_hist[group].Draw('HISTSAME')
 
     ## Save the net signal, net background, and net data histograms
-    h_net_sig  = sig_stack.GetStack().Last().Clone(dist+'_Net_Sig')
     h_net_bkg  = all_stack.GetStack().Last().Clone(dist+'_Net_Bkg')
-    h_net_bkg.Add(h_net_sig, -1)
+    if h_sig:
+        h_net_sig  = sig_stack.GetStack().Last().Clone(dist+'_Net_Sig')
+	h_net_bkg.Add(h_net_sig, -1)
     if h_data: h_net_data = h_data.Clone(dist+'_Net_Data')
 
     ## Draw the legend
     legend.Draw()
 
+    cms_label = R.TLatex()
+    cms_label.SetTextSize(0.04)    
+    cms_label.DrawLatexNDC(0.15, 0.85, '#scale[1.5]{CMS} #bf{#it{Preliminary}}')
+    cms_label.Draw('same')
+    lumi_label = R.TLatex()
+    lumi_label.SetTextSize(0.035)
+    lumi_label.SetTextAlign(31)
+    lumi_label.DrawLatexNDC(0.90, 0.91, '#bf{%s fb^{-1} (13 TeV)}' %LUMI )
+    lumi_label.Draw('same')
+
     ## Draw the lower pad, with the ratio histogram
     canv.cd()
 
-    lower_pad = R.TPad('lowerPad_'+dist, 'lowerPad_'+dist, 0, 0.05, 1, 0.3)
-    lower_pad.SetTopMargin(0.05)
-    lower_pad.SetRightMargin(0.20)
+    lower_pad = R.TPad('lowerPad_'+dist, 'lowerPad_'+dist, 0, 0, 1, 0.25)
+    lower_pad.SetTopMargin(0.04)
+    #lower_pad.SetRightMargin(0.20)
+    lower_pad.SetBottomMargin(0.3)
+    lower_pad.SetGridy()
     lower_pad.Draw()
     lower_pad.cd()
 
@@ -156,9 +344,78 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
         ratio_hist.SetTitle('')
         ratio_hist.SetMinimum(RATIO_MIN)
         ratio_hist.SetMaximum(RATIO_MAX)
-        # ratio_hist.GetYaxis().SetNdivisions(502)  ## For some reason causes segfault after a dozen or so plots - AWB 09.10.2018
+        ratio_hist.GetYaxis().SetNdivisions(505)  ## For some reason causes segfault after a dozen or so plots - AWB 09.10.2018
         ratio_hist.SetMarkerStyle(20)
-        ratio_hist.Draw()
+        ratio_hist.GetXaxis().SetLabelSize(0.15)
+	if dist == 'H_pair_mass_window':
+	    ratio_hist.GetXaxis().SetTitle("M(#mu#mu) (GeV)")
+	elif dist == 'H_pair_pt':
+	    ratio_hist.GetXaxis().SetTitle("p_{T}(#mu#mu) (GeV)")
+	elif dist == 'muH1_pt':
+            ratio_hist.GetXaxis().SetTitle("p_{T}(#mu_{leading}) (GeV)")
+	elif dist == 'muH1_eta':
+            ratio_hist.GetXaxis().SetTitle("#eta(#mu_{leading})")
+        elif dist == 'muH2_pt':
+            ratio_hist.GetXaxis().SetTitle("p_{T}(#mu_{trailing}) (GeV)")
+        elif dist == 'muH2_eta':
+            ratio_hist.GetXaxis().SetTitle("#eta(#mu_{traiking})")
+	elif dist == 'lep_pt':
+            ratio_hist.GetXaxis().SetTitle("p_{T}(lep) (GeV)")
+	elif dist == 'lep_eta':
+            ratio_hist.GetXaxis().SetTitle("#eta(lep)")
+        elif dist == 'muSS_muOS_dR':
+            ratio_hist.GetXaxis().SetTitle("#Delta R(#mu_{OS},#mu_{SS})")
+        elif dist == 'lep_H_pair_dR':
+            ratio_hist.GetXaxis().SetTitle("#Delta R(lep, #mu#mu_{H})")
+        elif dist == 'lep_H_pair_dEta':
+            ratio_hist.GetXaxis().SetTitle("#Delta#eta(lep, #mu#mu_{H})")
+        elif dist == 'lep_muSS_dEta':
+            ratio_hist.GetXaxis().SetTitle("#Delta#eta(lep, #mu_{SS})")
+        elif dist == 'lep_muSS_cosThStar':
+            ratio_hist.GetXaxis().SetTitle("cos#theta^{*}(lep, #mu_{SS})")
+        elif dist == 'lep_muOS_dR':
+            ratio_hist.GetXaxis().SetTitle("#Delta R(lep, #mu_{OS})")
+        elif dist == 'lep_muOS_dEta':
+            ratio_hist.GetXaxis().SetTitle("#Delta#eta(lep, #mu_{OS})")
+        elif dist == 'lep_muOS_cosThStar':
+            ratio_hist.GetXaxis().SetTitle("cos#theta^{*}(lep, #mu_{OS})")
+        elif dist == 'muSS_MHT_MT':
+            ratio_hist.GetXaxis().SetTitle("M_{T}(#mu_{SS},MHT) (GeV)")
+        elif dist == 'lep_MHT_MT':
+            ratio_hist.GetXaxis().SetTitle("M_{T}(lep,MHT) (GeV)")
+        elif dist == 'lep_MHT_dPhi_abs':
+            ratio_hist.GetXaxis().SetTitle("|#Delta#phi(lep, MHT)|")
+	elif dist == 'BDT_final':
+	    ratio_hist.GetXaxis().SetTitle("BDT output")
+	elif dist == 'H_pair_mass_zoomZ':
+	    ratio_hist.GetXaxis().SetTitle("M(#mu#mu) (GeV)")
+	else:
+	    ratio_hist.GetXaxis().SetTitle(dist)
+	ratio_hist.GetXaxis().SetTitleSize(0.15)
+        ratio_hist.GetXaxis().SetTitleOffset(0.8)
+	ratio_hist.GetYaxis().SetLabelSize(0.15)
+	ratio_hist.GetYaxis().SetTitle("data/MC")
+        ratio_hist.GetYaxis().SetTitleSize(0.15)
+        ratio_hist.GetYaxis().SetTitleOffset(0.3)
+	ratio_hist.Draw()
+        if dist == 'MHT' or dist == 'muSS_MHT_MT' or dist == 'lep_MHT_MT' or dist == 'MET' or dist == 'muSS_MET_MT' or dist == 'lep_MET_MT':
+            stat_err_band, sys_err_band, jec_err_band = GetDistSysRatio(in_file, dist, groups, all_stack)
+            stat_err_band.SetLineColor(0)
+            stat_err_band.SetMarkerColor(0)
+            stat_err_band.SetMarkerSize(0)
+            stat_err_band.SetFillColor(R.kGray)
+            sys_err_band.SetLineColor(0)
+            sys_err_band.SetMarkerColor(0)
+            sys_err_band.SetMarkerSize(0)
+            sys_err_band.SetFillColor(R.kOrange)
+            jec_err_band.SetLineColor(0)
+            jec_err_band.SetMarkerColor(0)
+            jec_err_band.SetMarkerSize(0)
+            jec_err_band.SetFillColor(R.kBlue)
+            sys_err_band.Draw("E2 same")
+            stat_err_band.Draw("E2 same")
+            jec_err_band.Draw("E2 same")
+            ratio_hist.Draw("same")
 
     canv.Update()
     if not ('BDT' in dist and 'zoom' in dist):
@@ -169,13 +426,14 @@ def DrawOneStack( dist, sig_stack, all_stack, h_data, legend, out_file_name ):  
     out_file_loc = R.TFile.Open(out_file_name, 'UPDATE')
     out_file_loc.cd()
     canv.Write()
-    h_net_sig.Write()
+    if h_sig: h_net_sig.Write()
     h_net_bkg.Write()
     if h_data: h_net_data.Write()
     out_file_loc.Close()
 
     ## Delete objects created in DrawOneStack()
-    del canv, upper_pad, lower_pad, h_sig, h_net_sig, h_net_bkg, out_file_loc
+    del canv, upper_pad, lower_pad, h_net_bkg, out_file_loc
+    if h_sig:  del h_sig, h_net_sig
     if h_data: del ratio_hist, h_net_data
 
 ## End function: DrawOneStack()
@@ -190,8 +448,10 @@ def main():
     ###  Set up input and output files  ###
     #######################################
 
-    if USER == 'abrinke1': in_file_dir = PLOT_DIR+'/'+LABEL+'/files/HADD'
-    else:                  in_file_dir = PLOT_DIR+'/'+LABEL+'/files/sum'
+    if USER == 'abrinke1':   in_file_dir = PLOT_DIR+'/'+LABEL+'/files/HADD'
+    elif USER == 'eyigitba': in_file_dir = PLOT_DIR+'/'+LABEL+'/files/HADD'
+    elif USER == 'xzuo':     in_file_dir = PLOT_DIR+'/'+LABEL+'/files/HADD'
+    else:                    in_file_dir = PLOT_DIR+'/'+LABEL+'/files/sum'
 
     in_file_name  = in_file_dir+'/'+IN_FILE
     out_dir       = PLOT_DIR+'/'+LABEL+'/plots/'+CATEGORY
@@ -353,7 +613,7 @@ def main():
 
 
     ## Drop empty groups
-    for kind in ['Data', 'Sig', 'Bkg']:
+    for kind in ['Data', 'Bkg']:  
         for group in groups[kind]:
             if len(groups[kind][group]) == 0:
                 print '\nRemoving group %s from %s!!!  Found no input samples' % (group, kind)
@@ -380,7 +640,7 @@ def main():
         groups = copy.deepcopy(orig_groups)
 
 	group_hist = {}  ## Summed sample histograms by group
-	stack_all  = R.THStack('all_stack_'+dist, dist+' signal + background')
+	stack_all  = R.THStack('all_stack_'+dist, dist+' signal + background')  # now stack_all is only used for backgrounds
 	stack_sig  = R.THStack('sig_stack_'+dist, dist+' signal')
 	stack_dat  = R.THStack('dat_stack_'+dist, dist+' data')
 
@@ -406,6 +666,11 @@ def main():
                             print 'Scaling sample %s by %.2f' % (samp, cfg.weight[samp])
                             hist.Scale(cfg.weight[samp])
 
+                        ## apply k-factor to WZ_3l sample
+                        if samp == 'WZ_3l' and APPLY_KFactor:
+                          if CONFIG  == 'WH_lep_allMass': hist.Scale(1.127)
+                          else:                           hist.Scale(1.102)
+
                         if not group in group_hist.keys():
                             group_hist[group] = hist.Clone('hist_'+dist+'_'+group)
                         else:
@@ -429,14 +694,16 @@ def main():
             group_hist[group].SetLineColor(colors[group])
             group_hist[group].SetLineWidth(2)
 	    stack_sig.Add(group_hist[group])
-	group_hist['Sig'] = stack_sig.GetStack().Last()
+	if stack_sig.GetNhists() != 0: group_hist['Sig'] = stack_sig.GetStack().Last()
         ## Fill the signal + background stack, saving individual stack components
         out_file_loc = R.TFile.Open(out_file_name, 'UPDATE')
         out_file_loc.cd('groups')
-        for group in (groups['Bkg'].keys() + groups['Sig'].keys()):
+        for group in (groups['Bkg'].keys()):  # removed signal from stack_all.
             group_hist[group].SetFillColor(colors[group])
             stack_all.Add(group_hist[group])
             ## Write out the histogram into 'groups/', stripping 'hist_' from the name
+            group_hist[group].Write(group_hist[group].GetName().replace('hist_',''))
+        for group in (groups['Sig'].keys()): # write signal to 'groups/'
             group_hist[group].Write(group_hist[group].GetName().replace('hist_',''))
 	group_hist['MC'] = stack_all.GetStack().Last()
         out_file_loc.Close()  ## Re-open later when saving stack
@@ -453,17 +720,19 @@ def main():
             group_hist['Dat'] = 0
 
         ## Set aliases for final histograms
-        h_sig = group_hist['Sig']
+	h_sig = False
+        if 'Sig' in group_hist.keys(): h_sig = group_hist['Sig']
         h_bkg = group_hist['MC']
         h_dat = group_hist['Dat']
-        nSig  = h_sig.Integral()
+        nSig  = 0 if not h_sig else h_sig.Integral()
         nBkg  = h_bkg.Integral()
         nDat  = 0 if MC_only else h_dat.Integral()
 
         ## Compute B/S and S/sqrt(B) for this distribution
         B_to_S = (nBkg/nSig) if (nSig > 0) else 0
         sigSq  = 0
-        for i in range(1, h_sig.GetNbinsX()+1):
+	if h_sig:
+          for i in range(1, h_sig.GetNbinsX()+1):
             numB = h_bkg.GetBinContent(i)
             errB = h_bkg.GetBinError(i)
             ## Don't consider empty bins (statistically limited)
@@ -471,21 +740,24 @@ def main():
             sigSq += ( pow(h_sig.GetBinContent(i), 2) / (numB + pow(errB, 2)) )
 
         ## Create TLegend
-        legend = R.TLegend(0.82, 0.1, 0.98, 0.9)
+        legend = R.TLegend(0.6, 0.6, 0.9, 0.9)
         for evt_type in groups.keys():
             for group in groups[evt_type].keys():
                 if MC_only and group == 'Data': continue
-                if   evt_type == 'Data' and nBkg > 0.0:   ## Display data integral and data / MC ration in the legend
-                    legend.AddEntry( group_hist[group], '%s (%d, %.2f)'  % (group, nDat, nDat / nBkg) )
-                elif evt_type == 'Sig'  and nSig > 0.0:  ## Display signal integral and scale factor in the legend
-                    legend.AddEntry( group_hist[group], '%s (%.3f)' % (group, nSig) )
-                    legend.AddEntry( group_hist[group], 'B/S=%d, %.3f#sigma' % (B_to_S, math.sqrt(sigSq)) )
+#                if   evt_type == 'Data' and nBkg > 0.0:   ## Display data integral and data / MC ration in the legend
+#                    legend.AddEntry( group_hist[group], '%s (%d, %.2f)'  % (group, nDat, nDat / nBkg) )
+#                elif evt_type == 'Sig'  and nSig > 0.0:  ## Display signal integral and scale factor in the legend
+#                    legend.AddEntry( group_hist[group], '%s (%.3f)' % (group, nSig) )
+#                    legend.AddEntry( group_hist[group], 'B/S=%d, %.3f#sigma' % (B_to_S, math.sqrt(sigSq)) )
+	 	if evt_type == 'Sig' and nSig > 0.0:
+		    legend.AddEntry( group_hist[group], '%s X50' %group)
                 else:
-                    legend.AddEntry(group_hist[group], group)
+                    if group == 'Others': legend.AddEntry(group_hist[group], 'Other Bkg.')
+                    else:                 legend.AddEntry(group_hist[group], group)
 
 
         ## Draw stack plot
-	DrawOneStack( dist, stack_sig, stack_all, group_hist['Dat'], legend, out_file_name )
+	DrawOneStack( in_file, dist, stack_sig, stack_all, groups, group_hist, legend, out_file_name )
         ## Delete objects created in loop over dists
         del group_hist, stack_all, stack_sig, stack_dat, h_sig, h_bkg, h_dat, legend
         

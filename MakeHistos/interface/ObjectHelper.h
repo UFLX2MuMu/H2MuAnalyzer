@@ -14,28 +14,40 @@
 #include "TH2.h"
 
 #include "H2MuAnalyzer/MakeHistos/interface/LoadNTupleBranches.h"
+#include "H2MuAnalyzer/MakeHistos/interface/RoccoR.h"
+#include "H2MuAnalyzer/MakeHistos/interface/JetCorrectorParameters_x.h"
+#include "H2MuAnalyzer/MakeHistos/interface/JetCorrectionUncertainty_x.h"
 
 bool  MuonID        ( const MuonInfo & muon, const std::string muon_ID );     // Return loose, medium, or tight muon ID
 bool  LepMVA        ( const MuonInfo & muon, const std::string year, const std::string cut ); // Return if muon passes lepton MVA cut
 bool  LepMVA        ( const EleInfo  & ele,  const std::string year, const std::string cut ); // Return if electron passes lepton MVA cut
 bool  MuonTrig      ( const MuonInfo & muon, const std::string year, const std::vector<std::string> trigNames ); // Return if muon fired HLT trigger
+
+float Roch_pt_shift ( const RoccoR rc, const MuonInfo & muon, float gen_pt, const std::string Roch_sys); // Return Rochester pt with systematic shifts 
+MuonInfos ReloadMuonRoch(const RoccoR rc, const MuonInfos & muons_orig, const GenMuonInfos & genMuons, const std::string Roch_sys);  // Return muon collection with shifted Roch pt
+MuonInfos ReloadMuonRoch_data(const RoccoR rc, const MuonInfos & muons_orig, const std::string Roch_sys); // return muon collection with shifted Roch pt, for data 
+
 float MuonPt        ( const MuonInfo & muon, const std::string pt_corr );     // Return PF, Rochester, or Kalman corrected muon pT
 float MuPairPt      ( const MuPairInfo & muPair, const std::string pt_corr ); // Return PF, Rochester, or Kalman corrected dimuon pT
 float MuPairMass    ( const MuPairInfo & muPair, const std::string pt_corr ); // Return PF, Rochester, or Kalman corrected dimuon invariant mass
 float MuPairMassErr ( const MuPairInfo & muPair, const std::string pt_corr ); // Return PF, Rochester, or Kalman corrected dimuon invariant mass uncertainty
 bool  IsGenMatched  ( const MuPairInfo & muPair, const MuonInfos & muons, const GenMuonInfos & genMuons, const GenParentInfos & genParents, const std::string gen_ID ); // Match di-muon pairs to GEN Higgs or Z
 TH2F* LoadSFsLepMVA ( const std::string year, const std::string flavor, const std::string WP ); // Return a 2D histogram with LepMVA efficiency scale factors
-float LepMVASF      ( const TH2F * h_SF, const float pt, const float eta );   // Return the LepMVA efficiency scale factor for a single lepton
+float LepMVASF      ( const TH2F * h_SF, const float pt, const float eta, const std::string SF_sys = "noSys" );   // Return the LepMVA efficiency scale factor for a single lepton
 
-bool  EleID ( const EleInfo & ele, const std::string ele_ID ); // Return loose, medium, or tight electron ID
+bool  EleID ( const EleInfo & ele, const std::string ele_ID ); // Return loose, medium, tight or tZq electron ID
+bool  EleMVAID ( const EleInfo & ele, const std::string ele_MVA_ID ); // Return MvaWpLooseID or MvaWp90ID electron ID
 
 float GetLepMVASF(const std::string lep_type, float pt, float eta, float lepMVA_cut); // return lepMVA SF, lep_type is "muon" or "ele" 
 
 bool JetPUID ( const JetInfo & jet, const std::string pu_ID, const std::string year ); // Return loose, medium, or tight jet PU ID from 2016 or 2017
 float JetCSV ( const JetInfo & jet, const std::string opt = "deepCSV" ); // Return CSVv2 or deepCSV, protect against NAN
+JetInfo ApplyJECuncert (const JetInfo & jet, const std::string year, const std::string JEC_file = "NONE", const std::string JEC_sys = "noSys" ); // Apply sys shift from JEC, return one jet after shift
 
 JetPairInfo MakeJetPair( TLorentzVector jet1_vec, TLorentzVector jet2_vec );
 
+TLorentzVector FourVecFSRGeoFit( const MuonInfo & muon, const int idx, const std::string pt_corr, const int year, const std::string fg = "", const PhotInfos & phots = {}, const std::string opt = "" );
+TLorentzVector FourVecFSRGeoFit( const MuPairInfo & muPair, const std::string pt_corr, const int year, const std::string fg = "", const MuonInfos & muons = {}, const PhotInfos & phots = {}, const std::string opt = "" );
 TLorentzVector FourVec( const MuonInfo & muon, const std::string pt_corr, const std::string opt = "" );
 TLorentzVector FourVec( const MuPairInfo & muPair, const std::string pt_corr, const std::string opt = "", const MuonInfos & muons = {} );
 TLorentzVector FourVec( const EleInfo & ele, const std::string opt = "" );
@@ -46,6 +58,7 @@ TLorentzVector FourVec( const GenParentInfo & genPar, const std::string opt = ""
 TLorentzVector FourVec( const GenMuonInfo & genMu, const std::string opt = "" );
 TLorentzVector FourVec( const GenJetInfo & genJet, const std::string opt = "" );
 TLorentzVector FourVec( const MuonInfos & muons, const std::string pt_corr, const EleInfos & eles, const JetInfos & jets, const std::string opt = "" );
+TLorentzVector FourVec( const PhotInfo & phot, const std::string opt = "" );
 
 float CosThetaStar( TLorentzVector vec1, TLorentzVector vec2 );
 float Cos_CS_Theta( TLorentzVector vec1, TLorentzVector vec2 );

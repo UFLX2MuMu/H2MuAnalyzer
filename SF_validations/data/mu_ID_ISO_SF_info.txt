@@ -1,0 +1,11 @@
+Standard ID and Iso SF provided by Muon POG
+
+from 
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceEffs2016LegacyRereco
+https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
+https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2018
+
+Eff(ISO/ID) * Eff(ID/trk)
+
+2016 and 2017 contains stats and syst uncertainties
+2018 contains only stats uncertainties

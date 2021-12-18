@@ -16,13 +16,19 @@ class Plot_Config:
 	self.LoadSampleNames()
 
     def LoadSampleNames(self):
-      self.signals.append("ttH")
+#      self.signals.append("bbH")   ## no yield in ZH channel, do not use
+#      self.signals.append("THQ")
+#      self.signals.append("THW")
+#      self.signals.append("ttH")
+      self.signals.append("ggZH")
       self.signals.append("ZH")
-      self.signals.append("WH")
-      self.signals.append("VBF")
-      self.signals.append("ggH")
+      if self.channel == "WH_3l":
+        self.signals.append("WH")
+#      self.signals.append("VBF")
+#      self.signals.append("ggH")
 
       if self.channel == "WH_3l":
+        
 	self.bkgs.append("others")
         self.bkgs.append("triboson")
         self.bkgs.append("tZq")
@@ -36,11 +42,11 @@ class Plot_Config:
 
       elif self.channel == "ZH_4l":
 	self.bkgs.append("others")
-        self.bkgs.append("triboson")
-        self.bkgs.append("tZq")
-        self.bkgs.append("ttZ")
-        self.bkgs.append("ttbar")
-        self.bkgs.append("WZ+WW")
+#        self.bkgs.append("triboson")
+#        self.bkgs.append("tZq")
+#        self.bkgs.append("ttZ")
+#        self.bkgs.append("ttbar")
+#        self.bkgs.append("WZ+WW")
         self.bkgs.append("ggZZ")
         self.bkgs.append("ZZ")
         self.bkgs.append("DY")
@@ -82,7 +88,12 @@ class Plot_Config:
         self.colors["WH"] =  kGreen + 2
         self.colors["ttH"]  = kPink + 6
 
-        self.colors["DY"] =  kAzure + 7
+        self.colors["ggZH"] = kOrange + 7
+        self.colors["bbH"]  = kBlack
+        self.colors["THQ"]  = kBlack
+        self.colors["THW"]  = kBlack
+
+        self.colors["DY"] =  kOrange - 3
         self.colors["ZZ"] =  kCyan - 7
 	self.colors["ggZZ"] =  kSpring -1
         self.colors["WZ+WW"] =  kGreen - 9
@@ -90,7 +101,7 @@ class Plot_Config:
         self.colors["ttZ"] = kOrange - 9
         self.colors["tZq"] = kRed - 7
         self.colors["triboson"] = kViolet - 9
-        self.colors["others"] = kPink + 6 
+        self.colors["others"] = kGray
 
       else:
         print "channel is %s" %self.channel

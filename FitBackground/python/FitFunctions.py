@@ -7,15 +7,20 @@
 ##############################
 
 import sys
+import os
 
 import ROOT as R
 import ROOT.RooFit as RF
 import ROOT.TMath as TM
 
+from ROOT import gInterpreter, gSystem
+#gInterpreter.ProcessLine('#include "H2MuAnalyzer/FitBackground/python/Custom_DSCB/My_double_CB.h"')
+gSystem.Load("/afs/cern.ch/work/x/xzuo/h2mm_944/src/H2MuAnalyzer/FitBackground/python/Custom_DSCB/HZZ2L2QRooPdfs_cc.so")
+from ROOT import RooDoubleCB
 
 class FitFunction:
 
-    def __init__(self, name, hist, fit_type, order, x_range, x_blind = [], var_name = None):
+    def __init__(self, name, hist, fit_type, order, x_range, x_blind = [], var_name = None, mean_sys = None, sigma_sys = None):
         self.name      = name            ## Name of fit
         self.hist_orig = hist.Clone()    ## Input data histogram - original, unblinded
         self.hist      = hist.Clone()    ## Input data histogram
@@ -35,6 +40,8 @@ class FitFunction:
         self.func_list = R.RooArgList()  ## Container of RooArgSets from arg_sets
         self.model     = 0               ## RooAddHist model from func_list and coef_list
         self.fit_hist  = 0               ## TH1 version of fit
+        self.var_mean_sys  = mean_sys    ## RooRealVar for shape uncertainty
+        self.var_sigma_sys = sigma_sys   ## RooRealVar for shape uncertainty
 
         if var_name is None:
             var_name = 'var_'+name
@@ -47,16 +54,26 @@ class FitFunction:
             InitPoly(self)
         elif fit_type == 'expo':
             InitExpo(self)
+        elif fit_type == 'Exp1int':
+            InitExp1int(self)
         elif fit_type == 'Bern':
             InitBern(self)
         elif fit_type == 'BWZ':
             InitBWZ(self)
+        elif fit_type == 'BWZ_constraint':
+            InitBWZ_constraint(self)
+        elif fit_type == 'BWZ_constant':
+            InitBWZ_constant(self)
+        elif fit_type == 'BWZGamma':
+            InitBWZGamma(self)
         elif fit_type == 'BWZRed':
             InitBWZRed(self)
         elif fit_type == 'PolyPlusBWZ':
             InitPolyPlusBWZ(self)
         elif fit_type == 'Gaus':
             InitGaus(self)
+	elif fit_type == 'DSCB':
+	    InitDSCB(self)
         else:
             print 'Fit type %s does not match any valid option!!! Exiting.' % fit_type
             sys.exit()
@@ -118,36 +135,48 @@ def InitVarDat(FF):
 def DoFit(FF):
     
     print '\n\nAbout to fit model %s to data!' % FF.model.GetName()
-
-    ## RooFit or Minuit strategy, error level, etc?
-    ## https://root.cern.ch/doc/master/classRooAbsPdf.html#a8f802a3a93467d5b7b089e3ccaec0fa8
-    ## https://root.cern.ch/doc/master/classRooMinuit.html#a605d27ee6cfbd36d5a61e8085bed0539
-    if len(FF.x_blind) == 2:
-        FF.model.fitTo(FF.dat, RF.Save(), RF.Range('loM,hiM'))
+   
+    print '\nhist havs integral %f' %FF.hist_orig.Integral()
+    if FF.hist_orig.Integral() < 0.001 and FF.hist_orig.GetEntries() < 10:
+      print 'hist %s has few events and infinitesimal yield, setting all coefficients to zero, all parameters are their initial value' %(FF.hist_orig.GetName())
+      for i in range(len(FF.coef_list)):
+	FF.coef_list[i].setVal(0.001)
+	FF.coef_list[i].setError(0.0)
+	FF.fit_hist = FF.model.createHistogram(FF.var_name, FF.x_bins[0])
     else:
-        FF.model.fitTo(FF.dat, RF.Save())
+      ## RooFit or Minuit strategy, error level, etc?
+      ## https://root.cern.ch/doc/master/classRooAbsPdf.html#a8f802a3a93467d5b7b089e3ccaec0fa8
+      ## https://root.cern.ch/doc/master/classRooMinuit.html#a605d27ee6cfbd36d5a61e8085bed0539
+      if 'DSCB' in FF.model.GetName(): 
+          FF.model.fitTo(FF.dat, RF.Save(), RF.SumW2Error(R.kFALSE))
+      elif len(FF.x_blind) == 2:
+          FF.model.fitTo(FF.dat, RF.Save(), RF.Range('loM,hiM'))
+      else:
+          FF.model.fitTo(FF.dat, RF.Save())
 
-    ## Creates a histogram of the model, with arbitrary normalization
-    FF.fit_hist = FF.model.createHistogram(FF.var_name, FF.x_bins[0])
-    ## Find the normalization of the fitted range, and scale model histogram
-    f_norm = FF.fit_hist.Integral()
-    h_norm = FF.hist_orig.Integral(FF.x_bins[1], FF.x_bins[2])
-    ## If a range of the histogram had been pre-blinded, need to use only fitted range
-    if len(FF.x_blind) == 2:
-        f_norm = 0
-        h_norm = 0
-        nBins = FF.hist.GetNbinsX()
-        for i in range(FF.x_bins[1], FF.x_bins[2]+1):
-            if FF.hist.GetBinLowEdge(i+1) <= FF.x_blind[0] or FF.hist.GetBinLowEdge(i) >= FF.x_blind[1]:
-                f_norm += FF.fit_hist.GetBinContent(i)
-                h_norm += FF.hist.GetBinContent(i)
+      ## Creates a histogram of the model, with arbitrary normalization
+      FF.fit_hist = FF.model.createHistogram(FF.var_name, FF.x_bins[0])
+      ## Find the normalization of the fitted range, and scale model histogram
+      f_norm = FF.fit_hist.Integral()
+      h_norm = FF.hist_orig.Integral(FF.x_bins[1], FF.x_bins[2])
+      ## If a range of the histogram had been pre-blinded, need to use only fitted range
+      if len(FF.x_blind) == 2:
+          f_norm = 0
+          h_norm = 0
+          nBins = FF.hist.GetNbinsX()
+          for i in range(FF.x_bins[1], FF.x_bins[2]+1):
+              if FF.hist.GetBinLowEdge(i+1) <= FF.x_blind[0] or FF.hist.GetBinLowEdge(i) >= FF.x_blind[1]:
+                  f_norm += FF.fit_hist.GetBinContent(i)
+                  h_norm += FF.hist.GetBinContent(i)
+  
+      ## Scale fit histogram to data normalization in the fitted range
+      FF.fit_hist.Scale( h_norm / f_norm )
+      ## Set line color red, remove error bars
+      FF.fit_hist.SetLineColor( R.kRed )
+      for i in range(FF.fit_hist.GetNbinsX()):
+          FF.fit_hist.SetBinError(i+1, 0)
+    ## End of else:  (if FF.hist_orig.Integral() <= 0)
 
-    ## Scale fit histogram to data normalization in the fitted range
-    FF.fit_hist.Scale( h_norm / f_norm )
-    ## Set line color red, remove error bars
-    FF.fit_hist.SetLineColor( R.kRed )
-    for i in range(FF.fit_hist.GetNbinsX()):
-        FF.fit_hist.SetBinError(i+1, 0)
 
     print 'Post-fit amplitude values are:'
     for i in range(len(FF.coef_list)):
@@ -226,6 +255,24 @@ def InitExpo(FF):
 
 ## End function InitExpo()
 
+## Create a exponential plus a constant
+def InitExp1int(FF):
+
+    FF.order = 1
+    FF.params[0].append( R.RooRealVar('expo',  'expo',   0.07, -99.9, 99.9) )
+    FF.params[0].append( R.RooRealVar('const', 'const', 0.1,  -10.0, 10.0) )
+    params_arg_list = R.RooArgList( R.RooArgSet(FF.var, FF.params[0][0], FF.params[0][1]) )
+    x_str = FF.var_name
+    FF.funcs    .append( R.RooGenericPdf('Exp1int', 'Exp1int', '@2 + exp(-1*@1*(@0-100))', params_arg_list) )
+    FF.arg_sets .append( R.RooArgSet(FF.funcs[0]) )
+    FF.amp_vars .append( R.RooRealVar('Exp1int_amp', 'Amplitude of Exp1int', 1.0, 1.0, 1.0) )
+
+    FF.func_list.add(FF.funcs[0])
+    FF.coef_list.add(FF.amp_vars[0])
+
+    FF.model = FF.funcs[0]
+## End function InitExp1int()
+
 
 ## Create a sum of Bernstein polynomials model
 def InitBern(FF):
@@ -255,12 +302,12 @@ def InitBern(FF):
 def InitBWZ(FF):
 
     FF.order = 1
-    FF.params[0].append( R.RooRealVar('a1', 'a1', 7.5, -99.9, 99.9) )
+    FF.params[0].append( R.RooRealVar('%s_pow0' %(FF.name), 'pow0', 0.1, -9.9, 9.9) )
     params_arg_list = R.RooArgList( R.RooArgSet(FF.var, FF.params[0][0]) )
     x_str = FF.var_name
-    FF.funcs    .append( R.RooGenericPdf('BWZ', 'BWZ', '2.5*exp(pow(a1/100.0, 2)*'+x_str+')/(pow('+x_str+'-91.2, 2) + pow(2.5/2, 2))', params_arg_list) )
+    FF.funcs    .append( R.RooGenericPdf('%s_BWZ' %(FF.name), 'BWZ', '2.5*exp(@0*@1/100.0)/(pow(@0-91.2, 2) + pow(2.5/2, 2))', params_arg_list) )
     FF.arg_sets .append( R.RooArgSet(FF.funcs[0]) )
-    FF.amp_vars .append( R.RooRealVar('BWZ_amp', 'Amplitude of BWZ', 1.0, 0.0, 1.0) )
+    FF.amp_vars .append( R.RooRealVar('%s_BWZ_amp'%(FF.name), 'Amplitude of BWZ', 1.0, 0.0, 1.0) )
 
     FF.func_list.add(FF.funcs[0])
     FF.coef_list.add(FF.amp_vars[0])
@@ -270,6 +317,62 @@ def InitBWZ(FF):
 
 ## End function InitBWZ()
 
+## Create a Breit-Wigner model
+def InitBWZ_constraint(FF):
+
+    FF.order = 1
+    FF.params[0].append( R.RooRealVar('%s_pow0' %(FF.name), 'pow0', 0.1, -9.9, 9.9) )
+    params_arg_list = R.RooArgList( R.RooArgSet(FF.var, FF.params[0][0]) )
+    x_str = FF.var_name
+    FF.funcs    .append( R.RooGenericPdf('%s_BWZ' %(FF.name), 'BWZ', '2.5*exp(@0*(4.0-@1*@1)/100.0)/(pow(@0-91.2, 2) + pow(2.5/2, 2))', params_arg_list) )
+    FF.arg_sets .append( R.RooArgSet(FF.funcs[0]) )
+    FF.amp_vars .append( R.RooRealVar('%s_BWZ_amp'%(FF.name), 'Amplitude of BWZ', 1.0, 0.0, 1.0) )
+
+    FF.func_list.add(FF.funcs[0])
+    FF.coef_list.add(FF.amp_vars[0])
+
+    # FF.model = R.RooAddPdf('mod_'+FF.name, 'BWZ', FF.func_list, FF.coef_list, R.kFALSE)
+    FF.model = FF.funcs[0]
+
+## End function InitBWZ_constraint()
+
+## Create a Breit-Wigner model
+def InitBWZ_constant(FF):
+
+    FF.order = 1
+    FF.params[0].append( R.RooRealVar('%s_pow0'  %(FF.name), 'pow0',  0.1, -9.9, 9.9) )
+    FF.params[0].append( R.RooRealVar('%s_const' %(FF.name), 'const', 0.1, -9.9, 9.9) )
+    params_arg_list = R.RooArgList( R.RooArgSet(FF.var, FF.params[0][0], FF.params[0][1]) )
+    x_str = FF.var_name
+    FF.funcs    .append( R.RooGenericPdf('%s_BWZ' %(FF.name), 'BWZ', '2.5*exp(@0*(4.0-@1*@1)/100.0)/(pow(@0-91.2, 2) + pow(2.5/2, 2)) + 0.01*@2*@2', params_arg_list) )
+    FF.arg_sets .append( R.RooArgSet(FF.funcs[0]) )
+    FF.amp_vars .append( R.RooRealVar('%s_BWZ_amp'%(FF.name), 'Amplitude of BWZ', 1.0, 0.0, 1.0) )
+
+    FF.func_list.add(FF.funcs[0])
+    FF.coef_list.add(FF.amp_vars[0])
+
+    # FF.model = R.RooAddPdf('mod_'+FF.name, 'BWZ', FF.func_list, FF.coef_list, R.kFALSE)
+    FF.model = FF.funcs[0]
+
+## End function InitBWZ_constant()
+
+## Create a BWZGamma
+def InitBWZGamma(FF):
+
+    FF.order = 1
+    FF.params[0].append( R.RooRealVar('%s_pow0' %(FF.name), 'pow0', 0.01, -99.9, 99.9) )
+    FF.params[0].append( R.RooRealVar('%s_f0' %(FF.name),   'f0',   0.25, -10.0, 10.0) )
+    params_arg_list = R.RooArgList( R.RooArgSet(FF.var, FF.params[0][0], FF.params[0][1]) )
+    x_str = FF.var_name
+    FF.funcs    .append( R.RooGenericPdf('%s_BWZGamma' %(FF.name), 'BWZGamma', "2.5*exp(@1*@0/100)/(pow(@0-91,2)+pow(2.5/2.0,2)) + 1000*@2*@2*exp(@1*@0)/pow(@0,2)", params_arg_list) )
+    FF.arg_sets .append( R.RooArgSet(FF.funcs[0]) )
+    FF.amp_vars .append( R.RooRealVar('%s_BWZGamma_amp' %(FF.name), 'Amplitude of BWZGamma', 1.0, 1.0, 1.0) )
+
+    FF.func_list.add(FF.funcs[0])
+    FF.coef_list.add(FF.amp_vars[0])
+
+    FF.model = FF.funcs[0]
+## End function InitBWZGamma()
 
 ## Create a reduced Breit-Wigner model
 def InitBWZRed(FF):
@@ -364,11 +467,11 @@ def InitGaus(FF):
 
     for i in range(FF.order):
         if i != 0: FF.params.append([])
-        FF.params[i].append( R.RooRealVar('mean%d'  % (i+1), 'Mean of Gaussian #%d'  % (i+1), coef[i][0], coef[i][1], coef[i][2]) )
-        FF.params[i].append( R.RooRealVar('width%d' % (i+1), 'Width of Gaussian #%d' % (i+1), coef[i][3], coef[i][4], coef[i][5]) )
-        FF.funcs    .append( R.RooGaussian('gaus%d' % (i+1), 'gaus(x - mean, width) #%d' % (i+1), FF.var, FF.params[i][0], FF.params[i][1]) )
+        FF.params[i].append( R.RooRealVar('%s_mean%d'  %(FF.name, (i+1)), 'Mean of Gaussian #%d'  % (i+1), coef[i][0], coef[i][1], coef[i][2]) )
+        FF.params[i].append( R.RooRealVar('%s_width%d' %(FF.name, (i+1)), 'Width of Gaussian #%d' % (i+1), coef[i][3], coef[i][4], coef[i][5]) )
+        FF.funcs    .append( R.RooGaussian('%s_gaus%d' %(FF.name, (i+1)), 'gaus(x - mean, width) #%d' % (i+1), FF.var, FF.params[i][0], FF.params[i][1]) )
         FF.arg_sets .append( R.RooArgSet(FF.funcs[i]) )
-        FF.amp_vars .append( R.RooRealVar('Gaus_amp%d' % (i+1), 'Amplitude of Gaussian #%d' % (i+1), coef[i][6], coef[i][7], coef[i][8]) )
+        FF.amp_vars .append( R.RooRealVar('%s_Gaus_amp%d' %(FF.name, (i+1)), 'Amplitude of Gaussian #%d' % (i+1), coef[i][6], coef[i][7], coef[i][8]) )
         
         FF.func_list.add(FF.funcs[i])
         if (i < FF.order - 1):
@@ -379,3 +482,33 @@ def InitGaus(FF):
     FF.model = R.RooAddPdf('mod_'+FF.name, 'Sum of %d Gaussians' % FF.order, FF.func_list, FF.coef_list, R.kTRUE)
 
 ## End function InitGaus()
+
+
+def InitDSCB(FF):
+
+    if (FF.order > 1):
+        print '\n\nNo need to use sum of DBCB, initiating ONE double sided crystal ball. \n' 
+
+    h_mean = FF.hist.GetMean()
+    h_rms  = FF.hist.GetRMS()
+
+    FF.params[0].append( R.RooRealVar('nom_%s_mean' %(FF.name),  'nominal_mean',  h_mean, h_mean - 1.5*h_rms, h_mean + 1.5*h_rms) )
+    FF.params[0].append( R.RooRealVar('nom_%s_sigma' %(FF.name), 'nominal_sigma', h_rms,  0.0,                5.0*h_rms) )
+    FF.params[0].append( R.RooRealVar('%s_a1' %(FF.name),    'a1',    1.0,    0.0,                5.0) )
+    FF.params[0].append( R.RooRealVar('%s_n1' %(FF.name),    'n2',    2.0,    2.0,                2.0) )
+    FF.params[0].append( R.RooRealVar('%s_a2' %(FF.name),    'a2',    1.0,    0.0,                5.0) )
+    FF.params[0].append( R.RooRealVar('%s_n2' %(FF.name),    'n2',    2.0,    2.0,                2.0) )
+#    FF.params[0].append( R.RooRealVar('CMS_hmm_%s_peak'  %(FF.name),  'peak_sys',       0.0, 0.0, 0.0) )
+#    FF.params[0].append( R.RooRealVar('CMS_hmm_%s_sigma' %(FF.name),  'sigma_sys',      0.0, 0.0, 0.0) )
+    FF.params[0].append( R.RooFormulaVar( '%s_mean'%(FF.name),  '@0*(1+@1)', R.RooArgList(FF.params[0][0], FF.var_mean_sys ) ) )
+    FF.params[0].append( R.RooFormulaVar( '%s_sigma'%(FF.name), '@0*(1+@1)', R.RooArgList(FF.params[0][1], FF.var_sigma_sys) ) )
+
+    FF.funcs    .append( RooDoubleCB('%s_DSCB' %(FF.name), 'DSCB', FF.var, FF.params[0][6], FF.params[0][7], FF.params[0][2], FF.params[0][3], FF.params[0][4], FF.params[0][5]) )
+    FF.arg_sets .append( R.RooArgSet(FF.funcs[0]) )
+    FF.amp_vars .append( R.RooRealVar('%s_DSCB_amp' %(FF.name), 'Amplitude of DSCB', 1.0, 1.0, 1.0) )
+    FF.func_list.add(FF.funcs[0])
+    FF.coef_list.add(FF.amp_vars[0])
+
+    FF.model = FF.funcs[0]
+
+## End function InitDBCB()

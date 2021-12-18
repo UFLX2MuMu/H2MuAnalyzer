@@ -28,12 +28,12 @@ import xml.etree.ElementTree as ET
 
 sys.path.insert(1, '%s/python' % os.getcwd())
 sys.path.insert(1, '%s/../FitBackground/python' % os.getcwd())
-import FitFunctions    as FF  ## From FitBackground/python/FitFunctions.py
-import DataLoader      as DL  ## From WorkspaceDatacard/python/DataLoader.py
-import PlotHelper      as PH  ## From WorkspaceDatacard/python/PlotHelper.py
-import WorkspaceHelper as WH  ## From WorkspaceDatacard/python/WorkspaceHelper.py
-import DatacardHelper  as DH  ## From WorkspaceDatacard/python/DatacardHelper.py
-
+import FitFunctions      as FF  ## From FitBackground/python/FitFunctions.py
+import DataLoader        as DL  ## From WorkspaceDatacard/python/DataLoader.py
+import PlotHelper        as PH  ## From WorkspaceDatacard/python/PlotHelper.py
+import WorkspaceHelper   as WH  ## From WorkspaceDatacard/python/WorkspaceHelper.py
+import DatacardHelper    as DH  ## From WorkspaceDatacard/python/DatacardHelper.py
+import SystematicsHelper as SH ## From WorkspaceDatacard/python/SystematicsHelper.py
 
 #============================================
 # User-defined settings
@@ -42,6 +42,7 @@ import DatacardHelper  as DH  ## From WorkspaceDatacard/python/DatacardHelper.py
 ## Configure the script user
 if 'abrinke1' in os.getcwd(): USER = 'abrinke1'
 if 'bortigno' in os.getcwd(): USER = 'bortigno'
+if 'eyigitba' in os.getcwd(): USER = 'eyigitba'
 if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 
 ## Configure the channels, distributions, and fits to use
@@ -52,10 +53,34 @@ if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 # CONFIGS = ['WH_lep_AWB_2019_05_20_v1_shape']
 
 #====== XWZ CONGIF
-CONFIGS = ['ZH_lep_XWZ_mass_05_23_MVAp04_v1']
-# CONFIGS = ['WH_lep_XWZ_2019_05_14_TMVA_out_v1']
+#CONFIGS = ['WH_Run2_3lep_07_31']
+#CONFIGS = ['ZH_Run2_lep_08_26']
+#CONFIGS = ['ZH_Run2_lep_BDT_08_26']
 
+#CONFIGS = ['WH_Run2_3lep_10_20_DSCB_sig_sys']
+#CONFIGS = ['ZH_Run2_lep_02_07_newcat_sys']
+#CONFIGS = ['WH_Run2_3lep_02_18_temp']
+#CONFIGS = ['ZH_Run2_lep_02_18_temp']
 
+#CONFIGS = ['WH_Run2_3lep_04_02_newcats_noSys']
+#CONFIGS = ['ZH_Run2_lep_04_02_newcats_noSys']
+
+#CONFIGS = ['WH_Run2_3lep_04_22_noSys']
+#CONFIGS = ['ZH_Run2_lep_04_22_noSys']
+
+#CONFIGS = ['WH_Run2_3lep_05_04_FullSys']
+#CONFIGS = ['ZH_Run2_lep_05_04_FullSys']
+
+#CONFIGS = ['WH_Run2_3lep_05_18_FullSys']
+#CONFIGS = ['ZH_Run2_lep_05_18_Fullsys']
+
+#CONFIGS = ['WH_Run2_3lep_06_02_sys_addRoch']
+#CONFIGS = ['ZH_Run2_lep_06_02_sys_addRoch']
+#CONFIGS = ['ZH_Run2_lep_06_02_altZHcat0_constraint']
+#CONFIGS = ['ZH_Run2_lep_06_02_altZHcat0_constant']
+
+CONFIGS = ['WH_Run2_3lep_07_20_extra_lepMVA_uncert']
+#CONFIGS = ['ZH_Run2_lep_07_20_extra_lepMVA_uncert']
 #============================================
 # Main code
 #============================================
@@ -64,26 +89,36 @@ class WorkspaceAndDatacardMaker:
 # Class to make workspace, root files, and datacards needed for
 # analytic shape or template limit setting via Higgs Combine
 
-    def __init__(self, _source, _in_dir, _in_file, _out_dir, _cat, _cat_loc, _dist, _min_max, _blind, _rebin, _models):
+    def __init__(self, _source, _in_dir, _in_file, _sys_dir, _sys_file, _signals, _sys_names, _out_dir, _cat, _cat_loc, _dist, _min_max, _blind, _rebin, _models):
 
         self.out_dir = _out_dir ## Output directory for datacards, workspaces, plots, etc.
         self.cat     = _cat     ## Category name for this workspace
         self.dist    = _dist    ## Distribution for signal extraction
+        self.catname = 'CatAll'
         self.blind   = _blind   ## Range to blind in data
         self.rebin   = _rebin   ## Rebin input distribution for optimal S^2/
         self.models  = _models  ## Set of analytic or template models to use
+	self.signals = _signals ## name of the signal in different channels
 
-        self.in_data = DL.DataLoader(USER, _source, _in_dir, _in_file, _cat_loc, _dist, _min_max, _rebin)
+        self.in_data = DL.DataLoader(USER, _source, _in_dir, _in_file, _sys_dir, _sys_file, _signals, _sys_names, _cat_loc, _dist, _min_max, _rebin)
 
-        self.h_sig_fit  = None  ## Histogram of analytic best-fit to signal shape
+        self.h_sig_fits  = []  ## Histogram of analytic best-fit to signal shape
         self.h_bkg_fit  = None  ## Histogram of analytic best-fit to background shape
         self.h_data_fit = None  ## Histogram of analytic best-fit to data shape
         # self.nuisances = []     ## List of nuisance parameters (not yet implemented - AWB 13.05.19)
 
+	self.sys_cfg = SH.SystematicsConfig(_signals, _sys_names, self.in_data.hists_sys)
+
+        if   _dist == 'dimu_mass_BDT_n10_n01': self.catname = 'ZHCat0'
+        elif _dist == 'dimu_mass_BDT_n01_p10': self.catname = 'ZHCat1'
+        elif _dist == 'H_pair_mass_BDT_final_n10_n01_zoomH': self.catname = 'WHCat0'
+        elif _dist == 'H_pair_mass_BDT_final_n01_p03_zoomH': self.catname = 'WHCat1'
+        elif _dist == 'H_pair_mass_BDT_final_p03_p10_zoomH': self.catname = 'WHCat2'
+
+
     def Clear(self):
         if not self.in_data    is None: self.in_data.Clear()
         if not self.in_data    is None: del self.in_data
-        if not self.h_sig_fit  is None: del self.h_sig_fit
         if not self.h_bkg_fit  is None: del self.h_bkg_fit
         if not self.h_data_fit is None: del self.h_data_fit
 
@@ -93,8 +128,9 @@ class WorkspaceAndDatacardMaker:
         self.blind      = []
         self.rebin      = []
         self.models     = []
+	self.signals	= []
         self.in_data    = None
-        self.h_sig_fit  = None
+	self.h_sig_fits = []
         self.h_bkg_fit  = None
         self.h_data_fit = None
     
@@ -115,7 +151,10 @@ class WorkspaceAndDatacardMaker:
         WS.cd()
 
         if 'stack' in model and self.rebin == False:
-            self.in_data.data_hist.Write('data_obs')
+            #self.in_data.data_hist.Write('data_obs')
+	    data_temp = self.in_data.bkg_hists[0].Clone()
+	    data_temp.Add(self.in_data.sig_hists[0].Clone())
+	    data_temp.Write('data_obs')
             self.in_data.sig_hists[0].Write()
             self.in_data.bkg_hists[0].Write()
             for i in range( min(4, len(self.in_data.hists_sys)) ):
@@ -163,23 +202,35 @@ class WorkspaceAndDatacardMaker:
         ## Don't print plots to screen while running (faster)
 	R.gROOT.SetBatch(R.kTRUE)
 
-        sig_fit  = FF.FitFunction('sig_fit_%s'  % self.cat, self.in_data.sig_hists[0], sig_mod, sig_ord, self.in_data.min_max, [],         'dimu_mass')
-        bkg_fit  = FF.FitFunction('bkg_fit_%s'  % self.cat, self.in_data.bkg_hists[0], bkg_mod, bkg_ord, self.in_data.min_max, [],         'dimu_mass')
-        data_fit = FF.FitFunction('data_fit_%s' % self.cat, self.in_data.data_hist,    bkg_mod, bkg_ord, self.in_data.min_max, self.blind, 'dimu_mass')
+        mean_sys  = R.RooRealVar('CMS_hmm_%s_peak'  %(self.catname),  'peak_sys',        0.0, 0.0, 0.0)
+        sigma_sys = R.RooRealVar('CMS_hmm_%s_sigma' %(self.catname),  'sigma_sys',       0.0, 0.0, 0.0)
 
-        FF.DoFit(sig_fit)
+	sig_fits = []
+	for sig_hist in self.in_data.sig_hists:
+	    sig_name = sig_hist.GetName() 
+	    print 'Adding signal %s ---------------------------' %sig_name
+            sig_fits.append( FF.FitFunction( sig_name+'_%s'  % self.catname, sig_hist, sig_mod, sig_ord, self.in_data.min_max, [],         'mh_'+self.cat, mean_sys, sigma_sys)  )
+        bkg_fit  = FF.FitFunction('bkg_%s'  % self.catname, self.in_data.bkg_hists[0], bkg_mod, bkg_ord, self.in_data.min_max, [],         'mh_'+self.cat)
+        data_fit = FF.FitFunction('data_%s' % self.catname, self.in_data.data_hist,    bkg_mod, bkg_ord, self.in_data.min_max, self.blind, 'mh_'+self.cat)
+
+	self.h_sig_fits = []
+	for sig_fit in sig_fits:
+	    print 'Doing fit of %s -------------------' % sig_fit.name
+            FF.DoFit(sig_fit)
+	    print 'Got sig_fit.fit_hist name = %s -----------------' % sig_fit.fit_hist.GetName()
+	    self.h_sig_fits.append(sig_fit.fit_hist)
+
         FF.DoFit(bkg_fit)
         FF.DoFit(data_fit)
 
-        self.h_sig_fit  = sig_fit.fit_hist
         self.h_bkg_fit  = bkg_fit.fit_hist
         self.h_data_fit = data_fit.fit_hist
 
         ## Plot data and fits into a frame
-        PH.DrawFits(sig_fit, bkg_fit, data_fit, self.cat+'_'+self.dist+'_'+sig_mod+str(sig_ord)+'_'+bkg_mod+str(bkg_ord), self.out_dir)
+        PH.DrawFits(sig_fits, bkg_fit, data_fit, self.cat+'_'+self.dist+'_'+sig_mod+str(sig_ord)+'_'+bkg_mod+str(bkg_ord), self.out_dir)
 
         ## After fitting, we freeze all parameters in the signal fit
-        WH.FreezeParams(sig_fit, sig_frz)
+	for sig_fit in sig_fits: WH.FreezeParams(sig_fit, sig_frz)
         ## Also freeze all the fit parameters in the background fit (to be revisited - AWB 09.05.2019)
         WH.FreezeParams(bkg_fit, bkg_frz)
         ## And all the fit parameters in the data fit (also to be revisited - AWB 09.05.2019)
@@ -189,26 +240,46 @@ class WorkspaceAndDatacardMaker:
         if len(sig_frz_str) > 0: sig_frz_str = '_frz'+sig_frz_str
         bkg_frz_str = '_frz'.join(f for f in bkg_frz)
         if len(bkg_frz_str) > 0: bkg_frz_str = '_frz'+bkg_frz_str
-        shape_str = sig_mod+str(sig_ord)+sig_frz_str+'_'+bkg_mod+str(bkg_ord)+bkg_frz_str+'_shape'
+#        shape_str = sig_mod+str(sig_ord)+sig_frz_str+'_'+bkg_mod+str(bkg_ord)+bkg_frz_str+'_shape'  ## this is original convention set up by AWB in May2019
+        shape_str = bkg_mod  ## convention for final DCs, since choices for sig/bkg models are set
 
         ## Create a new workspace for this category
-        WS_data = R.RooWorkspace(self.cat+'_'+self.dist+'_'+shape_str+'_data')  ## Using data for background
-        WS_MC   = R.RooWorkspace(self.cat+'_'+self.dist+'_'+shape_str+'_MC')    ## Using MC for background
+        WS_data = R.RooWorkspace(self.catname+'_'+shape_str.replace('_constraint','').replace('_constant',''))  ## Using data for background
+        WS_MC   = R.RooWorkspace(self.catname+'_'+shape_str.replace('_constraint','').replace('_constant','')+'_MC')    ## Using MC for background
         ## "Data" input to workspace must have name "data_obs"
         ## Rename signal and background models for simplicity
-        data_fit.dat  .SetName('data_obs')
-        bkg_fit .dat  .SetName('data_obs')
-        data_fit.model.SetName('data_fit')
-        bkg_fit .model.SetName('bkg_fit')
-        sig_fit .model.SetName('sig_fit')
+        data_fit.dat  .SetName('data_obs_' + self.catname)
+        bkg_fit .dat  .SetName('data_obs_' + self.catname)
+        data_fit.model.SetName('bkg_' + self.catname + '_pdf')
+        bkg_fit .model.SetName('BKG_' + self.catname + '_pdf')
+        data_bkg_norm  = R.RooRealVar('bkg_'+self.catname+'_pdf'+'_norm', 'bkg_'+self.catname+'_pdf'+'_norm', data_fit.fit_hist.Integral(), 0.0, 10000.0)
+        MC_bkg_norm    = R.RooRealVar('BKG_'+self.catname+'_pdf'+'_norm', 'BKG_'+self.catname+'_pdf'+'_norm',  bkg_fit.fit_hist.Integral(), 0.0, 10000.0)  ## use capital for MC so they have different names
+        data_bkg_norm.setConstant(False)
+        MC_bkg_norm.setConstant(False)
+        sig_norms = {}
+	for sig_fit in sig_fits:        
+	    sig_name = sig_fit.name + '_pdf'
+	    sig_fit.model.SetName( sig_name )
+	    sig_norms[sig_name] = R.RooRealVar(sig_name+'_norm', sig_name+'_norm', sig_fit.fit_hist.Integral(), 0, 10000.0)	
+            sig_norms[sig_name].setConstant(True)
+
         ## "import" is a keyword so workspace.import() doesn't work in python
         ##   Have to do this instead:
         getattr(WS_data, 'import')(data_fit.dat,   R.RooCmdArg())
         getattr(WS_data, 'import')(data_fit.model, R.RooCmdArg())
+        getattr(WS_data, 'import')(data_bkg_norm,  R.RooCmdArg())
         getattr(WS_MC,   'import')(bkg_fit.dat,    R.RooCmdArg())
         getattr(WS_MC,   'import')(bkg_fit.model,  R.RooCmdArg())
-        getattr(WS_data, 'import')(sig_fit.model,  R.RooCmdArg())
-        getattr(WS_MC,   'import')(sig_fit.model,  R.RooCmdArg())
+        getattr(WS_MC,   'import')(MC_bkg_norm,    R.RooCmdArg())
+
+        getattr(WS_data, 'import')(mean_sys,       R.RooCmdArg())   ## common signal shape uncertainty to all signal modes
+        getattr(WS_MC,   'import')(sigma_sys,      R.RooCmdArg())   ## common signal shape uncertainty to all signal modes
+	for sig_fit in sig_fits:
+	  print '\n\n\n Adding sig_fit.model %s to workspace **************************\n\n\n' %sig_fit.model.GetName()
+          getattr(WS_data, 'import')(sig_fit.model,  R.RooCmdArg())
+          getattr(WS_MC,   'import')(sig_fit.model,  R.RooCmdArg())
+          getattr(WS_data, 'import')(sig_norms[sig_fit.name+'_pdf'],  R.RooCmdArg())
+          getattr(WS_MC,   'import')(sig_norms[sig_fit.name+'_pdf'],  R.RooCmdArg())
 
 	# Save workspaces to root file
         WS_data.SaveAs(self.out_dir+'/workspace/'+WS_data.GetName()+'.root')
@@ -232,15 +303,16 @@ class WorkspaceAndDatacardMaker:
         if len(sig_frz_str) > 0: sig_frz_str = '_frz'+sig_frz_str
         bkg_frz_str = '_frz'.join(f for f in bkg_frz)
         if len(bkg_frz_str) > 0: bkg_frz_str = '_frz'+bkg_frz_str
-        shape_str = sig_mod+str(sig_ord)+sig_frz_str+'_'+bkg_mod+str(bkg_ord)+bkg_frz_str+'_shape'
+#        shape_str = sig_mod+str(sig_ord)+sig_frz_str+'_'+bkg_mod+str(bkg_ord)+bkg_frz_str+'_shape'  ## orignal convention set by AWB MAy2019
+        shape_str = bkg_mod  ## convention for final DCs
 
-        card_data = open(self.out_dir+'/datacard/'+self.cat+'_'+self.dist+'_'+shape_str+'_data.txt', 'w')
-        DH.WriteHeader    (card_data, self.cat, self.out_dir, self.cat+'_'+self.dist+'_'+shape_str+'_data')
-        DH.WriteSigBkgBody(card_data, self.cat, self.dist, 'shape_data', width, self.h_sig_fit.Integral(), self.h_data_fit.Integral())
-        
-        card_MC = open(self.out_dir+'/datacard/'+self.cat+'_'+self.dist+'_'+shape_str+'_MC.txt', 'w') 
-        DH.WriteHeader    (card_MC, self.cat, self.out_dir, self.cat+'_'+self.dist+'_'+shape_str+'_MC')
-        DH.WriteSigBkgBody(card_MC, self.cat, self.dist, 'shape_MC', width, self.h_sig_fit.Integral(), self.h_bkg_fit.Integral())
+        card_data = open(self.out_dir+'/datacard/'+self.catname+'_'+shape_str+'.txt', 'w')
+        DH.WriteHeader        (card_data, self.catname, self.out_dir, width, self.h_sig_fits, self.catname+'_'+shape_str)
+        DH.WriteSigBkgBody    (card_data, self.catname, self.dist, 'shape_data', width, self.h_sig_fits, self.h_data_fit.Integral(), self.signals, self.sys_cfg)
+
+        card_MC = open(self.out_dir+'/datacard/'+self.catname+'_'+shape_str+'_MC.txt', 'w') 
+        DH.WriteHeader        (card_MC, self.catname, self.out_dir, width, self.h_sig_fits, self.catname+'_'+shape_str+'_MC')
+        DH.WriteSigBkgBody    (card_MC, self.catname, self.dist, 'shape_MC', width, self.h_sig_fits, self.h_bkg_fit.Integral(), self.signals, self.sys_cfg)
 
     ## End function: def makeShapeDatacards(self, sig_mod, sig_ord, sig_frz, bkg_mod, bkg_ord, bkg_frz):
 
@@ -255,11 +327,11 @@ class WorkspaceAndDatacardMaker:
         DH.WriteHeader(card, self.cat, self.out_dir, self.cat+'_'+self.dist+'_'+model_str)
 
         if model_str == 'template_stack':
-            DH.WriteSigBkgBody(card, self.cat, self.dist, 'template_stack', width, self.in_data.sig_hists[0].Integral(), self.in_data.bkg_hists[0].Integral())
+            DH.WriteSigBkgBody(card, self.cat, self.dist, 'template_stack', width, self.in_data.sig_hists, self.in_data.bkg_hists[0].Integral(), self.signals, self.sys_cfg)
         elif model_str == 'template_group':
             DH.WriteGroupBody(card, self.cat, self.dist, 'template_group', width, self.in_data.sig_hists, self.in_data.bkg_hists, len(self.in_data.hists_sys) > 0)
         elif model_str == 'rebin_stack':
-            DH.WriteSigBkgBody(card, self.cat, self.dist, 'rebin_stack', width, self.in_data.sig_rebin[0].Integral(), self.in_data.bkg_rebin[0].Integral())
+            DH.WriteSigBkgBody(card, self.cat, self.dist, 'rebin_stack', width, self.in_data.sig_rebin, self.in_data.bkg_rebin[0].Integral(), self.signals, self.sys_cfg)
         elif model_str == 'rebin_group':
             DH.WriteGroupBody(card, self.cat, self.dist, 'rebin_group', width, self.in_data.sig_rebin, self.in_data.bkg_rebin, len(self.in_data.rebin_sys) > 0)
         else:
@@ -307,10 +379,38 @@ def main():
         source  = (XML.find('source') .text).replace(' ','')
         in_dir  = (XML.find('in_dir') .text).replace(' ','')
         in_file = (XML.find('in_file').text).replace(' ','')
+
+	if XML.find('sys_dir') == None:
+            sys_dir = 'None'
+        else:
+            sys_dir = (XML.find('sys_dir').text).replace(' ','')
+	if XML.find('sys_file') == None:
+            sys_file = 'None'
+	else:
+	    sys_file = (XML.find('sys_file').text).replace(' ','')
+
+	if XML.find('signals') == None:  #to be compatible with old xml configs
+	    signals = ['Net']		 #['Net'] is the default for not splitting by channels
+	else: 
+	    signal_list = []
+	    signals = (XML.find('signals').text).replace(' ','').replace('[','').replace(']','')
+	    for signal in signals.split(','): signal_list.append(signal)
+	    signals = signal_list
+	if XML.find('sys_names') == None: #to be compatible with old xml configs
+	    sys_names = ['Norminal']	  #['Norminal'] is the default for norminal uncertainties
+	else:
+	    sys_list    = []
+	    sys_names = (XML.find('sys_names').text).replace(' ','').replace('[','').replace(']','')
+	    for sys_name in sys_names.split(','): sys_list.append(sys_name)
+	    sys_names = sys_list 
         print '\nParsed XML from configs/'+config+'.xml specifying:'
-        print '  * source  = %s' % source
-        print '  * in_dir  = %s' % in_dir
-        print '  * in_file = %s' % in_file
+        print '  * source    = %s' % source
+        print '  * in_dir    = %s' % in_dir
+        print '  * in_file   = %s' % in_file
+	print '  * sys_dir   = %s' % sys_dir
+	print '  * sys_file  = %s' % sys_file
+	print '  * signals   = '   + ' '.join(signals)
+	print '  * sys_names = '   + ' '.join(sys_names)
 
         ## Loop over categories in XML
         for cat in XML.find('categories'):
@@ -362,7 +462,7 @@ def main():
                 print '    Models = %s' % ','.join(k for k in models)
 
                 ## Initialize using specified configuration
-                WDM = WorkspaceAndDatacardMaker(source, in_dir, in_file, out_dir, cat_name, cat_loc, dist, min_max, blind, rebin, models)
+                WDM = WorkspaceAndDatacardMaker(source, in_dir, in_file, sys_dir, sys_file, signals, sys_names, out_dir, cat_name, cat_loc, dist, min_max, blind, rebin, models)
 
                 ## Create MC template-based workspaces with grouped processes
                 ##  or inclusive signal and background stacks

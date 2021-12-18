@@ -11,7 +11,7 @@ sys.path.insert(1, '%s/../FitBackground/python' % os.getcwd())
 import FitFunctions as FF  ## From FitBackground/python/FitFunctions.py
 
 
-def WriteHeader(card, cat, out_dir, in_file):
+def WriteHeader(card, cat, out_dir, width, sig_hists, in_file):
 
     print '\nWriting datacard with input file '+out_dir+'/workspace/'+in_file+'.root'
     
@@ -22,11 +22,23 @@ def WriteHeader(card, cat, out_dir, in_file):
 
     if   ('template' in in_file or 'rebin' in in_file):
         card.write('shapes * * '+out_dir+'/workspace/'+in_file+'.root '+'$PROCESS $PROCESS_$SYSTEMATIC\n')
-    elif ('shape' in in_file):
-        card.write('shapes * * '+out_dir+'/workspace/'+in_file+'.root '+in_file+':$PROCESS\n')
-    else:
-        print '\n\nWriting datacard in category %s, input file name %s does not match template, rebin, or shape' % (cat, in_file)
-        sys.exit()
+    else:  ## default is doing shape analysis
+        #card.write('shapes * * '+out_dir+'/workspace/'+in_file+'.root '+in_file+':$PROCESS\n')
+        for sig_hist in sig_hists:
+            hname = sig_hist.GetName()
+            sig_name = hname.replace('_%s'%cat, '').replace('_DSCB', '').replace('__mh_WH', '').replace('__mh_ZH', '')
+            card.write('shapes ')
+            card.write((sig_name+'_hmm').ljust(width))
+            card.write(cat.ljust(width))
+            card.write( out_dir+'/workspace/'+in_file+'.root    ' +in_file+':%s_%s_pdf\n'%(sig_name, cat) )
+        card.write('shapes ')
+        card.write('bkg'.ljust(width))
+        card.write(cat.ljust(width))
+        card.write( out_dir+'/workspace/'+in_file+'.root    ' +in_file+':bkg_%s_pdf\n'%cat )
+        card.write('shapes ')
+        card.write('data_obs'.ljust(width))
+        card.write(cat.ljust(width))
+        card.write( out_dir+'/workspace/'+in_file+'.root    ' +in_file+':data_obs_%s\n'%cat )
 
     card.write('----------------------------------------------------------------------------------------------------------------------------------\n')
     card.write('bin            '+cat+'\n')
@@ -36,52 +48,70 @@ def WriteHeader(card, cat, out_dir, in_file):
 ## End function: WriteHeader(card, cat, dist, fit):
 
 
-def WriteSigBkgBody(card, cat, dist, fit, width, nSig, nBkg):
+def WriteSigBkgBody(card, cat, dist, fit, width, sig_hists, nBkg, signals, sys_cfg):
 
     ## Category name (same for each process)
-    card.write('bin'.ljust(width))
-    card.write((cat).ljust(width))
+    card.write('bin'.ljust(2*width))
+    for sig_hist in sig_hists:
+      card.write((cat).ljust(width))
     card.write((cat).ljust(width))
     card.write('\n')
 
     ## Process names
-    card.write('process'.ljust(width))
+    card.write('process'.ljust(2*width))
 
     if   (fit == 'template_stack' or fit == 'rebin_stack'):
         card.write(('Net_Sig').ljust(width))
         card.write(('Net_Bkg').ljust(width))
     elif (fit == 'shape_MC'):
-        card.write(('sig_fit').ljust(width))
+	for sig_hist in sig_hists:
+	    hname = sig_hist.GetName()
+	    print "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWriting "
+	    print hname
+	    sig_name = hname.replace(('_%s' %cat),'').replace('DSCB_','').replace('mod_','').replace('_fit_','').replace('__mh_WH', '').replace('__mh_ZH', '')
+            card.write((sig_name+'_hmm').ljust(width))
         card.write(('bkg_fit').ljust(width))
     elif (fit == 'shape_data'):
-        card.write(('sig_fit').ljust(width))
-        card.write(('data_fit').ljust(width))
+        for sig_hist in sig_hists:
+            hname = sig_hist.GetName()
+            sig_name = hname.replace(('_%s' %cat),'').replace('DSCB_','').replace('mod_','').replace('_fit_','').replace('__mh_WH', '').replace('__mh_ZH', '')
+            card.write((sig_name+'_hmm').ljust(width))
+        card.write(('bkg').ljust(width))
     else:
         print '\n\nWriting datacard in category %s for %s, no valid fit type %s' % (cat, dist, fit)
 
     card.write('\n')
 
     ## Process numbers (<= 0 for signal, > 0 for background)
-    card.write('process'.ljust(width))
-    card.write('0'.ljust(width))
+    card.write('process'.ljust(2*width))
+    for i in range(len(sig_hists)):
+      card.write(('%d' % (0-i)).ljust(width))
     card.write('1'.ljust(width))
     card.write('\n')
 
     ## Rate parameters (i.e. total integral) for each process
-    card.write('rate'.ljust(width))
-    card.write(('%f' % nSig).ljust(width))
-    card.write(('%f' % nBkg).ljust(width))
+    card.write('rate'.ljust(2*width))
+    for sig_hist in sig_hists:
+      card.write('1'.ljust(width))
+      #card.write(('%f' % sig_hist.Integral()).ljust(width))
+    card.write('1'.ljust(width))
+    #card.write(('%f' % nBkg).ljust(width)) ## nBkg no longer in use
     card.write('\n')
 
     card.write('----------------------------------------------------------------------------------------------------------------------------------\n')
 
-    ## Systematic uncertainties: only on rate per process
-    card.write(('bkg_norm').ljust(width-5))
-    card.write(('lnN  ').ljust(2))
-    card.write(('-').ljust(width))
-#    card.write(('9.99').ljust(width))
-    card.write(('1.2').ljust(width))
-    card.write('\n')
+    if (sys_cfg.sys_names[0] != 'Norminal'):
+	WriteSigSystematics(card, cat, dist, width, signals, sys_cfg)
+    else:
+    ## Norminal Systematic uncertainties: only on rate per process
+    ## this block can be moved into function WriteSigSystematics()  -- XWZ 2019.08.18
+        card.write(('bkg_norm').ljust(2*width-5))
+        card.write(('lnN  ').ljust(2))
+        card.write(('-').ljust(width))
+#        card.write(('9.99').ljust(width))
+#        card.write(('1.2').ljust(width))
+  	card.write(('1.05').ljust(width))
+        card.write('\n')
 
     ## Final line to add bin-by-bin MC stats uncertainties
     if ('template' in fit or 'rebin' in fit):
@@ -336,3 +366,38 @@ def WriteCutAndCount(card, cat, out_dir, dist, width, MASS_WINDOW, sig_hists, bk
     card.write('\n')
 
 ## End function: def WriteCutAndCount(card, cat, out_dir, dist, width, MASS_WINDOW, sig_hists, bkg_hists):
+
+
+
+
+
+def WriteSigSystematics(card, cat, dist, width, signals, sys_cfg):
+    for sys_name in sys_cfg.sys_names:
+	card.write(('%s  '%sys_name).ljust(2*width-5))
+	card.write(('lnN  ').ljust(2))
+	for signal in signals:
+	    sys_value = sys_cfg.sys_values[sys_name][signal]
+	    card.write( sys_value.ljust(width) )
+	card.write(('-').ljust(width)) # for bkg
+	card.write('\n')
+        if sys_name == 'pdf_Higgs_tHW' or sys_name == 'prefiring_2017' or sys_name == 'CMS_lepmva_eff_m' or sys_name == 'CMS_lepmva_eff_e' or sys_name == 'CMS_eff_btag':
+          card.write('----------------\n')
+
+
+    card.write('----------------\n')
+    card.write('CMS_hmm_%s_peak   param  0  0.001\n' %cat)
+    card.write('CMS_hmm_%s_sigma  param  0  0.1\n'   %cat)
+
+#    card.write(('bkg_norm').ljust(2*width-5))
+#    card.write(('lnN  ').ljust(2))
+#    for signal in signals:
+#	card.write(('-').ljust(width))
+#    card.write(('1.05').ljust(width))
+#    card.write('\n')
+
+## End function: def WriteSigSystematics(card, cat, dist, width, signals, sys_cfg):
+
+
+
+
+## End function: 

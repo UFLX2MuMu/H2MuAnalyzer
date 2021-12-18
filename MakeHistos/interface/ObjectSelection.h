@@ -25,18 +25,25 @@ struct ObjectSelectionConfig {  // Default values taken from 2016
   std::string mu_CSV_max  = "NONE";  // Veto muons with pT < 20 GeV with matching jet passing b-tag threshold
   float       mu_MVA_min  =  -99.0;  // Minimum prompt muon lepton MVA (lepMVA) BDT score
   float       mu_seg_min  =  -99.0;  // Minimum muon segment compatibility
+  float       mu_jet_CSV  =  -99.0;  // Minimum closest jet deepCSV
 
   // Electron selection
-  float       ele_pt_min   =  -99.0;  // Minimum electron pT
-  float       ele_eta_max  =  -99.0;  // Maximum electron |eta|
-  std::string ele_ID_cut   = "NONE";  // Electron ID: "loose", "medium", or "tight"
-  float       ele_iso_max  =  -99.0;  // Maximum electron relative isolation
-  float       ele_mIso_max =  -99.0;  // Maximum electron relative miniIsolation
-  float       ele_d0_max   =  -99.0;  // Maximum electron |dXY| from vertex
-  float       ele_dZ_max   =  -99.0;  // Maximum electron |dZ| from vertex
-  float       ele_SIP_max  =  -99.0;  // Maximum impact parameter significance
-  float       ele_MVA_min  =  -99.0;  // Minimum prompt electron lepton MVA (lepMVA) BDT score
-  std::string ele_CSV_max  = "NONE";  // Veto electrons with pT < 20 GeV with matching jet passing b-tag threshold
+  float       ele_pt_min       =  -99.0;  // Minimum electron pT
+  float       ele_eta_max      =  -99.0;  // Maximum electron |eta|
+  float	      ele_eta_gap_min  =  -99.0;  // Minimum electron gap eta
+  float       ele_eta_gap_max  =  -99.0;  // Maximum electron gap eta
+  std::string ele_ID_cut       = "NONE";  // Electron ID: "veto", loose", "medium", or "tight"
+  std::string ele_MVA_ID_cut   = "NONE";  // Electron MVA ID: "MvaWp90ID" or "MvaWpLooseID"
+  float       ele_iso_max      =  -99.0;  // Maximum electron relative isolation
+  float       ele_mIso_max     =  -99.0;  // Maximum electron relative miniIsolation
+  float       ele_d0_max       =  -99.0;  // Maximum electron |dXY| from vertex
+  float       ele_dZ_max       =  -99.0;  // Maximum electron |dZ| from vertex
+  float       ele_SIP_max      =  -99.0;  // Maximum impact parameter significance
+  float       ele_Conv_Veto    =  -99.0;  // Whether apply conversion veto
+  float       ele_MVA_min      =  -99.0;  // Minimum prompt electron lepton MVA (lepMVA) BDT score
+  float	      ele_POG_MVA      =  -99.0;  // Minimum POG MVA score
+  std::string ele_CSV_max      = "NONE";  // Veto electrons with pT < 20 GeV with matching jet passing b-tag threshold
+  float       ele_jet_CSV      =  -99.0;  // Minimum closest jet deepCSV
 
   // Jet selection
   float jet_pt_min       =      -99.0;  // Minimum jet pT
@@ -45,6 +52,17 @@ struct ObjectSelectionConfig {  // Default values taken from 2016
   float jet_ele_dR_min   =      -99.0;  // Minimum dR(electron, jet)
   std::string jet_PU_ID_cut = "NONE";   // Jet passes PU ID cut
   std::vector<float> jet_btag_cuts = {99,99,99}; // Loose, medium, and tight b-tag thresholds 
+  std::string JEC_file   = "NONE"; //path to the JEC txt file
+
+  // Photon selection
+  float phot_pt_min            =      -99.0;  // Minimum photon pT
+  float phot_eta_max           =      -99.0;  // Maximum photon |eta|
+  float phot_eta_gap_min       =      -99.0;  // Minimum photon gap eta
+  float phot_eta_gap_max       =      -99.0;  // Maximum photon gap eta
+  float phot_mu_dR_max         =      -99.0;  // Maximum dR(muon, photon)
+  float phot_rel_iso_max       =      -99.0;  // Maximum photon iso
+  float phot_pt_over_mu_pt_max =      -99.0;  // Maximum ET ratio phot/muon 
+  float phot_dR_over_et2_max   =      -99.0;  // Maximum dR(mu,phot)/ET^2(phot)
 
   // Higgs candidate pair selection
   std::string muPair_Higgs = "NONE"; // How to choose dimuon candidate pair
@@ -69,6 +87,7 @@ void ConfigureObjectSelection( ObjectSelectionConfig & cfg, const std::string _y
 bool MuonPass ( const ObjectSelectionConfig & cfg, const MuonInfo & muon, const NTupleBranches & br, const bool verbose = false );
 bool ElePass  ( const ObjectSelectionConfig & cfg, const EleInfo & ele, const NTupleBranches & br, const bool verbose = false );
 bool JetPass  ( const ObjectSelectionConfig & cfg, const JetInfo & jet, const NTupleBranches & br, const std::string sel = "", const bool verbose = false );
+bool PhotPass ( const ObjectSelectionConfig & cfg, const PhotInfo & phot, const NTupleBranches & br, const bool verbose = false);
 
 int JetMuonClean( const ObjectSelectionConfig & cfg, const JetInfo & jet, const MuonInfo & mu, const NTupleBranches & br, const bool verbose = false );
 int JetEleClean ( const ObjectSelectionConfig & cfg, const JetInfo & jet, const EleInfo & ele, const NTupleBranches & br, const bool verbose = false );
@@ -77,7 +96,8 @@ MuonInfos    SelectedMuons    ( const ObjectSelectionConfig & cfg, const NTupleB
 MuPairInfos  SelectedMuPairs  ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const std::string sel = "OS", const bool verbose = false );  // Return selected dimuon pairs in event
 MuPairInfo   SelectedCandPair ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const bool verbose = false );  // Return selected dimuon Higgs candidate pair
 EleInfos     SelectedEles     ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const bool verbose = false );  // Return selected electrons in event
-JetInfos     SelectedJets     ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const std::string sel = "", const bool verbose = false );  // Return selected jets in event
+JetInfos     SelectedJets     ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const std::string JEC_sys = "noSys", const std::string sel = "", const bool verbose = false );  // Return selected jets in event
 JetPairInfos SelectedJetPairs ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const std::string sel = "", const bool verbose = false );  // Return selected dijet pairs in event
+PhotInfos    SelectedPhots    ( const ObjectSelectionConfig & cfg, const NTupleBranches & br, const bool verbose = false );
 
 #endif  // #ifndef OBJECT_SELECTION

@@ -7,18 +7,21 @@
 
 #include "TChain.h"
 
-#include "Ntupliser/DiMuons/interface/NTupleBranches.h"
+#include "Ntupliser/DiMuons/interface/NTupleBranches.h"  // include object struct definitions muon, electron, jets etc.
 
 void ASSERT(bool condition, std::string message);
 
 struct NTupleBranches {
   EventInfo * event = 0;
   VertexInfos * vertices = 0;
-  
+
+  MuonInfos * muons_orig = 0; // separate pointer that reads the muons from the ntuple, in order to apply post-ntuple Roch correction and uncertainty  
   MuonInfos * muons = 0;
   MuPairInfos * muPairs = 0;
   
   EleInfos * eles = 0;
+
+  PhotInfos * phots = 0;
   
   JetInfos * jets = 0;
   JetInfos * jets_JES_up = 0;
@@ -50,6 +53,7 @@ struct NTupleBranches {
   int nMuons = -99;
   int nMuPairs = -99;
   int nEles = -99;
+  int nPhots = -99;
   int nJets = -99;
   int nJetPairs = -99;
   int nJetsCent = -99;
@@ -122,6 +126,7 @@ struct NTupleBranches {
   float IsoMu_SF_bug = -99;
   float IsoMu_SF_bug_up = -99;
   float IsoMu_SF_bug_down = -99;
+///////
 
   float MuID_SF_3 = -99;
   float MuID_SF_3_up = -99;
@@ -141,11 +146,18 @@ struct NTupleBranches {
   float PU_wgt_up = -99;
   float PU_wgt_down = -99;
 
-  int GEN_wgt = -99;
+  float l1pref_wgt = 1.0;
+  float l1pref_wgt_up = -99;
+  float l1pref_wgt_down = -99;
+
+  float MG_wgt = -99; //MG_wgt only for TH samples
+
+  float GEN_wgt = -99; // now MG_wgt included in GEN_wgt
+  int   GEN_wgt_int = -99; // to read the old integer GEN_wgt
 };
 
 
-void SetBranchAddresses(TChain & ch_, NTupleBranches & br_, std::vector<std::string> opts = {}, bool verbose = false);
+void SetBranchAddresses(TChain & ch_, NTupleBranches & br_, std::vector<std::string> opts = {}, std::string jet_sys = "noSys", bool verbose = false);
 
 JetInfos ConvertSlimJets(SlimJetInfos & _slimJets);
 

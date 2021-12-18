@@ -16,6 +16,7 @@ import ROOT as R
 ## Configure the script user
 if 'abrinke1' in os.getcwd(): USER = 'abrinke1'
 if 'bortigno' in os.getcwd(): USER = 'bortigno'
+if 'eyigitba' in os.getcwd(): USER = 'eyigitba'
 if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 
 ## Settings for this stack-drawing job
@@ -27,8 +28,8 @@ if USER == 'abrinke1':
     SAMPLES['H2Mu_VBF_120'] = ['H2Mu_VBF_120_NLO_1', 'H2Mu_VBF_120_NLO_2']
     SAMPLES['H2Mu_VBF']     = ['H2Mu_VBF_125_NLO_1', 'H2Mu_VBF_125_NLO_2']
     SAMPLES['H2Mu_VBF_130'] = ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2']
-    SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_MG_1', 'ZJets_MG_2']
-    SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_MG']
+    SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_AMC-ext', 'ZJets_MG_1', 'ZJets_MG_2']
+    SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_AMC-ext', 'ZJets_hiM_MG']
     SAMPLES['tt_ll']        = ['tt_ll_POW', 'tt_ll_MG', 'tt_ll_AMC']
     SAMPLES['ttZ']          = ['ttZ', 'ttZ_1', 'ttZ_2']
 
@@ -60,8 +61,74 @@ if USER == 'abrinke1':
     #               'e2mu_allMass_medLepMVA_onZ10_ge2j_btag']
 
 
+elif USER == 'eyigitba':
+    YEARS    = ['2016', '2017', '2018']  ## Dataset years (2016, 2017, 2018)
+    PLOT_DIR = '/afs/cern.ch/work/e/eyigitba/public/H2Mu/YEAR/Histograms'
+
+    SAMPLES = {}  ## Sets of samples to merge
+    SAMPLES['H2Mu_VBF_120'] = ['H2Mu_VBF_120_NLO_1', 'H2Mu_VBF_120_NLO_2']
+    SAMPLES['H2Mu_VBF']     = ['H2Mu_VBF_125_NLO_1', 'H2Mu_VBF_125_NLO_2']
+    SAMPLES['H2Mu_VBF_130'] = ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2', 'H2Mu_VBF_130']
+    SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_AMC-ext', 'ZJets_MG_1', 'ZJets_MG_2']
+    SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_AMC-ext', 'ZJets_hiM_MG']
+    SAMPLES['tt_ll']        = ['tt_ll_POW', 'tt_ll_MG', 'tt_ll_AMC']
+    SAMPLES['ttZ']          = ['ttZ', 'ttZ_1', 'ttZ_2']
+
+    LABEL      = 'WH_lep_AWB_2019_10_20_BtagSF'
+    CATEGORIES = ['3lep_hiPt_lep20_medLepMVA_noZ10_noBtag_noSys',
+                  '3lep_hiPt_lep20_medLepMVA_onZ10_noBtag_noSys']
+
 elif USER == 'xzuo':
-    PLOT_DIR = 'NONE'
+    YEARS    = ['2016', '2017', '2018']  ## Dataset years (2016, 2017, 2018)
+    PLOT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/YEAR/Histograms'
+
+    SAMPLES = {}  ## Sets of samples to merge
+    SAMPLES['H2Mu_VBF_120'] = ['H2Mu_VBF_120_NLO_1', 'H2Mu_VBF_120_NLO_2']
+    SAMPLES['H2Mu_VBF']     = ['H2Mu_VBF_125_NLO_1', 'H2Mu_VBF_125_NLO_2']
+    SAMPLES['H2Mu_VBF_130'] = ['H2Mu_VBF_130_NLO_1', 'H2Mu_VBF_130_NLO_2', 'H2Mu_VBF_130']
+    SAMPLES['ZJets']        = ['ZJets_AMC', 'ZJets_AMC-ext', 'ZJets_MG_1', 'ZJets_MG_2']
+    SAMPLES['ZJets_hiM']    = ['ZJets_hiM_AMC', 'ZJets_hiM_AMC-ext', 'ZJets_hiM_MG']
+    SAMPLES['tt_ll']        = ['tt_ll_POW', 'tt_ll_MG', 'tt_ll_AMC']
+    SAMPLES['ttZ']          = ['ttZ', 'ttZ_1', 'ttZ_2']
+
+    LABEL      = 'WH_lep_add_MHT_JES_shift_for_ARC_2020_07_04'
+#    LABEL      = 'WH_lep_preApp_final_SR_CR_missHit_2020_05_09'
+
+    CATEGORIES = ['3lep_lep20_MissHits1_medLepMVA_SR_Bveto_noSys',
+                  '3mu_lep20_MissHits1_medLepMVA_SR_Bveto_noSys',
+                  'e2mu_lep20_MissHits1_medLepMVA_SR_Bveto_noSys']
+#    CATEGORIES = ['3lep_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  '3lep_lep20_medLepMVA_DYCR_Bveto_noSys',
+#                  '3lep_lep20_WZCR_SMPWZ_noSys',
+#                  '3lep_lep20_DYCR_SMPWZ_noSys',
+#                  '3mu_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  '3mu_lep20_medLepMVA_DYCR_Bveto_noSys',
+#                  '3mu_lep20_WZCR_SMPWZ_noSys',
+#                  '3mu_lep20_DYCR_SMPWZ_noSys',
+#                  'e2mu_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  'e2mu_lep20_medLepMVA_DYCR_Bveto_noSys',
+#                  'e2mu_lep20_WZCR_SMPWZ_noSys',
+#                  'e2mu_lep20_DYCR_SMPWZ_noSys']
+#    CATEGORIES = ['3lep_lep20_MissHits0_medLepMVA_WZCR_Bveto_noSys',
+#                  '3lep_lep20_MissHits0_medLepMVA_SR_Bveto_noSys',
+#                  '3lep_lep20_MissHits1_medLepMVA_WZCR_Bveto_noSys',
+#                  '3lep_lep20_MissHits1_medLepMVA_SR_Bveto_noSys',
+#                  '3lep_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  '3lep_lep20_medLepMVA_SR_Bveto_noSys',
+#                  '3mu_lep20_MissHits0_medLepMVA_WZCR_Bveto_noSys',
+#                  '3mu_lep20_MissHits0_medLepMVA_SR_Bveto_noSys',
+#                  '3mu_lep20_MissHits1_medLepMVA_WZCR_Bveto_noSys',
+#                  '3mu_lep20_MissHits1_medLepMVA_SR_Bveto_noSys',
+#                  '3mu_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  '3mu_lep20_medLepMVA_SR_Bveto_noSys',
+#                  'e2mu_lep20_MissHits0_medLepMVA_WZCR_Bveto_noSys',
+#                  'e2mu_lep20_MissHits0_medLepMVA_SR_Bveto_noSys',
+#                  'e2mu_lep20_MissHits1_medLepMVA_WZCR_Bveto_noSys',
+#                  'e2mu_lep20_MissHits1_medLepMVA_SR_Bveto_noSys',
+#                  'e2mu_lep20_medLepMVA_WZCR_Bveto_noSys',
+#                  'e2mu_lep20_medLepMVA_SR_Bveto_noSys']
+
+
 elif USER == 'bortigno':
     PLOT_DIR = 'NONE'
 else: print 'Invalid USER = %s' % USER
@@ -78,7 +145,7 @@ def MergeOneCat(category, year):
     #######################################
 
     if USER == 'abrinke1': in_file_dir = PLOT_DIR.replace('YEAR', year)+'/'+LABEL+'/files/HADD'
-    else:                  in_file_dir = PLOT_DIR.replace('YEAR', year)+'/'+LABEL+'/files/sum'
+    else:                  in_file_dir = PLOT_DIR.replace('YEAR', year)+'/'+LABEL+'/files/HADD'
 
     in_file_name  = in_file_dir+'/histos_PreselRun2_%s.root' % category  ## File with input histograms
     out_file_name = in_file_name.replace('.root', '_merged.root')

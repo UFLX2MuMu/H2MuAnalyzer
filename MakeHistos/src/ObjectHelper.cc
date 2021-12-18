@@ -1,5 +1,5 @@
 #include "H2MuAnalyzer/MakeHistos/interface/ObjectHelper.h"
-
+#include "H2MuAnalyzer/GeoFit/GeoFitCorr.C"
 
 ////////////////////////
 ///  Muon functions  ///
@@ -60,11 +60,75 @@ bool MuonTrig ( const MuonInfo & muon, const std::string year, const std::vector
   assert(false);
 }
 
+
+// Return Rochester pt with systematic shifts
+float Roch_pt_shift(const RoccoR rc, const MuonInfo & muon, float gen_pt, const std::string Roch_sys) {
+  if (gen_pt == 0) {
+//    std::cout << "no gen match found for muon. Do not apply Roch sys shift. Just use nominal Roch" << std::endl; 
+    return muon.pt_Roch;  // do not have variable trackerLayersWithMeasurement available. Cannot do kSmearMC
+  }
+  double mcSF    = rc.kSpreadMC     ( muon.charge, muon.pt_trk, muon.eta_trk, muon.phi_trk, gen_pt, 0, 0 );
+  double mcSFerr = rc.kSpreadMCerror( muon.charge, muon.pt_trk, muon.eta_trk, muon.phi_trk, gen_pt );
+
+  if ( abs(muon.pt_trk * mcSF - muon.pt_Roch)/muon.pt_Roch > 0.005) { 
+    std::cout << "bizzare case: muon pt = " << muon.pt << ", pt_trk = " << muon.pt_trk << ", saved Roch pt = " << muon.pt_Roch 
+              << ", now Roch pt = " << muon.pt_trk * mcSF << ", gen pt = " << gen_pt << std::endl;
+  }
+  if (mcSFerr > 0.005) std::cout << "rare case: Roch error is " << mcSFerr << std::endl;
+  if      (Roch_sys == "Roch_up")   return muon.pt_trk * (mcSF + mcSFerr); 
+  else if (Roch_sys == "Roch_down") return muon.pt_trk * (mcSF - mcSFerr); 
+  else {
+    //std::cout << "systematic is " << Roch_sys <<". Not related to Rochester. Return nominal Roch pt from ntuple." << std::endl;
+    return muon.pt_Roch;
+  }
+}
+
+// Return muon collection with systematic shifted Roch pt
+MuonInfos ReloadMuonRoch(const RoccoR rc, const MuonInfos & muons_orig, const GenMuonInfos & genMuons, const std::string Roch_sys) {
+  MuonInfos muons;
+  for (const auto & mu_orig : muons_orig) {
+    MuonInfo muon = mu_orig;
+    float gen_pt = 0;
+    TLorentzVector mu_vec = FourVec(muon, "PF");
+    for (const auto & gen_mu : genMuons) {
+      TLorentzVector gen_vec = FourVec(gen_mu);
+      if ( mu_vec.DeltaR(gen_vec)<0.005 ) { gen_pt = gen_vec.Pt(); } // if mu and gen are in an arbitrary small cone,
+    }
+    muon.pt_Roch = Roch_pt_shift(rc, muon, gen_pt, Roch_sys);
+    muons.push_back(muon);
+  }
+  return muons;
+} // End function: MuonInfos ReloadMuonRoch()
+
+MuonInfos ReloadMuonRoch_data(const RoccoR rc, const MuonInfos & muons_orig, const std::string Roch_sys) {
+  MuonInfos muons;
+  for (const auto & mu_orig : muons_orig) {
+    MuonInfo muon = mu_orig;
+    if (muon.isTracker == 0) { muons.push_back(muon); continue; } // Roch only applied to tracker muon in ntuple, (medium muons are always tracker muons)
+    double dtSF    = rc.kScaleDT     ( muon.charge, muon.pt_trk, muon.eta_trk, muon.phi_trk, 0, 0 );
+    double dtSFerr = rc.kScaleDTerror( muon.charge, muon.pt_trk, muon.eta_trk, muon.phi_trk );
+    if ( abs(muon.pt_trk * dtSF - muon.pt_Roch)/muon.pt_Roch > 0.005) {
+      std::cout << "bizzare case: muon pt = " << muon.pt << ", pt_trk = " << muon.pt_trk << ", saved Roch pt = " << muon.pt_Roch
+                << ", now Roch pt = " << muon.pt_trk * dtSF << std::endl;
+    }
+    if (dtSFerr > 0.005) std::cout << "rare case: Roch error is " << dtSFerr << std::endl;
+    if      (Roch_sys == "Roch_up")   muon.pt_Roch = muon.pt_trk * (dtSF + dtSFerr); 
+    else if (Roch_sys == "Roch_down") muon.pt_Roch = muon.pt_trk * (dtSF - dtSFerr); 
+    else {
+      //std::cout << "systematic is " << Roch_sys <<". Not related to Rochester. Return central Roch pt value." << std::endl;
+      muon.pt_Roch = muon.pt_trk * dtSF;
+    }
+    muons.push_back(muon);
+  }
+  return muons;
+} // End function: MuonInfos ReloadMuonRoch_data()
+
 // Return PF, Rochester, or Kalman corrected muon pT
 float MuonPt ( const MuonInfo & muon, const std::string pt_corr ) {
   if ( pt_corr == "PF"   ) return muon.pt;
   if ( pt_corr == "Roch" ) return muon.pt_Roch;
   if ( pt_corr == "KaMu" ) return muon.pt_KaMu;
+
   std::cout << "\n\nInside ObjectHelper.cc, invalid option pt_corr = " << pt_corr << std::endl;
   assert(false);
 }
@@ -90,8 +154,8 @@ float MuPairMass ( const MuPairInfo & muPair, const std::string pt_corr ) {
 // Return PF, Rochester, or Kalman corrected dimuon invariant mass uncertainty
 float MuPairMassErr ( const MuPairInfo & muPair, const std::string pt_corr ) {
   if ( pt_corr == "PF"   ) return muPair.massErr;
-  if ( pt_corr == "Roch" ) return muPair.massErr_Roch;
-  if ( pt_corr == "KaMu" ) return muPair.massErr_KaMu;
+  if ( pt_corr.find("Roch") != std::string::npos ) return muPair.massErr_Roch;
+  if ( pt_corr.find("KaMu") != std::string::npos ) return muPair.massErr_KaMu;
   std::cout << "\n\nInside ObjectHelper.cc, invalid option pt_corr = " << pt_corr << std::endl;
   assert(false);
 }
@@ -124,7 +188,7 @@ TH2F * LoadSFsLepMVA( const std::string year, const std::string flavor, const st
 }
 
 // Return lepton MVA scale factor for a single lepton
-float LepMVASF( const TH2F * h_SF, const float pt, const float eta ) {
+float LepMVASF( const TH2F * h_SF, const float pt, const float eta, const std::string SF_sys ) {
 
   float min_pt  = h_SF->GetXaxis()->GetBinLowEdge(0) + 0.01;
   float max_pt  = h_SF->GetXaxis()->GetBinLowEdge( h_SF->GetNbinsX() + 1 ) - 0.01;
@@ -134,7 +198,12 @@ float LepMVASF( const TH2F * h_SF, const float pt, const float eta ) {
   int iPt  = h_SF->GetXaxis()->FindBin( std::min( std::max(pt , min_pt ), max_pt ) );
   int iEta = h_SF->GetYaxis()->FindBin( std::min( std::max(eta, min_eta), max_eta) );
 
-  return h_SF->GetBinContent(iPt, iEta);
+  // here muon and electron are not distinguished for up/down shifts. One should make sure the SF_sys is given correctly
+  if      (SF_sys == "LepMVA_SF_mu_up")    return h_SF->GetBinContent(iPt, iEta) + h_SF->GetBinError(iPt, iEta);
+  else if (SF_sys == "LepMVA_SF_ele_up")   return h_SF->GetBinContent(iPt, iEta) + h_SF->GetBinError(iPt, iEta);  
+  else if (SF_sys == "LepMVA_SF_mu_down")  return h_SF->GetBinContent(iPt, iEta) - h_SF->GetBinError(iPt, iEta);
+  else if (SF_sys == "LepMVA_SF_ele_down") return h_SF->GetBinContent(iPt, iEta) - h_SF->GetBinError(iPt, iEta);
+  else 					   return h_SF->GetBinContent(iPt, iEta);
 }
 
 // Determine if dimuon pair is matched to GEN pair
@@ -187,11 +256,18 @@ bool EleID ( const EleInfo & ele, const std::string ele_ID ) {
   if ( ele_ID == "loose" ) return ele.isLooseID;
   if ( ele_ID == "medium") return ele.isMediumID;
   if ( ele_ID == "tight" ) return ele.isTightID;
+  if ( ele_ID == "tZq"   ) return ele.isTZqID;
   std::cout << "\n\nInside ObjectHelper.cc, invalid option ele_ID = " << ele_ID << std::endl;
   assert(false);
 }
 
-
+// Return MvaWpLooseID or MvaWp90ID electron ID
+bool EleMVAID ( const EleInfo & ele, const std::string ele_MVA_ID ) {
+  if ( ele_MVA_ID == "MvaWp90ID" ) return ele.isMvaWp90ID;
+  if ( ele_MVA_ID == "MvaWpLooseID") return ele.isMvaWpLooseID;
+  std::cout << "\n\nInside ObjectHelper.cc, invalid option ele_MVA_ID = " << ele_MVA_ID << std::endl;
+  assert(false);
+}
 
 ///////////////////
 ///  lepMVA SF  ///
@@ -265,14 +341,26 @@ bool JetPUID ( const JetInfo & jet, const std::string PU_ID, const std::string y
 
   float puID_cut = 999;  // Minimum puID value to pass cut
 
-  if (year == "Legacy2016" || year == "2016") return true; // What is the true PU ID for 2016? - AWB 01.07.2019
+  if (year == "Legacy2016") return true; // What is the true PU ID for 2016? - AWB 01.07.2019
   
-  else if (year == "2017" || year == "2018") { // What is the true PU ID for 2018? - AWB 03.05.2019
+  else if (year == "2016" || year == "2017" || year == "2018") { // What is the true PU ID for 2018? - AWB 03.05.2019
+  // updated following twiki https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJetID#Working_points - XWZ 03.11.2020
+  // Also implementing PU ID scheme suggested by Raffaele in VBF, although zero impact in VH channel.  - XWZ 03.11.2020
+    if (year == "2017" and abs(jet.eta)>2.65 and abs(jet.eta)<3.139) {
+      // apply tight PU ID regardless of pt
+      if      ( abs(jet.eta) < 2.50 ) {
+        puID_cut = (jet.pt < 30 ? +0.69 : +0.86); }
+      else if ( abs(jet.eta) < 2.75 ) {
+        puID_cut = (jet.pt < 30 ? -0.35 : -0.10); }
+      else if ( abs(jet.eta) < 3.00 ) {
+        puID_cut = (jet.pt < 30 ? -0.26 : -0.05); }
+      else if ( abs(jet.eta) < 5.00 ) {
+        puID_cut = (jet.pt < 30 ? -0.21 : -0.01); }
+      else { std::cout << "Inside JetPUID, invalid jet eta = " << jet.eta << std::endl; assert(false); }
+    }
 
     if (jet.pt >= 50) return true;
 
-    // Where do these numbers come from?!?  No recommendation on the following twiki - AWB 24.09.2018
-    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJetID
     if ( PU_ID == "loose" ) {
       if      ( abs(jet.eta) < 2.50 ) {
 	puID_cut = (jet.pt < 30 ? -0.97 : -0.89); }
@@ -301,9 +389,9 @@ bool JetPUID ( const JetInfo & jet, const std::string PU_ID, const std::string y
       else if ( abs(jet.eta) < 2.75 ) {
 	puID_cut = (jet.pt < 30 ? -0.35 : -0.10); }
       else if ( abs(jet.eta) < 3.00 ) {
-	puID_cut = (jet.pt < 30 ? -0.42 : -0.23); }
+	puID_cut = (jet.pt < 30 ? -0.26 : -0.05); }
       else if ( abs(jet.eta) < 5.00 ) {
-	puID_cut = (jet.pt < 30 ? -0.36 : -0.17); }
+	puID_cut = (jet.pt < 30 ? -0.21 : -0.01); }
       else { std::cout << "Inside JetPUID, invalid jet eta = " << jet.eta << std::endl; assert(false); }
     }
 
@@ -325,6 +413,60 @@ float JetCSV( const JetInfo & jet, const std::string opt ) {
     else                      return jet.deepCSV;
   }
 } // End function: float JetCSV()
+
+JetInfo ApplyJECuncert (const JetInfo & jet, const std::string year, const std::string JEC_file, const std::string JEC_sys ) {
+  JetInfo jet_shift = jet;
+  bool is_up = true;
+  std::string JEC_source = JEC_sys;
+
+  if (jet.pt < 15 or jet.pt > 6500 or fabs(jet.eta) > 4.7) {
+    std::cout << "do not apply JEC to jet pt = " << jet.pt << "  eta = " << jet.eta << std::endl;
+    return jet_shift;
+  }
+
+  if (JEC_source.find("_up") != std::string::npos) {
+    JEC_source.erase( JEC_source.find("_up"), std::string("_up").length() );
+    is_up = true;
+  }
+  else if (JEC_source.find("_down") != std::string::npos) {
+    JEC_source.erase( JEC_source.find("_down"), std::string("_down").length() );
+    is_up = false;
+  }
+  else if (JEC_source != "noSys") {
+    std::cout << "JEC_sys = " << JEC_sys << "  ,no up/down shift direction specified. Exit." << std::endl;
+    assert(false);
+  }
+
+  if ( JEC_source.find("_2016") != std::string::npos and year != "2016" ) JEC_source = "noSys"; // do not apply year-specific source to other years
+  if ( JEC_source.find("_2017") != std::string::npos and year != "2017" ) JEC_source = "noSys"; // do not apply year-specific source to other years
+  if ( JEC_source.find("_2018") != std::string::npos and year != "2018" ) JEC_source = "noSys"; // do not apply year-specific source to other years
+
+  if (JEC_source == "noSys") return jet_shift;
+  else if ( JEC_source != "Absolute"            and  JEC_source != "BBEC1"               and  JEC_source != "EC2" and 
+            JEC_source != "FlavorQCD"           and  JEC_source != "HF"                  and  JEC_source != "RelativeBal" and 
+            JEC_source != "Absolute_2016"       and  JEC_source != "Absolute_2017"       and  JEC_source != "Absolute_2018" and 
+            JEC_source != "BBEC1_2016"          and  JEC_source != "BBEC1_2017"          and  JEC_source != "BBEC1_2018" and
+            JEC_source != "EC2_2016"            and  JEC_source != "EC2_2017"            and  JEC_source != "EC2_2018" and
+            JEC_source != "HF_2016"             and  JEC_source != "HF_2017"             and  JEC_source != "HF_2018" and
+            JEC_source != "RelativeSample_2016" and  JEC_source != "RelativeSample_2017" and  JEC_source != "RelativeSample_2018"
+          )  return jet_shift;
+  else { 
+      // only apply JEC uncert when the source is in the file
+      JetCorrectorParameters_x *JECpar = new JetCorrectorParameters_x( JEC_file, JEC_source );
+      JetCorrectionUncertainty_x *JECunc = new JetCorrectionUncertainty_x(*JECpar);
+      JECunc -> setJetPt(jet.pt);
+      JECunc -> setJetEta(jet.eta);
+
+      float uncert = JECunc->getUncertainty(is_up);
+      if (is_up) jet_shift.pt = jet.pt * (1 + uncert);
+      else       jet_shift.pt = jet.pt * (1 - uncert);
+      
+      delete JECpar;
+      delete JECunc;
+  }
+  return jet_shift;
+} // End function: JetInfo JECuncert()
+
 
 // Return a new JetPair object, modeled on Ntupliser/DiMuons/src/JetPairHelper.cc
 JetPairInfo MakeJetPair( TLorentzVector jet1_vec, TLorentzVector jet2_vec ) {
@@ -354,6 +496,30 @@ JetPairInfo MakeJetPair( TLorentzVector jet1_vec, TLorentzVector jet2_vec ) {
 ///////////////////////////////
 ///  Four-vector functions  ///
 ///////////////////////////////
+TLorentzVector FourVecFSRGeoFit( const MuonInfo & muon, const int idx, const std::string pt_corr, const int year, const std::string fg, const PhotInfos & phots, const std::string opt ) {
+  TLorentzVector vec = FourVec(muon, pt_corr);
+  bool DidFSR = false;
+  if (fg.find("FSR") != std::string::npos) {
+    for (const auto & phot: phots) {
+      if (phot.mu_idx == idx) {
+	vec += FourVec(phot);
+	//std::cout << "applying FSR to muon: " << std::endl;
+	//std::cout << "muon preFSR pt: " << muon.pt_Roch << ",   photon pt: " << FourVec(phot).Pt() << ",    postFSR pt: " << vec.Pt() << std::endl;
+	DidFSR = true;
+      }
+    }
+  }
+  if (fg.find("GeoFit") != std::string::npos and not DidFSR) vec.SetPtEtaPhiM( GeoFit::PtCorrGeoFit(muon.d0_BS * muon.charge, muon.pt_Roch, muon.eta, year), muon.eta, muon.phi, 0.105658367 );
+  if (opt == "T") vec.SetPtEtaPhiM( vec.Pt(), 0, vec.Phi(), 0.105658367);
+  return vec;  
+}
+TLorentzVector FourVecFSRGeoFit( const MuPairInfo & muPair, const std::string pt_corr, const int year, const std::string fg, const MuonInfos & muons, const PhotInfos & phots, const std::string opt ) {
+  TLorentzVector vec;
+  TLorentzVector mu1_vec = FourVecFSRGeoFit(muons.at(muPair.iMu1), muPair.iMu1, pt_corr, year, fg, phots, opt);
+  TLorentzVector mu2_vec = FourVecFSRGeoFit(muons.at(muPair.iMu2), muPair.iMu2, pt_corr, year, fg, phots, opt);
+  vec = mu1_vec + mu2_vec;
+  return vec;
+}
 
 TLorentzVector FourVec( const MuonInfo & muon, const std::string pt_corr, const std::string opt ) {
   TLorentzVector vec;
@@ -434,7 +600,14 @@ TLorentzVector FourVec( const MuonInfos & muons, const std::string pt_corr, cons
   if (opt == "T") vec.SetPtEtaPhiM( vec.Pt(), 0, vec.Phi(), 0 );
   return vec;
 }
-
+TLorentzVector FourVec( const PhotInfo & phot, const std::string opt ) {
+  TLorentzVector vec;
+  if (opt == "T")
+    vec.SetPtEtaPhiM(phot.pt,       0, phot.phi, 0 );
+  else
+    vec.SetPtEtaPhiM(phot.pt, phot.eta, phot.phi, 0 );
+  return vec;
+}
 
 ///////////////////////////////
 ///  Correlation functions  ///

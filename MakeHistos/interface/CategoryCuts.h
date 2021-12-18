@@ -8,6 +8,6 @@
 #include "H2MuAnalyzer/MakeHistos/interface/ObjectSelection.h"
 
 bool InCategory( const ObjectSelectionConfig & cfg, const NTupleBranches & br,
-		 const std::string sel, const bool verbose = false);
+		 const std::string SYS, const std::string sel, const bool verbose = false);
 
 #endif  // #ifndef CATEGORY_CUTS

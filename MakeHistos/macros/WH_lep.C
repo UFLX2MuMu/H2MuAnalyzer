@@ -70,7 +70,7 @@ const TString HIST_TREE = "HistTree"; // "Hist", "Tree", or "HistTree" to output
 const std::vector<std::string> SEL_CUTS = {"PreselRun2"};
 // Multiple selection cuts, applied independently in parallel
 const std::vector<std::string> OPT_CUTS = {"3lep"};
-// const std::vector<std::string> OPT_CUTS = {"3lep_allMass", "3mu_allMass", "e2mu_allMass"};
+//const std::vector<std::string> OPT_CUTS = {"3lep_allMass", "3mu_allMass", "e2mu_allMass"};
 // Category selection cuts, also applied in parallel
 // *** IMPORTANT!!! No category name may start with a sub-string which is identical to another entire category name! ***
 const std::vector<std::string> CAT_CUTS = { "looseLepMVA_noZ5_noBtag",
@@ -255,6 +255,14 @@ void WH_lep( TString sample = "", TString in_dir = "", TString out_dir = "",
     if (verbose) std::cout << "Before running GetEntry, event = " << br.event->event;
     
     in_chain->GetEntry(iEvt);
+
+     // process muon collection and load new ones with Roch pt with systematic shifts 
+    MuonInfos muons_tmp;
+    if ( not sample.Contains("SingleMu") and SYS.find("Roch_") != std::string::npos ) {
+      muons_tmp = ReloadMuonRoch(Roch_Cor, *br.muons_orig, *br.genMuons, SYS);
+      br.muons = &muons_tmp;
+    }
+    else br.muons = br.muons_orig;
     
     if (verbose) std::cout << "... after, event = " << br.event->event << std::endl;
 
@@ -290,7 +298,7 @@ void WH_lep( TString sample = "", TString in_dir = "", TString out_dir = "",
     }
 
     // Initialize the selected Higgs candidate dimuon pair
-    MuPairInfo     H_pair;  // When filling histograms, have only one candidate pair at a time
+    MuPairInfo     H_pair;     // When filling histograms, have only one candidate pair at a time
     TLorentzVector H_pair_vec(0,0,0,0);
 
     bool MU = false;  // Says whether event has 3 muons or 1 electron + 2 muons

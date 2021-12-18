@@ -10,10 +10,12 @@ from ROOT import *
 ## Configure the script user
 if 'abrinke1' in os.getcwd(): USER = 'abrinke1'
 if 'bortigno' in os.getcwd(): USER = 'bortigno'
+if 'eyigitba' in os.getcwd(): USER = 'eyigitba'
 if 'xzuo'     in os.getcwd(): USER = 'xzuo'
 
 ## Directory for input histograms and output plots
 if USER == 'abrinke1': PLOT_DIR = '/afs/cern.ch/work/a/abrinke1/public/H2Mu/2018/Histograms'
+if USER == 'eyigitba': PLOT_DIR = '/afs/cern.ch/work/e/eyigitba/public/H2Mu/2018/Histograms'
 if USER == 'xzuo':     PLOT_DIR = '/afs/cern.ch/work/x/xzuo/public/H2Mu/2018/Histograms'
 
 LABEL = 'VH_toy_2017_v4_v9'  ## Sub-folder within PLOT_DIR containing histograms
